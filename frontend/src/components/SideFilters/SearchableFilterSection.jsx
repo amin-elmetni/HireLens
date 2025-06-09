@@ -24,7 +24,7 @@ const SearchableFilterSection = ({
         className='flex items-center justify-between mb-4 cursor-pointer'
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <h2 className='text-lg font-semibold'>{title}</h2>
+        <h2 className='text-lg font-semibold truncate'>{title}</h2>
         <ChevronDown
           className={`h-5 w-5 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
         />
@@ -75,7 +75,7 @@ const SearchableFilterSection = ({
           )}
 
           {/* Items List */}
-          <div className='max-h-60 overflow-y-auto space-y-1 pr-2'>
+          <div className='max-h-60 overflow-y-auto scrollbar-custom space-y-1 pr-2'>
             {filteredItems.length > 0 ? (
               filteredItems.map(item => (
                 <div

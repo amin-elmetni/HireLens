@@ -19,7 +19,7 @@ const ExperienceRangeFilter = ({
         className='flex items-center justify-between mb-4 cursor-pointer'
         onClick={toggleExpand}
       >
-        <h2 className='text-lg font-semibold'>Years of Experience</h2>
+        <h2 className='text-lg font-semibold truncate'>Years of Experience</h2>
         <ChevronDown
           className={`h-5 w-5 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
         />

@@ -1,17 +1,75 @@
+import React, { useState } from 'react';
+import { TbLayoutSidebarLeftExpandFilled } from 'react-icons/tb';
+import { TbLayoutSidebarRightExpandFilled } from 'react-icons/tb';
 import NavBar from '@/components/NavBar/NavBar';
 import SideFilters from '@/components/SideFilters/SideFilters';
 import ResumesLayout from '@/components/ResumeLayout/ResumesLayout';
-import React from 'react';
+import { useSideFilters } from '@/hooks/useSideFilters';
 
 const Resumes = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isClicked, setIsClicked] = useState(false);
+  const { loading } = useSideFilters();
+
   return (
     <div className='bg-background min-h-screen'>
       <NavBar />
-      <div className='flex gap-10 px-16 py-10'>
-        <div className='w-[20%]'>
-          <SideFilters />
+      <div className='relative flex transition-all duration-300 px-14 py-10 gap-4'>
+        {/* Sticky Toggle Button */}
+        <button
+          onClick={() => {
+            setSidebarOpen(prev => !prev);
+            setIsClicked(true);
+          }}
+          onTransitionEnd={() => setIsClicked(false)}
+          className={`
+            fixed z-30 left-[-10px] top-32 transform -translate-y-1/2
+            bg-white shadow-md border border-gray-200
+            text-primary text-3xl pl-4 p-2 rounded
+            hover:bg-primary hover:text-white hover:shadow-lg
+            transition-all duration-300 cursor-pointer 
+            ${isClicked ? 'text-white bg-primary' : 'hover:translate-x-1'}
+            ${sidebarOpen ? '-translate-x-full' : 'translate-x-0'}
+          `}
+          title={sidebarOpen ? 'Close Filters' : 'Open Filters'}
+        >
+          {sidebarOpen ? (
+            <TbLayoutSidebarRightExpandFilled className='text-3xl' />
+          ) : (
+            <TbLayoutSidebarLeftExpandFilled className='text-3xl' />
+          )}
+        </button>
+
+        {/* Sidebar Container */}
+        <div className={`${sidebarOpen ? 'w-[22%]' : 'w-0'} transition-all duration-300`}>
+          {/* Sticky Sidebar Content - Fixed height calculation */}
+          <div
+            className={`sticky top-[100px] h-[calc(100vh-140px)] overflow-y-auto overflow-x-hidden pr-6`}
+          >
+            {sidebarOpen && (
+              <>
+                <div className='flex justify-between items-center mb-6'>
+                  <h2 className='text-xl font-bold text-gray-400'>Filters</h2>
+                  <button
+                    onClick={() => setSidebarOpen(false)}
+                    className='text-gray-400 text-3xl cursor-pointer hover:text-primary'
+                    title='Close Filters'
+                  >
+                    <TbLayoutSidebarRightExpandFilled />
+                  </button>
+                </div>
+                {loading ? (
+                  <div className='text-center text-gray-500'>Loading filters...</div>
+                ) : (
+                  <SideFilters />
+                )}{' '}
+              </>
+            )}
+          </div>
         </div>
-        <div className='w-[80%]'>
+
+        {/* Resume Layout */}
+        <div className={`${sidebarOpen ? 'w-[78%]' : 'w-full'} transition-all duration-300`}>
           <ResumesLayout />
         </div>
       </div>

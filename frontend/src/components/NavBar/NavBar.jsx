@@ -4,27 +4,39 @@ import logo from '@/assets/logo.png';
 import NavLink from './NavLink';
 import UserDropdown from './UserDropdown';
 import { useAuthUser } from '@/hooks/useAuthUser';
+import { TbLayoutSidebarLeftExpandFilled } from 'react-icons/tb';
 
-const Navbar = () => {
+const Navbar = ({ onFilterClick }) => {
   const user = useAuthUser();
 
   return (
     <nav className='bg-white sticky top-0 z-50'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex items-center justify-between h-18'>
-          <Link
-            to='/'
-            className='flex items-center gap-2'
-          >
-            <img
-              src={logo}
-              className='w-6'
-              alt='HireLens Logo'
-            />
-            <h1 className='text-lg font-bold tracking-widest'>
-              Hire<span className='text-primary'>Lens</span>
-            </h1>
-          </Link>
+          <div className='flex items-center gap-6'>
+            <div>
+              {/* <button
+                onClick={onFilterClick}
+                className='text-primary text-3xl p-2 rounded hover:bg-gray-100 transition cursor-pointer'
+                aria-label='Open Filters'
+              >
+                <TbLayoutSidebarLeftExpandFilled />
+              </button> */}
+            </div>
+            <Link
+              to='/'
+              className='flex items-center gap-2'
+            >
+              <img
+                src={logo}
+                className='w-6'
+                alt='HireLens Logo'
+              />
+              <h1 className='text-lg font-bold tracking-widest'>
+                Hire<span className='text-primary'>Lens</span>
+              </h1>
+            </Link>
+          </div>
 
           <div className='hidden md:flex items-center space-x-8'>
             <NavLink to='/'>Find Resumes</NavLink>

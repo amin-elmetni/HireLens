@@ -24,12 +24,7 @@ const SideFilters = () => {
     handleApply,
     min,
     max,
-    loading,
   } = useSideFilters();
-
-  if (loading || !filters) {
-    return <div className='text-center text-gray-500'>Loading filters...</div>;
-  }
 
   return (
     <div className='w-full rounded-lg flex flex-col gap-1'>

@@ -6,8 +6,17 @@ export const useSideFilters = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { metadata, loading } = useResumeMetadata();
 
-  const [filters, setFilters] = useState(null);
-  const [tempSelections, setTempSelections] = useState(null);
+  const [filters, setFilters] = useState({
+    categories: [],
+    skills: [],
+    languages: [],
+    experienceRange: [0, 20], // Default range
+  });
+  const [tempSelections, setTempSelections] = useState({
+    categories: [],
+    skills: [],
+    languages: [],
+  });
   const [isExpanded, setIsExpanded] = useState(false);
   const initialized = useRef(false);
 
