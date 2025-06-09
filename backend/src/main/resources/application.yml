@@ -1,0 +1,34 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pfe_db
+    username: postgres
+    password: 1986
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/PFE
+
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  security:
+    user:
+      name: testuser
+      password: testpass
+      roles: USER
+
+server:
+  port: 8090
+
+jwt:
+  secret: ${JWT_SECRET}
+
+storage:
+  resume-directory: C:\Users\LENOVO\Desktop\ENSA\GI3\PFE\resume-recommender

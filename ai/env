@@ -1,0 +1,21 @@
+#? HuggingFace
+HF_TOKEN=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
+
+#? MongoDB Configuration
+MONGO_HOST=localhost
+MONGO_PORT=27017
+MONGO_DB=PFE
+MONGO_COLLECTION=resumes
+
+#? PostgreSQL Configuration
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=pfe_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=1986
+
+#?Wandb
+WANDB_API_KEY=c7fd96016d65daddf2107d846a43cc746c22110b
+
+#? Github Token :
+GITHUB_TOKEN=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
