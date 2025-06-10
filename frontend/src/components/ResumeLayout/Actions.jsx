@@ -55,7 +55,6 @@ const Actions = ({ uuid }) => {
   return (
     <div className='flex items-center justify-between'>
       <div className='flex items-center gap-2 text-sm'>
-      <div className='flex items-center gap-2 text-sm'>
         <div className='flex items-center gap-1 group cursor-default'>
           <FontAwesomeIcon icon='fa-regular fa-thumbs-up' />
           <span>{likeCount}</span>
