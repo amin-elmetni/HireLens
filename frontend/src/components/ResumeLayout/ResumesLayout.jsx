@@ -1,62 +1,170 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ResumeCard from '@/components/ResumeLayout/ResumeCard';
 import { useFilteredResumes } from '@/hooks/useFilteredResumes';
+import { getLikeCount, getResumeByUuid } from '@/api/likeApi';
+import { getCommentCount } from '@/api/commentApi';
 
-const normalize = s => s.toLowerCase().replace(/\s+/g, '_');
-const RESUMES_PER_PAGE = 12;
+const normalize = s => s?.toLowerCase().replace(/\s+/g, '_') ?? '';
+
+const BASE_SORT_OPTIONS = [
+  { value: 'matchingScore', label: 'Matching Score' },
+  { value: 'lastUpdated', label: 'Last Updated' },
+  { value: 'likes', label: 'Number of Likes' },
+  { value: 'comments', label: 'Number of Comments' },
+  { value: 'yearsOfExperience', label: 'Years of Experience' },
+  { value: 'numExperiences', label: 'Number of Experiences' },
+  { value: 'numProjects', label: 'Number of Projects' },
+];
+
+// Dynamic sort options for selected skills/categories
+const getDynamicSortOptions = (
+  availableSkills,
+  availableCategories,
+  selectedSkills,
+  selectedCategories
+) => [
+  ...availableSkills
+    .filter(s => selectedSkills.includes(s.id))
+    .map(s => ({ value: `skill:${s.id}`, label: `Skill: ${s.label}` })),
+  ...availableCategories
+    .filter(c => selectedCategories.includes(c.id))
+    .map(c => ({ value: `category:${c.id}`, label: `Category: ${c.label}` })),
+];
+
+// How to extract the actual sort value for a given resume for a given sort key
+const getSortValue = (resume, sortBy) => {
+  if (sortBy.startsWith('skill:')) {
+    const skillId = sortBy.replace('skill:', '');
+    return (resume.skills || []).find(s => normalize(s.name) === skillId)?.score ?? -Infinity;
+  }
+  if (sortBy.startsWith('category:')) {
+    const categoryId = sortBy.replace('category:', '');
+    return (
+      (resume.categories || []).find(c => normalize(c.name) === categoryId)?.score ?? -Infinity
+    );
+  }
+  switch (sortBy) {
+    case 'matchingScore':
+      return resume._matchingScore ?? 0;
+    case 'lastUpdated':
+      return Date.parse(resume.lastUpdated) || 0;
+    case 'likes':
+      return resume._likes ?? 0;
+    case 'comments':
+      return resume._comments ?? 0;
+    case 'yearsOfExperience':
+      return resume.yearsOfExperience ?? 0;
+    case 'numExperiences':
+      return (resume.experiences || []).length;
+    case 'numProjects':
+      return (resume.projects || []).length;
+    default:
+      return 0;
+  }
+};
 
 const ResumesLayout = () => {
   const { resumes, loading } = useFilteredResumes();
   const [searchParams] = useSearchParams();
+  const [sortBy, setSortBy] = useState('matchingScore');
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
+  // Like and comment counts state
+  const [resumeCounts, setResumeCounts] = useState({}); // { [resumeUuid]: { likes: X, comments: Y } }
+
+  // Get selected skills/categories
+  const selectedSkills = (searchParams.get('skills') || '').split(',').filter(Boolean);
+  const selectedCategories = (searchParams.get('categories') || '').split(',').filter(Boolean);
+
+  // Collect available skills/categories from resumes for dropdown
+  const availableSkills = useMemo(() => {
+    const seen = {};
+    resumes.forEach(r => (r.skills || []).forEach(s => (seen[normalize(s.name)] = s.name)));
+    return Object.entries(seen).map(([id, label]) => ({ id, label }));
+  }, [resumes]);
+  const availableCategories = useMemo(() => {
+    const seen = {};
+    resumes.forEach(r => (r.categories || []).forEach(c => (seen[normalize(c.name)] = c.name)));
+    return Object.entries(seen).map(([id, label]) => ({ id, label }));
+  }, [resumes]);
+
+  // Compose dynamic options
+  const dynamicSortOptions = getDynamicSortOptions(
+    availableSkills,
+    availableCategories,
+    selectedSkills,
+    selectedCategories
+  );
+  const sortOptions = [...BASE_SORT_OPTIONS, ...dynamicSortOptions];
 
   const hasFilters = ['skills', 'categories', 'languages', 'expMin', 'expMax'].some(key =>
     searchParams.has(key)
   );
 
+  // Fetch likes/comments for all resumes and store in state
+  useEffect(() => {
+    const fetchCounts = async () => {
+      const counts = {};
+      await Promise.all(
+        resumes.map(async resume => {
+          try {
+            // get resumeId from uuid
+            const { data: resumeMeta } = await getResumeByUuid(resume.uuid);
+            if (!resumeMeta?.id) return;
+            const [likesRes, commentsRes] = await Promise.all([
+              getLikeCount(resumeMeta.id),
+              getCommentCount(resumeMeta.id),
+            ]);
+            counts[resume.uuid] = {
+              likes: likesRes.data ?? 0,
+              comments: commentsRes.data ?? 0,
+            };
+          } catch (e) {
+            counts[resume.uuid] = { likes: 0, comments: 0 };
+          }
+        })
+      );
+      setResumeCounts(counts);
+    };
+
+    if (resumes.length) fetchCounts();
+  }, [resumes]);
+
+  // Compute _matchingScore for all resumes (as before), and attach like/comment counts
+  const processedResumes = useMemo(() => {
+    return resumes.map(resume => {
+      const skills = resume.skills || [];
+      const categories = resume.categories || [];
+      const matchedSkills = skills.filter(s => selectedSkills.includes(normalize(s.name)));
+      const matchedCategories = categories.filter(c =>
+        selectedCategories.includes(normalize(c.name))
+      );
+
+      let score = 0;
+      if (matchedSkills.length > 0) {
+        score = matchedSkills.reduce((sum, s) => sum + (s.score ?? 0), 0) / matchedSkills.length;
+      } else if (matchedCategories.length > 0) {
+        score =
+          matchedCategories.reduce((sum, c) => sum + (c.score ?? 0), 0) / matchedCategories.length;
+      } else {
+        score = resume.finalScore ?? 0;
+      }
+
+      // Attach like/comment count if available
+      const counts = resumeCounts[resume.uuid] || {};
+      return {
+        ...resume,
+        _matchingScore: Math.round(score * 100),
+        _likes: counts.likes ?? 0,
+        _comments: counts.comments ?? 0,
+      };
+    });
+  }, [resumes, selectedSkills, selectedCategories, resumeCounts]);
+
+  // Sort resumes with selected sort
   const sortedResumes = useMemo(() => {
-    const skillIds = (searchParams.get('skills') || '').split(',').map(normalize);
-    const categoryIds = (searchParams.get('categories') || '').split(',').map(normalize);
-
-    return [...resumes]
-      .map(resume => {
-        const skills = resume.skills || [];
-        const categories = resume.categories || [];
-        const matchedSkills = skills.filter(s => skillIds.includes(normalize(s.name)));
-        const matchedCategories = categories.filter(c => categoryIds.includes(normalize(c.name)));
-
-        let score = 0;
-        if (matchedSkills.length > 0) {
-          score = matchedSkills.reduce((sum, s) => sum + s.score, 0) / matchedSkills.length;
-        } else if (matchedCategories.length > 0) {
-          score = matchedCategories.reduce((sum, c) => sum + c.score, 0) / matchedCategories.length;
-        } else {
-          score = resume.finalScore ?? 0;
-        }
-
-        return { ...resume, _matchingScore: Math.round(score * 100) };
-      })
-      .sort((a, b) => b._matchingScore - a._matchingScore);
-  }, [resumes, searchParams]);
-
-  // Pagination logic
-  const totalPages = Math.ceil(sortedResumes.length / RESUMES_PER_PAGE);
-  const paginatedResumes = sortedResumes.slice(
-    (currentPage - 1) * RESUMES_PER_PAGE,
-    currentPage * RESUMES_PER_PAGE
-  );
-
-  // Reset to first page if filters change
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [searchParams, resumes.length]);
-
-  const handlePrev = () => setCurrentPage(page => Math.max(1, page - 1));
-  const handleNext = () => setCurrentPage(page => Math.min(totalPages, page + 1));
-  const handlePageClick = page => setCurrentPage(page);
+    return [...processedResumes].sort((a, b) => getSortValue(b, sortBy) - getSortValue(a, sortBy));
+  }, [processedResumes, sortBy]);
 
   return (
     <div>
@@ -67,11 +175,19 @@ const ResumesLayout = () => {
         </h1>
         <h2>
           <span className='text-gray-400'>Sort by :</span>
-          <select className='border-none outline-none rounded py-1 font-semibold px-1'>
-            <option value='score'>Score</option>
-            <option value='date'>Date</option>
-            <option value='likes'>Likes</option>
-            <option value='comments'>Comments</option>
+          <select
+            className='border-none outline-none rounded py-1 font-semibold px-1 ml-2'
+            value={sortBy}
+            onChange={e => setSortBy(e.target.value)}
+          >
+            {sortOptions.map(opt => (
+              <option
+                key={opt.value}
+                value={opt.value}
+              >
+                {opt.label}
+              </option>
+            ))}
           </select>
         </h2>
       </div>
@@ -85,47 +201,14 @@ const ResumesLayout = () => {
       ) : sortedResumes.length === 0 ? (
         <div className='text-center text-gray-500'>No resumes found.</div>
       ) : (
-        <>
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4'>
-            {paginatedResumes.map(resume => (
-              <ResumeCard
-                key={resume.id}
-                resume={resume}
-              />
-            ))}
-          </div>
-          <div className='flex justify-center mt-6 gap-2'>
-            <button
-              onClick={handlePrev}
-              disabled={currentPage === 1}
-              className={`px-3 py-1 rounded cursor-pointer hover:opacity-85 ${
-                currentPage === 1 ? 'bg-gray-200 text-gray-400' : 'bg-primary text-white'
-              }`}
-            >
-              Prev
-            </button>
-            {[...Array(totalPages).keys()].map(i => (
-              <button
-                key={i + 1}
-                onClick={() => handlePageClick(i + 1)}
-                className={`px-3 py-1 rounded cursor-pointer hover:opacity-85 ${
-                  currentPage === i + 1 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <button
-              onClick={handleNext}
-              disabled={currentPage === totalPages}
-              className={`px-3 py-1 rounded cursor-pointer hover:opacity-85 ${
-                currentPage === totalPages ? 'bg-gray-200 text-gray-400' : 'bg-primary text-white'
-              }`}
-            >
-              Next
-            </button>
-          </div>
-        </>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4'>
+          {sortedResumes.map(resume => (
+            <ResumeCard
+              key={resume.id}
+              resume={resume}
+            />
+          ))}
+        </div>
       )}
     </div>
   );

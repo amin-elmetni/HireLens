@@ -41,7 +41,7 @@ const SearchableFilterSection = ({
                 placeholder={`Search ${title.toLowerCase()}...`}
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className='w-full pl-10 pr-8 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm'
+                className='w-full pl-10 pr-8 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-2 focus:border-primary text-sm transition-colors duration-200'
               />
               {searchQuery && (
                 <button

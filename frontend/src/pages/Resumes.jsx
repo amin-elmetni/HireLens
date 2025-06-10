@@ -27,7 +27,7 @@ const Resumes = () => {
             bg-white shadow-md border border-gray-200
             text-primary text-3xl pl-4 p-2 rounded
             hover:bg-primary hover:text-white hover:shadow-lg
-            transition-all duration-300 cursor-pointer 
+            transition-all duration-300 cursor-pointer focus:outline-none 
             ${isClicked ? 'text-white bg-primary' : 'hover:translate-x-1'}
             ${sidebarOpen ? '-translate-x-full' : 'translate-x-0'}
           `}
@@ -41,7 +41,7 @@ const Resumes = () => {
         </button>
 
         {/* Sidebar Container */}
-        <div className={`${sidebarOpen ? 'w-[22%]' : 'w-0'} transition-all duration-300`}>
+        <div className={`${sidebarOpen ? 'w-[23%]' : 'w-0'} transition-all duration-300`}>
           {/* Sticky Sidebar Content - Fixed height calculation */}
           <div
             className={`sticky top-[100px] h-[calc(100vh-140px)] overflow-y-auto overflow-x-hidden pr-6`}
@@ -69,7 +69,7 @@ const Resumes = () => {
         </div>
 
         {/* Resume Layout */}
-        <div className={`${sidebarOpen ? 'w-[78%]' : 'w-full'} transition-all duration-300`}>
+        <div className={`${sidebarOpen ? 'w-[77%]' : 'w-full'} transition-all duration-300`}>
           <ResumesLayout />
         </div>
       </div>
