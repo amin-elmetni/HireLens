@@ -14,7 +14,7 @@ const Resumes = () => {
   return (
     <div className='bg-background min-h-screen'>
       <NavBar />
-      <div className='relative flex transition-all duration-300 px-14 py-10 gap-4'>
+      <div className='relative flex transition-all duration-300 px-14 py-8 gap-4'>
         {/* Sticky Toggle Button */}
         <button
           onClick={() => {
@@ -41,27 +41,17 @@ const Resumes = () => {
         </button>
 
         {/* Sidebar Container */}
-        <div className={`${sidebarOpen ? 'w-[23%]' : 'w-0'} transition-all duration-300`}>
+        <div className={`${sidebarOpen ? 'w-[25%]' : 'w-0'} transition-all duration-300`}>
           {/* Sticky Sidebar Content - Fixed height calculation */}
           <div
-            className={`sticky top-[100px] h-[calc(100vh-140px)] overflow-y-auto overflow-x-hidden pr-6 scrollbar-custom`}
+            className={`sticky top-[100px] h-[calc(100vh-140px)] overflow-y-auto overflow-x-hidden pr-2 scrollbar-custom`}
           >
             {sidebarOpen && (
               <>
-                <div className='flex justify-between items-center mb-6'>
-                  <h2 className='text-xl font-bold text-primary'>Filters</h2>
-                  <button
-                    onClick={() => setSidebarOpen(false)}
-                    className='text-primary text-3xl p-2 cursor-pointer hover:text-gray-400 hover:bg-gray-100 rounded-full transition-colors duration-200'
-                    title='Close Filters'
-                  >
-                    <TbLayoutSidebarRightExpandFilled />
-                  </button>
-                </div>
                 {loading ? (
                   <div className='text-center text-gray-500'>Loading filters...</div>
                 ) : (
-                  <SideFilters />
+                  <SideFilters onClose={() => setSidebarOpen(false)} />
                 )}{' '}
               </>
             )}
@@ -69,7 +59,7 @@ const Resumes = () => {
         </div>
 
         {/* Resume Layout */}
-        <div className={`${sidebarOpen ? 'w-[77%]' : 'w-full'} transition-all duration-300`}>
+        <div className={`${sidebarOpen ? 'w-[75%]' : 'w-full'} transition-all duration-300`}>
           <ResumesLayout />
         </div>
       </div>

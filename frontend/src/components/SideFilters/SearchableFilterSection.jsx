@@ -2,13 +2,7 @@
 import React, { useMemo, useState } from 'react';
 import { Search, X, ChevronDown } from 'lucide-react';
 
-const SearchableFilterSection = ({
-  title,
-  items,
-  selectedItems,
-  onToggleItem,
-  onApplySelection,
-}) => {
+const SearchableFilterSection = ({ title, items, selectedItems, onToggleItem }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -131,16 +125,6 @@ const SearchableFilterSection = ({
               </div>
             )}
           </div>
-
-          {/* Apply Button */}
-          {/* {selectedItems.length > 0 && (
-            <button
-              onClick={onApplySelection}
-              className="mt-4 w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark transition"
-            >
-              Apply {selectedItems.length} {title.slice(0, -1)}{selectedItems.length !== 1 ? 's' : ''}
-            </button>
-          )} */}
         </>
       )}
     </div>

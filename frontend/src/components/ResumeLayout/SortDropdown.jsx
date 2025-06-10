@@ -156,7 +156,7 @@ export default function SortDropdown({ options, value, onChange }) {
     >
       <button
         type='button'
-        className='flex items-center gap-2 px-4 py-2 font-semibold text-gray-700 focus:outline-none cursor-pointer'
+        className='flex items-center gap-2 pl-1 pr-4 py-2 font-semibold text-gray-700 focus:outline-none cursor-pointer'
         onClick={() => {
           setOpen(o => !o);
           setHighlighted(flatOptions.findIndex(opt => opt.value === value));
@@ -167,7 +167,11 @@ export default function SortDropdown({ options, value, onChange }) {
         <span>{selected ? selected.label : 'Select sort'}</span>
         <FontAwesomeIcon
           icon='fa-solid fa-caret-down'
-          className='text-gray-400'
+          className={`
+      text-gray-400
+      transition-transform duration-200
+      ${open ? 'rotate-180' : ''}
+    `}
         />
       </button>
       {show && (

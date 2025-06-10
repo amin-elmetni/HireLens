@@ -23,6 +23,7 @@ import {
   faAngleRight,
   faCircleDown as fasCircleDown,
   faEye as fasEye,
+  faAngleLeft,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Add all icons to the library
@@ -45,5 +46,6 @@ library.add(
   farCircleDown,
   fasCircleDown,
   farEye,
-  fasEye
+  fasEye,
+  faAngleLeft
 );
