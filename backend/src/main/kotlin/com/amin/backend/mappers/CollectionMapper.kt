@@ -11,7 +11,6 @@ object CollectionMapper {
         description = collection.description,
         visibility = collection.visibility,
         userId = collection.user.id ?: 0,
-        userName = collection.user.name,
         createdAt = collection.createdAt,
         updatedAt = collection.updatedAt
     )

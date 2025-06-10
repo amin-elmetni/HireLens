@@ -9,7 +9,6 @@ data class CollectionDto(
     val description: String? = null,
     val visibility: CollectionVisibility,
     val userId: Long,
-    val userName: String,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
 )
