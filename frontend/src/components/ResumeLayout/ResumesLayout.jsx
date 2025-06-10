@@ -1,13 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import ResumeCard from '@/components/ResumeLayout/ResumeCard';
-import { useFilteredResumes } from '@/hooks/useFilteredResumes';
+import SortDropdown from '@/components/ResumeLayout/SortDropdown';
+import { useSearchParams } from 'react-router-dom';
+import { useFilteredResumes } from '@/hooks/resumes/useFilteredResumes';
 
 import { BASE_SORT_OPTIONS, getDynamicSortOptions } from '@/utils/resumeUtils';
-import { useAvailableSkillsAndCategories } from '@/hooks/useAvailableSkillsAndCategories';
-import { useResumeCounts } from '@/hooks/useResumeCounts';
-import { useProcessedResumes } from '@/hooks/useProcessedResumes';
-import { useSortedResumes } from '@/hooks/useSortedResumes';
+import { useAvailableSkillsAndCategories } from '@/hooks/resumes/useAvailableSkillsAndCategories';
+import { useResumeCounts } from '@/hooks/resumes/useResumeCounts';
+import { useProcessedResumes } from '@/hooks/resumes/useProcessedResumes';
+import { useSortedResumes } from '@/hooks/resumes/useSortedResumes';
 
 const FILTER_KEYS = ['skills', 'categories', 'languages', 'expMin', 'expMax'];
 
@@ -47,34 +48,21 @@ const ResumesLayout = () => {
   return (
     <div>
       <div className='flex items-center justify-between mb-4'>
-        <h1 className='text-2xl font-semibold'>
+        <h1 className='text-2xl font-semibold text-gray-700'>
           {hasFilters ? sortedResumes.length : 0}{' '}
-          <span className='font-light text-gray-400'>Resumes Found</span>
+          <span className='text-gray-400 font-semibold'>Resumes Found</span>
         </h1>
-        <h2>
+        <h2 className='flex items-center gap-2 font-semibold text-gray-600'>
           <span className='text-gray-400'>Sort by :</span>
-          <select
-            className='border-none outline-none rounded py-1 font-semibold px-1 ml-2'
+          <SortDropdown
+            options={sortOptions}
             value={sortBy}
-            onChange={e => setSortBy(e.target.value)}
-          >
-            {sortOptions.map(opt => (
-              <option
-                key={opt.value}
-                value={opt.value}
-              >
-                {opt.label}
-              </option>
-            ))}
-          </select>
+            onChange={setSortBy}
+          />
         </h2>
       </div>
 
-      {!hasFilters ? (
-        <div className='text-center text-gray-500 mt-10'>
-          Please select at least one filter to view resumes.
-        </div>
-      ) : loading ? (
+      {loading ? (
         <div className='text-center text-gray-500'>Loading resumes...</div>
       ) : sortedResumes.length === 0 ? (
         <div className='text-center text-gray-500'>No resumes found.</div>

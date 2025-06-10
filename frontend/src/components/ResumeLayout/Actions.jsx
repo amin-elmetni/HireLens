@@ -2,10 +2,10 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ToggleIconButton from './ToggleIconButton';
-import { useLikes } from '@/hooks/useLikes';
-import { useComments } from '@/hooks/useComments';
-import { useSaves } from '@/hooks/useSaves';
-import { useResumeActions } from '@/hooks/useResumeActions';
+import { useLikes } from '@/hooks/resumes/useLikes';
+import { useComments } from '@/hooks/resumes/useComments';
+import { useSaves } from '@/hooks/resumes/useSaves';
+import { useResumeActions } from '@/hooks/resumes/useResumeActions';
 
 const Actions = ({ uuid }) => {
   const { liked, likeCount, toggleLike } = useLikes(uuid);

@@ -1,5 +1,5 @@
 // src/pages/Login.jsx
-import { useLogin } from '@/hooks/useLogin';
+import { useLogin } from '@/hooks/auth/useLogin';
 import SocialLoginIcons from '@/components/Login/SocialLoginIcons';
 import Logo from '@/components/Login/Logo';
 import SignUpPrompt from '@/components/Login/SignUpPrompt';

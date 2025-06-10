@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSideFilters } from '@/hooks/useSideFilters';
+import { useSideFilters } from '@/hooks/resumes/useSideFilters';
 import SearchableFilterSection from './SearchableFilterSection';
 import ExperienceRangeFilter from './ExperienceRangeFilter';
 

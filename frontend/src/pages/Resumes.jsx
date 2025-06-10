@@ -4,7 +4,7 @@ import { TbLayoutSidebarRightExpandFilled } from 'react-icons/tb';
 import NavBar from '@/components/NavBar/NavBar';
 import SideFilters from '@/components/SideFilters/SideFilters';
 import ResumesLayout from '@/components/ResumeLayout/ResumesLayout';
-import { useSideFilters } from '@/hooks/useSideFilters';
+import { useSideFilters } from '@/hooks/resumes/useSideFilters';
 
 const Resumes = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -23,7 +23,7 @@ const Resumes = () => {
           }}
           onTransitionEnd={() => setIsClicked(false)}
           className={`
-            fixed z-30 left-[-10px] top-32 transform -translate-y-1/2
+            fixed z-10 left-[-10px] top-32 transform -translate-y-1/2
             bg-white shadow-md border border-gray-200
             text-primary text-3xl pl-4 p-2 rounded
             hover:bg-primary hover:text-white hover:shadow-lg

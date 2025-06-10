@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import UserAvatar from './UserAvatar';
 import DisplayName from './DisplayName';
-import useLogout from '@/hooks/useLogout';
+import useLogout from '@/hooks/auth/useLogout';
 
 const UserDropdown = ({ user }) => {
   const [open, setOpen] = useState(false);

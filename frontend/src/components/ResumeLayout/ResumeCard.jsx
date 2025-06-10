@@ -8,7 +8,7 @@ import Stats from '@/components/ResumeLayout/Stats';
 import Actions from '@/components/ResumeLayout/Actions';
 import ExploreProfileBtn from '@/components/ResumeLayout/ExploreProfileBtn';
 import LanguagesTags from '@/components/ResumeLayout/LanguagesTags';
-import { useResumeMetrics } from '@/hooks/useResumeMetrics';
+import { useResumeMetrics } from '@/hooks/resumes/useResumeMetrics';
 
 const ResumeCard = ({ resume }) => {
   const {
