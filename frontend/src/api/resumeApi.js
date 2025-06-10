@@ -1,11 +1,14 @@
 import api from './index';
 
-export const getFilteredResumes = params => api.get('/api/resume-metadata', { params });
+const RESUME_BASE = '/api/resumes';
+const RESUME_METADATA_BASE = '/api/resume-metadata';
 
-export const getResumeMetadataFilters = () => api.get('/api/resume-metadata/filters');
+export const getFilteredResumes = params => api.get(RESUME_METADATA_BASE, { params });
+
+export const getResumeMetadataFilters = () => api.get(`${RESUME_METADATA_BASE}/filters`);
 
 export const downloadResumeById = uuid =>
-  api.get(`/api/resumes/download/${uuid}`, { responseType: 'blob' });
+  api.get(`${RESUME_BASE}/download/${uuid}`, { responseType: 'blob' });
 
 export const viewResumeById = uuid =>
-  api.get(`/api/resumes/view/${uuid}`, { responseType: 'blob' });
+  api.get(`${RESUME_BASE}/view/${uuid}`, { responseType: 'blob' });

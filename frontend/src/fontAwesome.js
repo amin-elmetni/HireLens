@@ -8,6 +8,9 @@ import {
   faComment,
   faCircleDown as farCircleDown,
   faEye as farEye,
+  faSquarePlus as farSquarePlus,
+  faFolderOpen as farFolderOpen,
+  faFolderClosed as farFolderClosed,
 } from '@fortawesome/free-regular-svg-icons';
 
 import {
@@ -24,6 +27,10 @@ import {
   faCircleDown as fasCircleDown,
   faEye as fasEye,
   faAngleLeft,
+  faSquarePlus as fasSquarePlus,
+  faFolderOpen as fasFolderOpen,
+  faFolderClosed as fasFolderClosed,
+  faFolderPlus,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Add all icons to the library
@@ -47,5 +54,12 @@ library.add(
   fasCircleDown,
   farEye,
   fasEye,
-  faAngleLeft
+  faAngleLeft,
+  farSquarePlus,
+  fasSquarePlus,
+  farFolderOpen,
+  fasFolderOpen,
+  farFolderClosed,
+  fasFolderClosed,
+  faFolderPlus
 );
