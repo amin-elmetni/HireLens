@@ -31,6 +31,9 @@ import {
   faFolderOpen as fasFolderOpen,
   faFolderClosed as fasFolderClosed,
   faFolderPlus,
+  faPlus,
+  faMagnifyingGlass,
+  faArrowLeft,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Add all icons to the library
@@ -61,5 +64,8 @@ library.add(
   fasFolderOpen,
   farFolderClosed,
   fasFolderClosed,
-  faFolderPlus
+  faFolderPlus,
+  faPlus,
+  faMagnifyingGlass,
+  faArrowLeft
 );
