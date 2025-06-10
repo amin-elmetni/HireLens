@@ -1,17 +1,19 @@
 import api from './index';
 
+const SAVE_BASE = '/api/saves';
+
 export const saveResume = saveDto => {
-  return api.post('/api/saves', saveDto);
+  return api.post(SAVE_BASE, saveDto);
 };
 
 export const unsaveResume = (userId, resumeId) => {
-  return api.delete(`/api/saves/${userId}/${resumeId}`);
+  return api.delete(`${SAVE_BASE}/${userId}/${resumeId}`);
 };
 
 export const getSaveCount = resumeId => {
-  return api.get(`/api/saves/count/${resumeId}`);
+  return api.get(`${SAVE_BASE}/count/${resumeId}`);
 };
 
 export const hasSavedResume = (userId, resumeId) => {
-  return api.get(`/api/saves/check/${userId}/${resumeId}`);
+  return api.get(`${SAVE_BASE}/check/${userId}/${resumeId}`);
 };

@@ -15,6 +15,13 @@ const Actions = ({ uuid }) => {
 
   const actionButtons = [
     {
+      // onClick: toggleLike,
+      regularIcon: 'fa-solid fa-folder-plus',
+      solidIcon: 'fa-regular fa-folder-open',
+      activeColor: 'text-blue-500',
+      isActive: false,
+    },
+    {
       onClick: () => viewResume(uuid),
       regularIcon: 'fa-regular fa-eye',
       solidIcon: 'fa-solid fa-eye',
@@ -25,7 +32,7 @@ const Actions = ({ uuid }) => {
       onClick: () => downloadResume(uuid),
       regularIcon: 'fa-regular fa-circle-down',
       solidIcon: 'fa-solid fa-circle-down',
-      activeColor: 'text-blue-400',
+      activeColor: 'text-green-500',
       isActive: false,
     },
     {
@@ -46,7 +53,7 @@ const Actions = ({ uuid }) => {
 
   return (
     <div className='flex items-center justify-between'>
-      <div className='flex items-center gap-2 text-xs'>
+      <div className='flex items-center gap-2 text-sm'>
         <div className='flex items-center gap-1 group cursor-default'>
           <FontAwesomeIcon icon='fa-regular fa-thumbs-up' />
           <span>{likeCount}</span>
