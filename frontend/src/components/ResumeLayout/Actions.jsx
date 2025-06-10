@@ -33,6 +33,7 @@ const Actions = ({ uuid }) => {
       regularIcon: 'fa-regular fa-circle-down',
       solidIcon: 'fa-solid fa-circle-down',
       activeColor: 'text-green-500',
+      activeColor: 'text-green-500',
       isActive: false,
     },
     {
@@ -53,6 +54,7 @@ const Actions = ({ uuid }) => {
 
   return (
     <div className='flex items-center justify-between'>
+      <div className='flex items-center gap-2 text-sm'>
       <div className='flex items-center gap-2 text-sm'>
         <div className='flex items-center gap-1 group cursor-default'>
           <FontAwesomeIcon icon='fa-regular fa-thumbs-up' />
