@@ -44,15 +44,15 @@ const Resumes = () => {
         <div className={`${sidebarOpen ? 'w-[23%]' : 'w-0'} transition-all duration-300`}>
           {/* Sticky Sidebar Content - Fixed height calculation */}
           <div
-            className={`sticky top-[100px] h-[calc(100vh-140px)] overflow-y-auto overflow-x-hidden pr-6`}
+            className={`sticky top-[100px] h-[calc(100vh-140px)] overflow-y-auto overflow-x-hidden pr-6 scrollbar-custom`}
           >
             {sidebarOpen && (
               <>
                 <div className='flex justify-between items-center mb-6'>
-                  <h2 className='text-xl font-bold text-gray-400'>Filters</h2>
+                  <h2 className='text-xl font-bold text-primary'>Filters</h2>
                   <button
                     onClick={() => setSidebarOpen(false)}
-                    className='text-gray-400 text-3xl cursor-pointer hover:text-primary'
+                    className='text-primary text-3xl p-2 cursor-pointer hover:text-gray-400 hover:bg-gray-100 rounded-full transition-colors duration-200'
                     title='Close Filters'
                   >
                     <TbLayoutSidebarRightExpandFilled />

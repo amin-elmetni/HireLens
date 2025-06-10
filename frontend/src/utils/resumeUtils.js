@@ -49,8 +49,8 @@ export const getDynamicSortOptions = (
 ) => [
   ...availableSkills
     .filter(s => selectedSkills.includes(s.id))
-    .map(s => ({ value: `skill:${s.id}`, label: `Skill: ${s.label}` })),
+    .map(s => ({ value: `skill:${s.id}`, label: `${s.label}` })),
   ...availableCategories
     .filter(c => selectedCategories.includes(c.id))
-    .map(c => ({ value: `category:${c.id}`, label: `Category: ${c.label}` })),
+    .map(c => ({ value: `category:${c.id}`, label: `${c.label}` })),
 ];

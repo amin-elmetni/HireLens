@@ -1,12 +1,31 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+// Utility to split options into groups
+function groupOptions(options) {
+  const base = [];
+  const categories = [];
+  const skills = [];
+  options.forEach(option => {
+    if (option.value.startsWith('category:')) categories.push(option);
+    else if (option.value.startsWith('skill:')) skills.push(option);
+    else base.push(option);
+  });
+  return { base, categories, skills };
+}
+
 export default function SortDropdown({ options, value, onChange }) {
   const [open, setOpen] = useState(false);
   const [show, setShow] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [highlighted, setHighlighted] = useState(-1);
   const ref = useRef();
+
+  // Group options
+  const { base, categories, skills } = groupOptions(options);
+
+  // For navigation, flatten all options left-to-right (base, categories, skills)
+  const flatOptions = [...base, ...categories, ...skills];
 
   // Animation: robust mount/unmount and transition
   useEffect(() => {
@@ -32,13 +51,13 @@ export default function SortDropdown({ options, value, onChange }) {
   useEffect(() => {
     if (!open) return;
     const handleKey = e => {
-      if (e.key === 'ArrowDown') {
-        setHighlighted(h => (h + 1) % options.length);
-      } else if (e.key === 'ArrowUp') {
-        setHighlighted(h => (h - 1 + options.length) % options.length);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        setHighlighted(h => (h + 1) % flatOptions.length);
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        setHighlighted(h => (h - 1 + flatOptions.length) % flatOptions.length);
       } else if (e.key === 'Enter') {
-        if (highlighted >= 0 && highlighted < options.length) {
-          onChange(options[highlighted].value);
+        if (highlighted >= 0 && highlighted < flatOptions.length) {
+          onChange(flatOptions[highlighted].value);
           setOpen(false);
         }
       } else if (e.key === 'Escape') {
@@ -47,15 +66,88 @@ export default function SortDropdown({ options, value, onChange }) {
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [open, highlighted, options, onChange]);
+  }, [open, highlighted, flatOptions, onChange]);
 
   // Close on overlay click
   const handleOverlayClick = e => {
-    // Only close if the overlay itself was clicked, not the dropdown
     if (e.target === e.currentTarget) setOpen(false);
   };
 
   const selected = options.find(opt => opt.value === value);
+
+  // Render one group column
+  const renderGroupColumn = (label, group, startIndex) => {
+    if (!group.length) return null;
+    return (
+      <div className='min-w-56 max-w-xs'>
+        <div className='px-4 pt-4 pb-2 text-xs font-bold text-gray-400 select-none cursor-default uppercase tracking-wider'>
+          {label}
+        </div>
+        <ul role='group'>
+          {group.map((opt, idx) => {
+            const flatIdx = startIndex + idx;
+            return (
+              <li
+                key={opt.value}
+                role='option'
+                aria-selected={opt.value === value}
+                className={`group flex items-center w-full px-4 py-3 text-sm cursor-pointer whitespace-nowrap ${
+                  flatIdx === highlighted ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
+                } ${opt.value === value ? 'font-semibold bg-primary/5 text-gray-900' : ''}`}
+                onMouseEnter={() => setHighlighted(flatIdx)}
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+              >
+                {opt.label}
+                {opt.value === value && <span className='ml-auto text-primary'>✓</span>}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  };
+
+  function ScrollLockOverlay({ onClick }) {
+    useEffect(() => {
+      const prevent = e => {
+        e.preventDefault();
+      };
+      // Prevent scroll events (mouse and touch)
+      document.addEventListener('wheel', prevent, { passive: false });
+      document.addEventListener('touchmove', prevent, { passive: false });
+      document.addEventListener('scroll', prevent, { passive: false });
+
+      return () => {
+        document.removeEventListener('wheel', prevent, { passive: false });
+        document.removeEventListener('touchmove', prevent, { passive: false });
+        document.removeEventListener('scroll', prevent, { passive: false });
+      };
+    }, []);
+
+    return (
+      <div
+        className='fixed inset-0 z-20 cursor-default'
+        aria-hidden='true'
+        style={{ background: 'transparent', pointerEvents: 'auto' }}
+        onClick={onClick}
+        // Prevent scroll bubbling from overlay
+        onWheel={e => e.preventDefault()}
+        onTouchMove={e => e.preventDefault()}
+        onScroll={e => e.preventDefault()}
+      />
+    );
+  }
+
+  // Compute the starting index for each group in flatOptions
+  const baseStart = 0;
+  const catStart = base.length;
+  const skillStart = base.length + categories.length;
+
+  // Compute column count for dropdown width
+  const colCount = 1 + (categories.length ? 1 : 0) + (skills.length ? 1 : 0);
 
   return (
     <div
@@ -67,7 +159,7 @@ export default function SortDropdown({ options, value, onChange }) {
         className='flex items-center gap-2 px-4 py-2 font-semibold text-gray-700 focus:outline-none cursor-pointer'
         onClick={() => {
           setOpen(o => !o);
-          setHighlighted(options.findIndex(opt => opt.value === value));
+          setHighlighted(flatOptions.findIndex(opt => opt.value === value));
         }}
         aria-haspopup='listbox'
         aria-expanded={open}
@@ -80,17 +172,12 @@ export default function SortDropdown({ options, value, onChange }) {
       </button>
       {show && (
         <>
-          {/* Overlay */}
-          <div
-            className='fixed inset-0 z-20 cursor-default'
-            aria-hidden='true'
-            style={{ background: 'transparent' }}
-            onClick={handleOverlayClick}
-          />
+          {/* Scroll lock overlay */}
+          <ScrollLockOverlay onClick={handleOverlayClick} />
           {/* Dropdown */}
-          <ul
+          <div
             className={`
-              absolute right-0 w-56 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-opacity-5 z-30 divide-y divide-gray-100
+              absolute right-0 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-opacity-5 z-30 flex
               transition-all duration-200 ease-out scrollbar-custom
               ${
                 dropdownVisible
@@ -98,29 +185,19 @@ export default function SortDropdown({ options, value, onChange }) {
                   : 'opacity-0 scale-90 pointer-events-none'
               }
             `}
-            style={{ transformOrigin: 'top right', maxHeight: '19.75rem', overflowY: 'auto' }}
+            style={{
+              transformOrigin: 'top right',
+              maxHeight: '21.75rem',
+              minWidth: `${colCount * 14}rem`,
+              overflowY: 'auto',
+            }}
             tabIndex={-1}
             role='listbox'
           >
-            {options.map((opt, idx) => (
-              <li
-                key={opt.value}
-                role='option'
-                aria-selected={opt.value === value}
-                className={`group flex items-center w-full px-4 py-3 text-sm cursor-pointer ${
-                  idx === highlighted ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
-                } ${opt.value === value ? 'font-semibold bg-primary/5 text-gray-900' : ''}`}
-                onMouseEnter={() => setHighlighted(idx)}
-                onClick={() => {
-                  onChange(opt.value);
-                  setOpen(false);
-                }}
-              >
-                {opt.label}
-                {opt.value === value && <span className='ml-auto text-primary'>✓</span>}
-              </li>
-            ))}
-          </ul>
+            {renderGroupColumn('General', base, baseStart)}
+            {renderGroupColumn('Categories', categories, catStart)}
+            {renderGroupColumn('Skills', skills, skillStart)}
+          </div>
         </>
       )}
     </div>
