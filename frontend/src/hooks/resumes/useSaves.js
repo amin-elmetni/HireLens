@@ -2,9 +2,10 @@
 import { useEffect, useState } from 'react';
 import { saveResume, unsaveResume, hasSavedResume } from '@/api/saveApi';
 import { getResumeByUuid } from '@/api/likeApi';
+import { getUser } from '@/utils/userUtils';
 
 export const useSaves = uuid => {
-  const user = JSON.parse(localStorage.getItem('auth_user'));
+  const user = getUser();
   const [resumeId, setResumeId] = useState(null);
   const [saved, setSaved] = useState(false);
 

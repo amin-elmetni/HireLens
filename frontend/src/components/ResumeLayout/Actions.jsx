@@ -16,8 +16,7 @@ const Actions = ({ uuid }) => {
   const { saved, toggleSave } = useSaves(uuid);
   const { viewResume, downloadResume } = useResumeActions();
 
-  const userId = 6;
-  const addToCollection = useAddToCollection(userId, uuid);
+  const addToCollection = useAddToCollection(uuid);
 
   const actionButtons = [
     {

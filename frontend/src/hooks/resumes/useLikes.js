@@ -6,9 +6,10 @@ import {
   likeResume,
   unlikeResume,
 } from '@/api/likeApi';
+import { getUser } from '@/utils/userUtils';
 
 export const useLikes = uuid => {
-  const user = JSON.parse(localStorage.getItem('auth_user'));
+  const user = getUser();
   const [resumeId, setResumeId] = useState(null);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);

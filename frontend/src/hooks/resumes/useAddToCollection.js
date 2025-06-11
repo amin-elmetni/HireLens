@@ -1,8 +1,12 @@
 import { useState, useCallback } from 'react';
 import { getUserCollections, createCollection } from '@/api/collectionApi';
 import { addItemToCollection } from '@/api/collectionItemApi';
+import { getUser } from '@/utils/userUtils'; // <-- import your utility
 
-export function useAddToCollection(userId, resumeId) {
+export function useAddToCollection(resumeId) {
+  const user = getUser();
+  const userId = user ? user.id : null;
+
   const [open, setOpen] = useState(false);
   const [collections, setCollections] = useState([]);
   const [search, setSearch] = useState('');
@@ -59,10 +63,7 @@ export function useAddToCollection(userId, resumeId) {
       return true; // success
     } catch (err) {
       if (err?.response?.status === 409) {
-        setError(
-          err?.response?.data ||
-            `A collection named "${name}" already exists. Please choose a different name.`
-        );
+        setError(`A collection named "${name}" already exists. Please choose a different name.`);
       } else if (err?.response?.data) {
         setError(`An error occurred: ${err.response.data}`);
       } else {

@@ -10,7 +10,7 @@ export const useSideFilters = () => {
     categories: [],
     skills: [],
     languages: [],
-    experienceRange: [0, 20], // Default range
+    experienceRange: [0, 20],
   });
   const [tempSelections, setTempSelections] = useState({
     categories: [],
