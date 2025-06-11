@@ -2,6 +2,7 @@ package com.amin.backend.services
 
 import com.amin.backend.dtos.CollectionDto
 import com.amin.backend.enums.CollectionVisibility
+import com.amin.backend.exceptions.DuplicateCollectionNameException
 import com.amin.backend.mappers.CollectionMapper
 import com.amin.backend.repositories.CollectionRepository
 import com.amin.backend.repositories.UserRepository
@@ -13,6 +14,10 @@ class CollectionService(
     private val userRepository: UserRepository
 ) {
     fun createCollection(dto: CollectionDto): CollectionDto {
+        // Check for duplicate name
+        if (collectionRepository.existsByNameAndUserId(dto.name, dto.userId)) {
+            throw DuplicateCollectionNameException("Collection name already exists for this user.")
+        }
         val user = userRepository.findById(dto.userId).orElseThrow {
             IllegalArgumentException("User not found")
         }

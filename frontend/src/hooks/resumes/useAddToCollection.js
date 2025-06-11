@@ -8,6 +8,7 @@ export function useAddToCollection(userId, resumeId) {
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const fetchCollections = useCallback(async () => {
     if (!userId) return;
@@ -45,6 +46,7 @@ export function useAddToCollection(userId, resumeId) {
 
   // Handler for new collection creation used by drawer
   const onActuallyCreateNew = async name => {
+    setError('');
     setLoading(true);
     try {
       const res = await createCollection({
@@ -55,7 +57,13 @@ export function useAddToCollection(userId, resumeId) {
       await fetchCollections();
       setSelected(res.data);
     } catch (err) {
-      console.error('Error creating collection:', err?.response?.data || err);
+      if (err?.response?.status === 409) {
+        setError('A collection with this name already exists.');
+      } else {
+        setError('An error occurred. Please try again.');
+      }
+      // Don't close create mode if error!
+      return;
     } finally {
       setLoading(false);
     }
@@ -78,5 +86,7 @@ export function useAddToCollection(userId, resumeId) {
     onAdd: handleAdd,
     loading,
     canAdd: !!selected,
+    error,
+    setError,
   };
 }

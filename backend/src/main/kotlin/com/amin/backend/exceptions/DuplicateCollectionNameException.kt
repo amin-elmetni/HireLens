@@ -1,4 +1,7 @@
 package com.amin.backend.exceptions
 
-class DuplicateCollectionNameException {
-}
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
+
+@ResponseStatus(HttpStatus.CONFLICT)
+class DuplicateCollectionNameException(message: String) : RuntimeException(message)

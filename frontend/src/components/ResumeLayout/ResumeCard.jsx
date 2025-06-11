@@ -52,7 +52,7 @@ const ResumeCard = ({ resume }) => {
         projects={projects}
       />
 
-      <p className='text-gray-500 text-xs text-justify hyphens-auto h-28 overflow-y-auto scrollbar-custom pr-2 tracking-wide leading-[19px] mb-4'>
+      <p className='text-gray-500 text-xs text-justify hyphens-auto h-29 overflow-y-auto scrollbar-custom pr-2 tracking-wide leading-[19px] mb-4'>
         {summary}
       </p>
 

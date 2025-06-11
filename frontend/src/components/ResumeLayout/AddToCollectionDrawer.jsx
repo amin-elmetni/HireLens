@@ -17,6 +17,8 @@ const AddToCollectionDrawer = ({
   loading,
   canAdd,
   onActuallyCreateNew,
+  error,
+  setError,
 }) => {
   const [showDrawer, setShowDrawer] = useState(open);
   const [inCreateMode, setInCreateMode] = useState(false);
@@ -81,6 +83,11 @@ const AddToCollectionDrawer = ({
     setInCreateMode(false);
     setNewCollectionName('');
     onClose();
+  };
+
+  const handleInputChange = e => {
+    setNewCollectionName(e.target.value);
+    if (error) setError('');
   };
 
   if (!showDrawer && !open) return null;
@@ -148,6 +155,7 @@ const AddToCollectionDrawer = ({
                 onChange={e => setNewCollectionName(e.target.value)}
                 maxLength={50}
               />
+              {error && <div className='text-red-600 mt-2 font-medium transition-all'>{error}</div>}
             </div>
 
             <div className='flex items-center justify-end'>

@@ -11,4 +11,6 @@ interface CollectionRepository : JpaRepository<Collection, Long> {
         userId: Long,
         visibility: com.amin.backend.enums.CollectionVisibility
     ): List<Collection>
+
+    fun existsByNameAndUserId(name: String, userId: Long): Boolean
 }
