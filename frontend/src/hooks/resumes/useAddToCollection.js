@@ -43,17 +43,16 @@ export function useAddToCollection(userId, resumeId) {
     }
   };
 
-  const handleCreateNew = async () => {
-    const name = prompt('Collection name?');
-    if (!name) return;
+  // Handler for new collection creation used by drawer
+  const onActuallyCreateNew = async name => {
     setLoading(true);
     try {
       const res = await createCollection({
         name,
         visibility: 'PRIVATE',
-        userId, // Adjust if needed
+        userId,
       });
-      fetchCollections();
+      await fetchCollections();
       setSelected(res.data);
     } finally {
       setLoading(false);
@@ -73,7 +72,7 @@ export function useAddToCollection(userId, resumeId) {
     onSelect,
     onSearch,
     searchQuery: search,
-    onCreateNew: handleCreateNew,
+    onActuallyCreateNew,
     onAdd: handleAdd,
     loading,
     canAdd: !!selected,
