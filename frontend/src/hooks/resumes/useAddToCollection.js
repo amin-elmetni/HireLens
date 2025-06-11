@@ -56,14 +56,19 @@ export function useAddToCollection(userId, resumeId) {
       });
       await fetchCollections();
       setSelected(res.data);
+      return true; // success
     } catch (err) {
       if (err?.response?.status === 409) {
-        setError('A collection with this name already exists.');
+        setError(
+          err?.response?.data ||
+            `A collection named "${name}" already exists. Please choose a different name.`
+        );
+      } else if (err?.response?.data) {
+        setError(`An error occurred: ${err.response.data}`);
       } else {
-        setError('An error occurred. Please try again.');
+        setError(`An error occurred. Please try again. (${err.message})`);
       }
-      // Don't close create mode if error!
-      return;
+      return false; // error
     } finally {
       setLoading(false);
     }

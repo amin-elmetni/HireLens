@@ -74,9 +74,11 @@ const AddToCollectionDrawer = ({
   // Handler for actual creation
   const handleCreateCollection = async () => {
     if (!newCollectionName.trim()) return;
-    await onActuallyCreateNew(newCollectionName.trim());
-    setInCreateMode(false);
-    setNewCollectionName('');
+    const success = await onActuallyCreateNew(newCollectionName.trim());
+    if (success) {
+      setInCreateMode(false);
+      setNewCollectionName('');
+    }
   };
 
   const handleDrawerClose = () => {

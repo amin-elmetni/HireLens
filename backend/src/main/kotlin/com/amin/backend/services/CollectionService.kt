@@ -14,16 +14,16 @@ class CollectionService(
     private val userRepository: UserRepository
 ) {
     fun createCollection(dto: CollectionDto): CollectionDto {
-        // Check for duplicate name
-        if (collectionRepository.existsByNameAndUserId(dto.name, dto.userId)) {
-            throw DuplicateCollectionNameException("Collection name already exists for this user.")
-        }
         val user = userRepository.findById(dto.userId).orElseThrow {
             IllegalArgumentException("User not found")
+        }
+        if (collectionRepository.existsByNameAndUser(dto.name, user)) {
+            throw DuplicateCollectionNameException("Collection name already exists for this user.")
         }
         val collection = CollectionMapper.toEntity(dto, user)
         return CollectionMapper.toDto(collectionRepository.save(collection))
     }
+
 
     fun updateCollection(dto: CollectionDto): CollectionDto {
         val existing = collectionRepository.findById(dto.id ?: throw IllegalArgumentException("ID required"))
