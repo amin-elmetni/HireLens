@@ -15,7 +15,7 @@ const Actions = ({ uuid }) => {
   const { commentCount } = useComments(uuid);
   const { saved, toggleSave } = useSaves(uuid);
   const { viewResume, downloadResume } = useResumeActions();
-  
+
   const userId = 6;
   const addToCollection = useAddToCollection(userId, uuid);
 
@@ -85,7 +85,11 @@ const Actions = ({ uuid }) => {
         open={addToCollection.open}
         onClick={addToCollection.hide}
       />
-      <AddToCollectionDrawer {...addToCollection} />
+      <AddToCollectionDrawer
+        open={addToCollection.open}
+        onClose={addToCollection.hide}
+        {...addToCollection}
+      />{' '}
     </>
   );
 };

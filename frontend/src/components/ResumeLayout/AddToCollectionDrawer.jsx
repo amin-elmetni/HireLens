@@ -16,7 +16,7 @@ const AddToCollectionDrawer = ({
   onAdd,
   loading,
   canAdd,
-  onActuallyCreateNew, // will be passed from hook for api call
+  onActuallyCreateNew,
 }) => {
   const [showDrawer, setShowDrawer] = useState(open);
   const [inCreateMode, setInCreateMode] = useState(false);
@@ -101,55 +101,64 @@ const AddToCollectionDrawer = ({
       {/* Header */}
       <div className='px-6 py-5 border-b border-gray-800 flex items-center gap-4'>
         {/* Arrow/back button */}
-        {inCreateMode ? (
-          <button
-            onClick={handleBackFromCreate}
-            className='text-white hover:bg-gray-600 w-12 h-12 rounded-full transition-colors cursor-pointer'
-            aria-label='Back'
-          >
-            <FontAwesomeIcon
-              icon='fa-solid fa-arrow-left'
-              size='lg'
-            />
-          </button>
-        ) : (
-          <button
-            onClick={handleDrawerClose}
-            className='text-white hover:bg-gray-600 w-12 h-12 rounded-full transition-colors cursor-pointer'
-            aria-label='Close'
-          >
-            <FontAwesomeIcon
-              icon='fa-solid fa-arrow-left'
-              size='lg'
-            />
-          </button>
-        )}
+
+        <button
+          onClick={handleDrawerClose}
+          className='text-white hover:bg-gray-600 w-12 h-12 rounded-full transition-colors cursor-pointer'
+          aria-label='Close'
+        >
+          <FontAwesomeIcon
+            icon='fa-solid fa-arrow-left'
+            size='lg'
+          />
+        </button>
+
         <span className='text-lg font-semibold'>Add to Collection</span>
       </div>
       {/* Content */}
       <div className='p-6 flex-1 flex flex-col overflow-y-auto'>
         {inCreateMode ? (
           <div>
-            <div className='mb-8 flex items-center gap-2'>
-              <span className='font-semibold uppercase text-xs text-gray-400 tracking-wide'>
+            <button
+              className='text-white px-4 py-[6px] hover:bg-gray-700 rounded-full font-semibold transition-colors cursor-pointer mb-1 flex items-center gap-2'
+              onClick={handleBackFromCreate}
+            >
+              <FontAwesomeIcon
+                icon='fa-solid fa-arrow-left'
+                className='text-lg'
+              />
+              Back
+            </button>
+            <div className='relative group mb-6'>
+              <span
+                className='
+                  flex items-center gap-2 translate-y-2 translate-x-3 bg-gray-900 w-fit px-2
+                  font-semibold uppercase text-[11px] text-gray-400 tracking-wide
+                  group-focus-within:text-white group-hover:text-white transition-colors duration-200
+                '
+              >
                 Collection Name
               </span>
+              <input
+                ref={newCollectionInputRef}
+                type='text'
+                className='
+                  w-full px-4 py-3 rounded border border-gray-400 bg-transparent text-white
+                  focus:outline-none focus:border-white hover:border-white transition-colors text-lg 
+                '
+                placeholder='Name your new Collection'
+                value={newCollectionName}
+                onChange={e => setNewCollectionName(e.target.value)}
+                maxLength={50}
+              />
             </div>
-            <input
-              ref={newCollectionInputRef}
-              type='text'
-              className='w-full px-4 py-3 rounded border border-gray-400 bg-transparent text-white focus:outline-none focus:border-white transition-colors text-lg mb-8'
-              placeholder='Name your new Collection'
-              value={newCollectionName}
-              onChange={e => setNewCollectionName(e.target.value)}
-              maxLength={50}
-            />
+
             <div className='flex items-center justify-end'>
               <button
                 className={`px-6 py-[10px] rounded-full font-semibold transition
                   ${
                     newCollectionName.trim()
-                      ? 'bg-white text-gray-900 hover:bg-primary hover:text-white cursor-pointer'
+                      ? 'bg-white text-gray-900 cursor-pointer'
                       : 'bg-gray-500 text-gray-900 cursor-not-allowed'
                   }`}
                 onClick={handleCreateCollection}
