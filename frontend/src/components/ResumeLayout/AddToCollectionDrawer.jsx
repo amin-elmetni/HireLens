@@ -8,16 +8,16 @@ const AddToCollectionDrawer = ({
   open,
   onClose,
   collections,
-  selected,
-  onSelect,
+  selectedIds,
+  toggleCollection,
   onSearch,
   searchQuery,
-  onAdd,
   loading,
   canAdd,
-  onActuallyCreateNew,
+  handleAdd,
   error,
   setError,
+  onActuallyCreateNew, // unchanged, for creating new collections
 }) => {
   const [showDrawer, setShowDrawer] = useState(open);
   const [inCreateMode, setInCreateMode] = useState(false);
@@ -59,14 +59,13 @@ const AddToCollectionDrawer = ({
       newCollectionInputRef.current.focus();
   }, [open, inCreateMode]);
 
-  // Handler for opening create new collection view
   const handleCreateNewClick = () => {
     setInCreateMode(true);
     setNewCollectionName('');
     setNewCollectionDescription('');
+    setError('');
   };
 
-  // Handler for leaving create new collection view
   const handleBackFromCreate = () => {
     setInCreateMode(false);
     setNewCollectionName('');
@@ -74,10 +73,9 @@ const AddToCollectionDrawer = ({
     setError('');
   };
 
-  // Handler for actual creation
   const handleCreateCollection = async () => {
     if (!newCollectionName.trim()) return;
-    const success = await onActuallyCreateNew(
+    const success = await onActuallyCreateNew?.(
       newCollectionName.trim(),
       newCollectionDescription.trim()
     );
@@ -137,6 +135,7 @@ const AddToCollectionDrawer = ({
       </div>
       {/* Content */}
       <div className='p-6 flex-1 flex flex-col overflow-y-auto'>
+        {error && <div className='text-red-600 mb-4 font-medium transition-all'>{error}</div>}
         {inCreateMode ? (
           <div>
             <button
@@ -146,7 +145,6 @@ const AddToCollectionDrawer = ({
               <FontAwesomeIcon icon='fa-solid fa-arrow-left' />
               Back
             </button>
-            {error && <div className='text-red-600 mt-2 font-medium transition-all'>{error}</div>}
             <div className='relative group mb-2'>
               <span
                 className='
@@ -170,7 +168,6 @@ const AddToCollectionDrawer = ({
                 maxLength={50}
               />
             </div>
-
             {/* Description Field */}
             <div className='relative group mb-6'>
               <span
@@ -195,7 +192,6 @@ const AddToCollectionDrawer = ({
                 maxLength={150}
               />
             </div>
-
             <div className='flex items-center justify-end'>
               <button
                 className={`px-6 py-[10px] rounded-full font-semibold
@@ -245,13 +241,13 @@ const AddToCollectionDrawer = ({
                   <label className='flex items-center py-[14px] px-4 cursor-pointer hover:bg-gray-200 rounded-xs'>
                     <input
                       type='checkbox'
-                      checked={Boolean(selected && selected.id === col.id)}
-                      onChange={() => onSelect(col)}
+                      checked={selectedIds.has(col.id)}
+                      onChange={() => toggleCollection(col.id)}
                       className="form-checkbox appearance-none mr-3 h-[17px] w-[17px] border-2 border-gray-400 rounded-xs 
-             checked:bg-black checked:border-black 
-             relative after:absolute after:content-[''] after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1 
-             after:w-[10px] after:h-[6px] after:border-l-2 after:border-b-2 after:border-white 
-             after:rotate-[-45deg] after:opacity-0 checked:after:opacity-100"
+                 checked:bg-black checked:border-black 
+                 relative after:absolute after:content-[''] after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1 
+                 after:w-[10px] after:h-[6px] after:border-l-2 after:border-b-2 after:border-white 
+                 after:rotate-[-45deg] after:opacity-0 checked:after:opacity-100"
                     />
                     <span className='text-gray-800'>{col.name}</span>
                   </label>
@@ -276,8 +272,8 @@ const AddToCollectionDrawer = ({
                 ? 'bg-primary text-white hover:shadow-lg cursor-pointer transition'
                 : 'bg-gray-400 text-white'
             }`}
-            onClick={onAdd}
-            disabled={!canAdd || loading}
+            onClick={handleAdd}
+            disabled={loading}
           >
             Add
           </button>

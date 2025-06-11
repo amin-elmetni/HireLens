@@ -1,4 +1,3 @@
-// src/components/Actions.jsx
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ToggleIconButton from './ToggleIconButton';
@@ -8,7 +7,7 @@ import { useSaves } from '@/hooks/resumes/useSaves';
 import { useResumeActions } from '@/hooks/resumes/useResumeActions';
 import Overlay from '@/components/Overlay';
 import AddToCollectionDrawer from './AddToCollectionDrawer';
-import { useAddToCollection } from '@/hooks/resumes/useAddToCollection';
+import { useMultiCollectionPicker } from '@/hooks/resumes/useMultiCollectionPicker';
 
 const Actions = ({ uuid }) => {
   const { liked, likeCount, toggleLike } = useLikes(uuid);
@@ -16,11 +15,11 @@ const Actions = ({ uuid }) => {
   const { saved, toggleSave } = useSaves(uuid);
   const { viewResume, downloadResume } = useResumeActions();
 
-  const addToCollection = useAddToCollection(uuid);
+  const collectionPicker = useMultiCollectionPicker(uuid);
 
   const actionButtons = [
     {
-      onClick: addToCollection.show,
+      onClick: collectionPicker.show,
       regularIcon: 'fa-solid fa-folder-plus',
       solidIcon: 'fa-regular fa-folder-open',
       activeColor: 'text-blue-500',
@@ -37,7 +36,6 @@ const Actions = ({ uuid }) => {
       onClick: () => downloadResume(uuid),
       regularIcon: 'fa-regular fa-circle-down',
       solidIcon: 'fa-solid fa-circle-down',
-      activeColor: 'text-green-500',
       activeColor: 'text-green-500',
       isActive: false,
     },
@@ -70,7 +68,6 @@ const Actions = ({ uuid }) => {
             <span>{commentCount}</span>
           </div>
         </div>
-
         <div className='flex items-center gap-2 text-xl'>
           {actionButtons.map((btn, index) => (
             <ToggleIconButton
@@ -81,14 +78,24 @@ const Actions = ({ uuid }) => {
         </div>
       </div>
       <Overlay
-        open={addToCollection.open}
-        onClick={addToCollection.hide}
+        open={collectionPicker.open}
+        onClick={collectionPicker.hide}
       />
       <AddToCollectionDrawer
-        open={addToCollection.open}
-        onClose={addToCollection.hide}
-        {...addToCollection}
-      />{' '}
+        open={collectionPicker.open}
+        onClose={collectionPicker.hide}
+        collections={collectionPicker.collections}
+        selectedIds={collectionPicker.selectedIds}
+        toggleCollection={collectionPicker.toggleCollection}
+        onSearch={collectionPicker.onSearch}
+        searchQuery={collectionPicker.searchQuery}
+        handleAdd={collectionPicker.handleAdd}
+        loading={collectionPicker.loading}
+        canAdd={collectionPicker.canAdd}
+        error={collectionPicker.error}
+        setError={collectionPicker.setError}
+        onActuallyCreateNew={collectionPicker.onActuallyCreateNew}
+      />
     </>
   );
 };
