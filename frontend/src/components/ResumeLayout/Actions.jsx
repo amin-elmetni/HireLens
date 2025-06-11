@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ToggleIconButton from './ToggleIconButton';
 import { useLikes } from '@/hooks/resumes/useLikes';
@@ -8,6 +8,7 @@ import { useResumeActions } from '@/hooks/resumes/useResumeActions';
 import Overlay from '@/components/Overlay';
 import AddToCollectionDrawer from './AddToCollectionDrawer';
 import { useMultiCollectionPicker } from '@/hooks/resumes/useMultiCollectionPicker';
+import ConfirmationToast from '@/components/ConfirmationToast';
 
 const Actions = ({ uuid }) => {
   const { liked, likeCount, toggleLike } = useLikes(uuid);
@@ -16,6 +17,9 @@ const Actions = ({ uuid }) => {
   const { viewResume, downloadResume } = useResumeActions();
 
   const collectionPicker = useMultiCollectionPicker(uuid);
+
+  // Toast state moved here (parent of drawer)
+  const [toast, setToast] = useState({ show: false, message: '' });
 
   const actionButtons = [
     {
@@ -95,6 +99,13 @@ const Actions = ({ uuid }) => {
         error={collectionPicker.error}
         setError={collectionPicker.setError}
         onActuallyCreateNew={collectionPicker.onActuallyCreateNew}
+        setToast={setToast}
+      />
+      <ConfirmationToast
+        message={toast.message}
+        show={toast.show}
+        onClose={() => setToast({ show: false, message: '' })}
+        width='18rem'
       />
     </>
   );

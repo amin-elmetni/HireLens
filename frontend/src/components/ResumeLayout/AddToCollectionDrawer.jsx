@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import ConfirmationToast from '@/components/ConfirmationToast';
 
 const DRAWER_WIDTH = 550;
 
@@ -19,12 +18,12 @@ const AddToCollectionDrawer = ({
   error,
   setError,
   onActuallyCreateNew, // unchanged, for creating new collections
+  setToast, // <-- now comes from parent
 }) => {
   const [showDrawer, setShowDrawer] = useState(open);
   const [inCreateMode, setInCreateMode] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
   const [newCollectionDescription, setNewCollectionDescription] = useState('');
-  const [toast, setToast] = useState({ show: false, message: '' });
 
   const inputRef = useRef();
   const newCollectionInputRef = useRef();
@@ -86,7 +85,7 @@ const AddToCollectionDrawer = ({
       setInCreateMode(false);
       setNewCollectionName('');
       setNewCollectionDescription('');
-      setToast({ show: true, message: 'Collection Created Successfully!' });
+      if (setToast) setToast({ show: true, message: 'Collection Created Successfully!' });
     }
   };
 
@@ -109,8 +108,11 @@ const AddToCollectionDrawer = ({
   };
 
   const handleUpdate = async () => {
-    await handleAddAndRemove();
-    setToast({ show: true, message: 'Resume Collections Updated!' });
+    const result = await handleAddAndRemove();
+    if (result && setToast) {
+      setToast({ show: true, message: 'Resume Collections Updated!' });
+    }
+    onClose();
   };
 
   if (!showDrawer && !open) return null;
@@ -290,11 +292,6 @@ const AddToCollectionDrawer = ({
           )}
         </div>
       </aside>
-      <ConfirmationToast
-        message={toast.message}
-        show={toast.show}
-        onClose={() => setToast({ show: false, message: '' })}
-      />
     </>,
     document.body
   );

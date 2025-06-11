@@ -102,8 +102,10 @@ export function useMultiCollectionPicker(resumeUuid) {
       ]);
       setIncludedIds(new Set(selectedIds));
       setOpen(false);
+      return true;
     } catch (err) {
       setError('Failed to update collections.');
+      return false;
     } finally {
       setLoading(false);
     }

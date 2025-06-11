@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 const ConfirmationToast = ({ message, show, duration = 2500, onClose, width = '20rem' }) => {
   useEffect(() => {
@@ -9,12 +10,13 @@ const ConfirmationToast = ({ message, show, duration = 2500, onClose, width = '2
     return () => clearTimeout(timer);
   }, [show, duration, onClose]);
 
-  return (
+  // The toast content
+  const toastContent = (
     <div
       aria-live='polite'
       aria-atomic='true'
-      className={`fixed left-6 bottom-6 z-[9999] w-full min-h-[50px] px-4 text-center flex items-center justify-center  
-        bg-black text-white rounded-xl shadow-lg text-base transition-all duration-300 
+      className={`fixed left-6 bottom-6 z-[9999] w-full min-h-[45px] px-4 text-center flex items-center justify-center  
+        bg-gray-800 text-white rounded-xl shadow-lg text-base transition-all duration-300 
         ${show ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none translate-y-4'}
       `}
       style={{
@@ -26,6 +28,9 @@ const ConfirmationToast = ({ message, show, duration = 2500, onClose, width = '2
       {message}
     </div>
   );
+
+  // Render the toast as a portal to document.body
+  return createPortal(toastContent, document.body);
 };
 
 export default ConfirmationToast;
