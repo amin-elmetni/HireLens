@@ -18,8 +18,26 @@ const Actions = ({ uuid }) => {
 
   const collectionPicker = useMultiCollectionPicker(uuid);
 
-  // Toast state moved here (parent of drawer)
+  // Toast state
   const [toast, setToast] = useState({ show: false, message: '' });
+
+  // Wrap like handler
+  const handleToggleLike = async () => {
+    await toggleLike();
+    setToast({
+      show: true,
+      message: liked ? 'Resume unliked!' : 'Resume liked!',
+    });
+  };
+
+  // Wrap save handler
+  const handleToggleSave = async () => {
+    await toggleSave();
+    setToast({
+      show: true,
+      message: saved ? 'Resume unsaved!' : 'Resume saved!',
+    });
+  };
 
   const actionButtons = [
     {
@@ -44,14 +62,14 @@ const Actions = ({ uuid }) => {
       isActive: false,
     },
     {
-      onClick: toggleLike,
+      onClick: handleToggleLike,
       regularIcon: 'fa-regular fa-heart',
       solidIcon: 'fa-solid fa-heart',
       activeColor: 'text-red-500',
       isActive: liked,
     },
     {
-      onClick: toggleSave,
+      onClick: handleToggleSave,
       regularIcon: 'fa-regular fa-bookmark',
       solidIcon: 'fa-solid fa-bookmark',
       activeColor: 'text-yellow-400',
@@ -105,7 +123,6 @@ const Actions = ({ uuid }) => {
         message={toast.message}
         show={toast.show}
         onClose={() => setToast({ show: false, message: '' })}
-        width='18rem'
       />
     </>
   );
