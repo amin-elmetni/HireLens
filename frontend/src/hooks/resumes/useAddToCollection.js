@@ -54,6 +54,8 @@ export function useAddToCollection(userId, resumeId) {
       });
       await fetchCollections();
       setSelected(res.data);
+    } catch (err) {
+      console.error('Error creating collection:', err?.response?.data || err);
     } finally {
       setLoading(false);
     }

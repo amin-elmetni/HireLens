@@ -87,7 +87,7 @@ const AddToCollectionDrawer = ({
 
   return createPortal(
     <aside
-      className={`fixed top-0 right-0 h-full w-full sm:w-[${DRAWER_WIDTH}px] max-w-full bg-gray-900 text-white z-[1010] shadow-lg flex flex-col transition-transform duration-300
+      className={`fixed top-0 right-0 h-full w-full sm:w-[${DRAWER_WIDTH}px] max-w-full bg-white text-gray-900 z-[1010] shadow-lg flex flex-col transition-transform duration-300
         ${open ? 'translate-x-0' : 'translate-x-full'}
       `}
       style={{
@@ -99,12 +99,12 @@ const AddToCollectionDrawer = ({
       onClick={e => e.stopPropagation()} // prevent overlay click
     >
       {/* Header */}
-      <div className='px-6 py-5 border-b border-gray-800 flex items-center gap-4'>
+      <div className='px-6 py-5 border-b border-gray-200 flex items-center gap-4'>
         {/* Arrow/back button */}
 
         <button
           onClick={handleDrawerClose}
-          className='text-white hover:bg-gray-600 w-12 h-12 rounded-full transition-colors cursor-pointer'
+          className='text-gray-900 hover:bg-gray-100 w-12 h-12 rounded-full transition-colors cursor-pointer'
           aria-label='Close'
         >
           <FontAwesomeIcon
@@ -120,21 +120,18 @@ const AddToCollectionDrawer = ({
         {inCreateMode ? (
           <div>
             <button
-              className='text-white px-4 py-[6px] hover:bg-gray-700 rounded-full font-semibold transition-colors cursor-pointer mb-1 flex items-center gap-2'
+              className='text-gray-900 px-4 py-[6px] hover:bg-gray-100 rounded-full font-semibold transition-colors cursor-pointer mb-1 flex items-center gap-3'
               onClick={handleBackFromCreate}
             >
-              <FontAwesomeIcon
-                icon='fa-solid fa-arrow-left'
-                className='text-lg'
-              />
+              <FontAwesomeIcon icon='fa-solid fa-arrow-left' />
               Back
             </button>
             <div className='relative group mb-6'>
               <span
                 className='
-                  flex items-center gap-2 translate-y-2 translate-x-3 bg-gray-900 w-fit px-2
+                  flex translate-y-[9px] translate-x-3 bg-white w-fit px-2
                   font-semibold uppercase text-[11px] text-gray-400 tracking-wide
-                  group-focus-within:text-white group-hover:text-white transition-colors duration-200
+                  group-focus-within:text-black group-hover:text-black transition-colors duration-200
                 '
               >
                 Collection Name
@@ -143,8 +140,8 @@ const AddToCollectionDrawer = ({
                 ref={newCollectionInputRef}
                 type='text'
                 className='
-                  w-full px-4 py-3 rounded border border-gray-400 bg-transparent text-white
-                  focus:outline-none focus:border-white hover:border-white transition-colors text-lg 
+                  w-full px-4 py-3 rounded border border-gray-300 bg-transparent text-gray-900
+                  focus:outline-none focus:border-black hover:border-black transition-colors text-lg 
                 '
                 placeholder='Name your new Collection'
                 value={newCollectionName}
@@ -155,11 +152,11 @@ const AddToCollectionDrawer = ({
 
             <div className='flex items-center justify-end'>
               <button
-                className={`px-6 py-[10px] rounded-full font-semibold transition
+                className={`px-6 py-[10px] rounded-full font-semibold
                   ${
                     newCollectionName.trim()
-                      ? 'bg-white text-gray-900 cursor-pointer'
-                      : 'bg-gray-500 text-gray-900 cursor-not-allowed'
+                      ? 'bg-primary text-white cursor-pointer hover:shadow-lg transition'
+                      : 'bg-gray-400 text-white'
                   }`}
                 onClick={handleCreateCollection}
                 disabled={!newCollectionName.trim() || loading}
@@ -171,10 +168,10 @@ const AddToCollectionDrawer = ({
         ) : (
           <>
             <div className='mb-4'>
-              <div className='flex items-center pl-6 rounded-full text-white border border-gray-400 focus-within:border-white transition-colors'>
+              <div className='flex items-center pl-6 rounded-full text-gray-900 border border-gray-200 focus-within:border-black hover:border-black transition-colors'>
                 <FontAwesomeIcon
                   icon='fa-solid fa-magnifying-glass'
-                  className='text-white'
+                  className='text-gray-900'
                 />
                 <input
                   ref={inputRef}
@@ -187,7 +184,7 @@ const AddToCollectionDrawer = ({
               </div>
             </div>
             <button
-              className='flex items-center gap-4 w-full py-4 px-4 bg-transparent rounded text-left hover:bg-gray-800 mb-2 cursor-pointer'
+              className='flex items-center gap-4 w-full py-[14px] px-4 bg-transparent rounded text-left hover:bg-gray-200 cursor-pointer'
               onClick={handleCreateNewClick}
             >
               <FontAwesomeIcon
@@ -196,15 +193,19 @@ const AddToCollectionDrawer = ({
               />
               <span>Create New Collection</span>
             </button>
-            <ul className='flex-1 overflow-y-auto'>
+            <ul className='flex-1 overflow-y-auto scrollbar-custom-2'>
               {collections.map(col => (
                 <li key={col.id}>
-                  <label className='flex items-center py-2 px-0 cursor-pointer hover:bg-gray-800 rounded'>
+                  <label className='flex items-center py-[14px] px-4 cursor-pointer hover:bg-gray-200 rounded'>
                     <input
                       type='checkbox'
                       checked={selected && selected.id === col.id}
                       onChange={() => onSelect(col)}
-                      className='form-checkbox accent-primary mr-3'
+                      className="form-checkbox appearance-none mr-3 h-[17px] w-[17px] border-2 border-gray-400 rounded-xs 
+             checked:bg-black checked:border-black 
+             relative after:absolute after:content-[''] after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1 
+             after:w-[10px] after:h-[6px] after:border-l-2 after:border-b-2 after:border-white 
+             after:rotate-[-45deg] after:opacity-0 checked:after:opacity-100"
                     />
                     <span>{col.name}</span>
                   </label>
@@ -215,19 +216,19 @@ const AddToCollectionDrawer = ({
         )}
       </div>
       {/* Footer */}
-      <div className='flex items-center justify-end border-t border-gray-800 px-6 py-4 gap-3'>
+      <div className='flex items-center justify-end border-t border-gray-200 px-6 py-4 gap-3'>
         <button
-          className='text-white px-6 py-[6px] hover:bg-gray-700 rounded-full font-semibold transition-colors cursor-pointer'
+          className='text-black px-6 py-[6px] hover:bg-gray-100 rounded-full font-semibold transition-colors cursor-pointer'
           onClick={handleDrawerClose}
         >
           Cancel
         </button>
         {!inCreateMode && (
           <button
-            className={`px-6 py-[6px] rounded-full font-semibold transition ${
+            className={`px-6 py-[6px] rounded-full font-semibold ${
               canAdd
-                ? 'bg-white text-gray-900 hover:bg-primary-dark cursor-pointer'
-                : 'bg-gray-500 text-gray-900'
+                ? 'bg-primary text-white hover:shadow-lg cursor-pointer transition'
+                : 'bg-gray-400 text-white'
             }`}
             onClick={onAdd}
             disabled={!canAdd || loading}
