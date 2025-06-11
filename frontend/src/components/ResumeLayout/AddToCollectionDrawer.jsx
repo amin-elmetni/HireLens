@@ -184,7 +184,7 @@ const AddToCollectionDrawer = ({
               </div>
             </div>
             <button
-              className='flex items-center gap-4 w-full py-[14px] px-4 bg-transparent rounded text-left hover:bg-gray-200 cursor-pointer'
+              className='flex items-center gap-4 w-full py-[14px] px-4 bg-transparent rounded-xs text-left hover:bg-gray-200 cursor-pointer'
               onClick={handleCreateNewClick}
             >
               <FontAwesomeIcon
@@ -196,7 +196,7 @@ const AddToCollectionDrawer = ({
             <ul className='flex-1 overflow-y-auto scrollbar-custom-2'>
               {collections.map(col => (
                 <li key={col.id}>
-                  <label className='flex items-center py-[14px] px-4 cursor-pointer hover:bg-gray-200 rounded'>
+                  <label className='flex items-center py-[14px] px-4 cursor-pointer hover:bg-gray-200 rounded-xs'>
                     <input
                       type='checkbox'
                       checked={selected && selected.id === col.id}
@@ -207,7 +207,7 @@ const AddToCollectionDrawer = ({
              after:w-[10px] after:h-[6px] after:border-l-2 after:border-b-2 after:border-white 
              after:rotate-[-45deg] after:opacity-0 checked:after:opacity-100"
                     />
-                    <span>{col.name}</span>
+                    <span className='text-gray-800'>{col.name}</span>
                   </label>
                 </li>
               ))}
