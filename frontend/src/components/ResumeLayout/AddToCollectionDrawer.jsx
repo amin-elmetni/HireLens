@@ -12,7 +12,6 @@ const AddToCollectionDrawer = ({
   onSelect,
   onSearch,
   searchQuery,
-  onCreateNew,
   onAdd,
   loading,
   canAdd,
@@ -23,15 +22,16 @@ const AddToCollectionDrawer = ({
   const [showDrawer, setShowDrawer] = useState(open);
   const [inCreateMode, setInCreateMode] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
+  const [newCollectionDescription, setNewCollectionDescription] = useState('');
 
   const inputRef = useRef();
   const newCollectionInputRef = useRef();
+  const newCollectionDescriptionRef = useRef();
 
   // Animate slide in/out
   useEffect(() => {
     if (open) setShowDrawer(true);
     else {
-      // Wait for transition before removing from DOM
       const timeout = setTimeout(() => setShowDrawer(false), 300);
       return () => clearTimeout(timeout);
     }
@@ -63,32 +63,46 @@ const AddToCollectionDrawer = ({
   const handleCreateNewClick = () => {
     setInCreateMode(true);
     setNewCollectionName('');
+    setNewCollectionDescription('');
   };
 
   // Handler for leaving create new collection view
   const handleBackFromCreate = () => {
     setInCreateMode(false);
     setNewCollectionName('');
+    setNewCollectionDescription('');
+    setError('');
   };
 
   // Handler for actual creation
   const handleCreateCollection = async () => {
     if (!newCollectionName.trim()) return;
-    const success = await onActuallyCreateNew(newCollectionName.trim());
+    const success = await onActuallyCreateNew(
+      newCollectionName.trim(),
+      newCollectionDescription.trim()
+    );
     if (success) {
       setInCreateMode(false);
       setNewCollectionName('');
+      setNewCollectionDescription('');
     }
   };
 
   const handleDrawerClose = () => {
     setInCreateMode(false);
     setNewCollectionName('');
+    setNewCollectionDescription('');
+    setError('');
     onClose();
   };
 
   const handleInputChange = e => {
     setNewCollectionName(e.target.value);
+    if (error) setError('');
+  };
+
+  const handleDescriptionChange = e => {
+    setNewCollectionDescription(e.target.value);
     if (error) setError('');
   };
 
@@ -105,12 +119,10 @@ const AddToCollectionDrawer = ({
         transform: open ? 'translateX(0)' : `translateX(${DRAWER_WIDTH}px)`,
       }}
       aria-label='Add to Collection Drawer'
-      onClick={e => e.stopPropagation()} // prevent overlay click
+      onClick={e => e.stopPropagation()}
     >
       {/* Header */}
       <div className='px-6 py-5 border-b border-gray-200 flex items-center gap-4'>
-        {/* Arrow/back button */}
-
         <button
           onClick={handleDrawerClose}
           className='text-gray-900 hover:bg-gray-100 w-12 h-12 rounded-full transition-colors cursor-pointer'
@@ -121,7 +133,6 @@ const AddToCollectionDrawer = ({
             size='lg'
           />
         </button>
-
         <span className='text-lg font-semibold'>Add to Collection</span>
       </div>
       {/* Content */}
@@ -135,7 +146,8 @@ const AddToCollectionDrawer = ({
               <FontAwesomeIcon icon='fa-solid fa-arrow-left' />
               Back
             </button>
-            <div className='relative group mb-6'>
+            {error && <div className='text-red-600 mt-2 font-medium transition-all'>{error}</div>}
+            <div className='relative group mb-2'>
               <span
                 className='
                   flex translate-y-[9px] translate-x-3 bg-white w-fit px-2
@@ -152,12 +164,36 @@ const AddToCollectionDrawer = ({
                   w-full px-4 py-3 rounded border border-gray-300 bg-transparent text-gray-900
                   focus:outline-none focus:border-black hover:border-black transition-colors text-lg 
                 '
-                placeholder='Name your new Collection'
+                placeholder='Name your new collection'
                 value={newCollectionName}
-                onChange={e => setNewCollectionName(e.target.value)}
+                onChange={handleInputChange}
                 maxLength={50}
               />
-              {error && <div className='text-red-600 mt-2 font-medium transition-all'>{error}</div>}
+            </div>
+
+            {/* Description Field */}
+            <div className='relative group mb-6'>
+              <span
+                className='
+                  flex translate-y-[9px] translate-x-3 bg-white w-fit px-2
+                  font-semibold uppercase text-[11px] text-gray-400 tracking-wide
+                  group-focus-within:text-black group-hover:text-black transition-colors duration-200
+                '
+              >
+                Description
+              </span>
+              <textarea
+                ref={newCollectionDescriptionRef}
+                type='text'
+                className='
+                  w-full px-4 py-3 rounded border border-gray-300 bg-transparent text-gray-900
+                  focus:outline-none focus:border-black hover:border-black transition-colors text-lg h-40 resize-none scrollbar-custom-2
+                '
+                placeholder='Describe your new collection'
+                value={newCollectionDescription}
+                onChange={handleDescriptionChange}
+                maxLength={150}
+              />
             </div>
 
             <div className='flex items-center justify-end'>

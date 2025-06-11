@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { getUserCollections, createCollection } from '@/api/collectionApi';
 import { addItemToCollection } from '@/api/collectionItemApi';
-import { getUser } from '@/utils/userUtils'; // <-- import your utility
+import { getUser } from '@/utils/userUtils';
 
 export function useAddToCollection(resumeId) {
   const user = getUser();
@@ -28,6 +28,7 @@ export function useAddToCollection(resumeId) {
     setOpen(false);
     setSearch('');
     setSelected(null);
+    setError('');
   };
 
   const onSearch = val => setSearch(val);
@@ -49,12 +50,13 @@ export function useAddToCollection(resumeId) {
   };
 
   // Handler for new collection creation used by drawer
-  const onActuallyCreateNew = async name => {
+  const onActuallyCreateNew = async (name, description) => {
     setError('');
     setLoading(true);
     try {
       const res = await createCollection({
         name,
+        description,
         visibility: 'PRIVATE',
         userId,
       });
@@ -63,7 +65,10 @@ export function useAddToCollection(resumeId) {
       return true; // success
     } catch (err) {
       if (err?.response?.status === 409) {
-        setError(`A collection named "${name}" already exists. Please choose a different name.`);
+        setError(
+          err?.response?.data ||
+            `A collection named "${name}" already exists. Please choose a different name.`
+        );
       } else if (err?.response?.data) {
         setError(`An error occurred: ${err.response.data}`);
       } else {
