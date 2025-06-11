@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getLikeCount, getResumeByUuid } from '@/api/likeApi';
+import { getLikeCount } from '@/api/likeApi';
 import { getCommentCount } from '@/api/commentApi';
+import { getResumeByUuid } from '@/api/resumeApi';
 
 export function useResumeCounts(resumes) {
   const [resumeCounts, setResumeCounts] = useState({});

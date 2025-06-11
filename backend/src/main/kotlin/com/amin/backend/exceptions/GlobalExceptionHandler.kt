@@ -11,6 +11,11 @@ class GlobalExceptionHandler {
     fun handleDuplicateName(ex: DuplicateCollectionNameException): ResponseEntity<String> {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.message)
     }
+    
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleIllegalArgument(ex: IllegalArgumentException): ResponseEntity<String> {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.message)
+    }
 
     @ExceptionHandler(Exception::class)
     fun handleAll(ex: Exception): ResponseEntity<String> {

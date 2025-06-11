@@ -1,7 +1,7 @@
 // src/hooks/useComments.js
 import { useEffect, useState } from 'react';
 import { getCommentCount } from '@/api/commentApi';
-import { getResumeByUuid } from '@/api/likeApi';
+import { getResumeByUuid } from '@/api/resumeApi';
 
 export const useComments = uuid => {
   const [resumeId, setResumeId] = useState(null);

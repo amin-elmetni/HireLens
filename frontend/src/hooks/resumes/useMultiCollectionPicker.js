@@ -5,9 +5,10 @@ import {
   addItemToCollection,
   removeItemFromCollection,
 } from '@/api/collectionItemApi';
+import { getResumeByUuid } from '@/api/resumeApi'; // <-- import the API to resolve uuid
 import { getUser } from '@/utils/userUtils';
 
-export function useMultiCollectionPicker(resumeId) {
+export function useMultiCollectionPicker(resumeUuid) {
   const user = getUser();
   const userId = user ? user.id : null;
 
@@ -19,21 +20,41 @@ export function useMultiCollectionPicker(resumeId) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Use a ref or state to cache the resolved numeric resumeId
+  const [resumeId, setResumeId] = useState(null);
+
+  // Fetch and resolve the numeric resumeId once
+  const resolveResumeId = useCallback(async () => {
+    if (!resumeUuid) return null;
+    try {
+      const { data: resume } = await getResumeByUuid(resumeUuid);
+      return resume.id;
+    } catch (err) {
+      setError('Failed to resolve resume ID');
+      return null;
+    }
+  }, [resumeUuid]);
+
   // Fetch collections and which ones currently include this resume
   const fetchCollectionsAndIncluded = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
       if (!userId) return;
+      // Resolve numeric resumeId first
+      const resolvedResumeId = await resolveResumeId();
+      if (!resolvedResumeId) throw new Error('Resume ID not found');
+      setResumeId(resolvedResumeId);
+
       const { data: allCollections = [] } = await getUserCollections(userId);
       setCollections(allCollections);
 
-      // For each collection, check if resume is included
+      // For each collection, check if resume is included (using numeric resumeId)
       const included = new Set();
       await Promise.all(
         allCollections.map(async col => {
           const { data: items } = await getItemsByCollection(col.id);
-          if (items?.some(item => item.resumeId === resumeId)) {
+          if (items?.some(item => item.resumeId === resolvedResumeId)) {
             included.add(col.id);
           }
         })
@@ -45,7 +66,7 @@ export function useMultiCollectionPicker(resumeId) {
     } finally {
       setLoading(false);
     }
-  }, [userId, resumeId]);
+  }, [userId, resolveResumeId]);
 
   const show = () => {
     fetchCollectionsAndIncluded();
@@ -68,10 +89,11 @@ export function useMultiCollectionPicker(resumeId) {
     });
   };
 
-  const handleAdd = async () => {
+  const handleAddAndRemove = async () => {
     setLoading(true);
     setError('');
     try {
+      if (!resumeId) throw new Error('Resume ID not resolved');
       const toAdd = [...selectedIds].filter(id => !includedIds.has(id));
       const toRemove = [...includedIds].filter(id => !selectedIds.has(id));
       await Promise.all([
@@ -87,7 +109,6 @@ export function useMultiCollectionPicker(resumeId) {
     }
   };
 
-  // -- THIS IS THE NEW/COPIED FUNCTION --
   const onActuallyCreateNew = async (name, description) => {
     setError('');
     setLoading(true);
@@ -98,11 +119,9 @@ export function useMultiCollectionPicker(resumeId) {
         visibility: 'PRIVATE',
         userId,
       });
-      // Refetch collections so the new one appears in the list and can be selected
       await fetchCollectionsAndIncluded();
-      // Optionally, auto-select the new collection in the UI
       setSelectedIds(prev => new Set(prev).add(res.data.id));
-      return true; // success
+      return true;
     } catch (err) {
       if (err?.response?.status === 409) {
         setError(
@@ -133,7 +152,7 @@ export function useMultiCollectionPicker(resumeId) {
     toggleCollection,
     searchQuery: search,
     onSearch,
-    handleAdd,
+    handleAddAndRemove,
     loading,
     canAdd: selectedIds.size > 0 || includedIds.size > 0,
     error,

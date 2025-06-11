@@ -2,8 +2,6 @@ import api from './index';
 
 const LIKE_BASE = '/api/likes';
 
-export const getResumeByUuid = uuid => api.get(`/api/resumes/uuid/${uuid}`);
-
 export const getLikeCount = resumeId => api.get(`${LIKE_BASE}/count/${resumeId}`);
 
 export const checkIfLiked = (userId, resumeId) =>

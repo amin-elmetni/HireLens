@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import {
-  getResumeByUuid,
   getLikeCount,
   checkIfLiked,
   likeResume,
   unlikeResume,
 } from '@/api/likeApi';
 import { getUser } from '@/utils/userUtils';
+import { getResumeByUuid } from '@/api/resumeApi';
 
 export const useLikes = uuid => {
   const user = getUser();

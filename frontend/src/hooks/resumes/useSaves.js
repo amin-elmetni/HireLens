@@ -1,7 +1,7 @@
 // src/hooks/useSaves.js
 import { useEffect, useState } from 'react';
 import { saveResume, unsaveResume, hasSavedResume } from '@/api/saveApi';
-import { getResumeByUuid } from '@/api/likeApi';
+import { getResumeByUuid } from '@/api/resumeApi';
 import { getUser } from '@/utils/userUtils';
 
 export const useSaves = uuid => {

@@ -89,7 +89,7 @@ const Actions = ({ uuid }) => {
         toggleCollection={collectionPicker.toggleCollection}
         onSearch={collectionPicker.onSearch}
         searchQuery={collectionPicker.searchQuery}
-        handleAdd={collectionPicker.handleAdd}
+        handleAddAndRemove={collectionPicker.handleAddAndRemove}
         loading={collectionPicker.loading}
         canAdd={collectionPicker.canAdd}
         error={collectionPicker.error}

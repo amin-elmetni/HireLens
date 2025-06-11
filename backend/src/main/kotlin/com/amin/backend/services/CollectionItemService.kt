@@ -5,6 +5,7 @@ import com.amin.backend.mappers.CollectionItemMapper
 import com.amin.backend.repositories.CollectionItemRepository
 import com.amin.backend.repositories.CollectionRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CollectionItemService(
@@ -31,6 +32,7 @@ class CollectionItemService(
         return collectionItemRepository.findByCollection(collection).map(CollectionItemMapper::toDto)
     }
 
+    @Transactional   // <-- ADD THIS
     fun removeItem(collectionId: Long, resumeId: Long) {
         val collection = collectionRepository.findById(collectionId)
             .orElseThrow { IllegalArgumentException("Collection not found") }
