@@ -108,6 +108,11 @@ const AddToCollectionDrawer = ({
     if (error) setError('');
   };
 
+  const handleUpdate = async () => {
+    await handleAddAndRemove();
+    setToast({ show: true, message: 'Resume Collections Updated!' });
+  };
+
   if (!showDrawer && !open) return null;
 
   return createPortal(
@@ -277,7 +282,7 @@ const AddToCollectionDrawer = ({
                   ? 'bg-primary text-white hover:shadow-lg cursor-pointer transition'
                   : 'bg-gray-400 text-white'
               }`}
-              onClick={handleAddAndRemove}
+              onClick={handleUpdate}
               disabled={loading}
             >
               Update
