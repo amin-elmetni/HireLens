@@ -165,7 +165,7 @@ const AddToCollectionDrawer = ({
                   focus:outline-none focus:border-black hover:border-black transition-colors text-lg 
                 '
                 placeholder='Name your new collection'
-                value={newCollectionName}
+                value={newCollectionName || ''}
                 onChange={handleInputChange}
                 maxLength={50}
               />
@@ -190,7 +190,7 @@ const AddToCollectionDrawer = ({
                   focus:outline-none focus:border-black hover:border-black transition-colors text-lg h-40 resize-none scrollbar-custom-2
                 '
                 placeholder='Describe your new collection'
-                value={newCollectionDescription}
+                value={newCollectionDescription || ''}
                 onChange={handleDescriptionChange}
                 maxLength={150}
               />
@@ -245,7 +245,7 @@ const AddToCollectionDrawer = ({
                   <label className='flex items-center py-[14px] px-4 cursor-pointer hover:bg-gray-200 rounded-xs'>
                     <input
                       type='checkbox'
-                      checked={selected && selected.id === col.id}
+                      checked={Boolean(selected && selected.id === col.id)}
                       onChange={() => onSelect(col)}
                       className="form-checkbox appearance-none mr-3 h-[17px] w-[17px] border-2 border-gray-400 rounded-xs 
              checked:bg-black checked:border-black 
