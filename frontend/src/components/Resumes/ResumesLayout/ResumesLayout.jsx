@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import ResumeCard from '@/components/ResumesLayout/ResumeCard';
-import SortDropdown from '@/components/ResumesLayout/SortDropdown';
+import React, { useState, useMemo, useEffect } from 'react';
+import ResumeCard from '@/components/Resumes/ResumesLayout/ResumeCard';
+import SortDropdown from '@/components/Resumes/ResumesLayout/SortDropdown';
 import { useSearchParams } from 'react-router-dom';
 import { useFilteredResumes } from '@/hooks/resumes/useFilteredResumes';
 import { BASE_SORT_OPTIONS, getDynamicSortOptions } from '@/utils/resumeUtils';
@@ -57,6 +57,11 @@ const ResumesLayout = () => {
 
   // Reset to first page if sort or filters change
   useMemo(() => setCurrentPage(1), [sortBy, searchParams]);
+
+  // Scroll window to absolute top when changing page
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentPage]);
 
   return (
     <div>

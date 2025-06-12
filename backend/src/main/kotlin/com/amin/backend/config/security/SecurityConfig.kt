@@ -28,6 +28,7 @@ class SecurityConfig(
                 it.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // First handle OPTIONS
                     .requestMatchers(
                         "/api/auth/**",
+                        "/api/users/**", // Public endpoints
                     ).permitAll() // Then handle specific paths
                     .anyRequest().authenticated()
             }

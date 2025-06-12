@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { TbLayoutSidebarLeftExpandFilled } from 'react-icons/tb';
 import { TbLayoutSidebarRightExpandFilled } from 'react-icons/tb';
 import NavBar from '@/components/NavBar/NavBar';
-import SideFilters from '@/components/SideFilters/SideFilters';
-import ResumesLayout from '@/components/ResumesLayout/ResumesLayout';
+import SideFilters from '@/components/Resumes/SideFilters/SideFilters';
+import ResumesLayout from '@/components/Resumes/ResumesLayout/ResumesLayout';
 import { useSideFilters } from '@/hooks/resumes/useSideFilters';
 import { useNavigate, useLocation } from 'react-router-dom';
 

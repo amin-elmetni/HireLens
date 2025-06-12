@@ -1,7 +1,7 @@
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { ChevronDown } from 'lucide-react';
-import RangeInput from '@/components/SideFilters/RangeInput';
+import RangeInput from '@/components/Resumes/SideFilters/RangeInput';
 
 const ExperienceRangeFilter = ({
   isExpanded,
