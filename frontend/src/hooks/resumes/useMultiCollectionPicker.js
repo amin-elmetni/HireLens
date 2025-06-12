@@ -5,7 +5,7 @@ import {
   addItemToCollection,
   removeItemFromCollection,
 } from '@/api/collectionItemApi';
-import { getResumeByUuid } from '@/api/resumeApi'; // <-- import the API to resolve uuid
+import { getResumeByUuid } from '@/api/resumeApi';
 import { getUser } from '@/utils/userUtils';
 
 export function useMultiCollectionPicker(resumeUuid) {

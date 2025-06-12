@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from '@/pages/Login';
 import Resumes from '@/pages/Resumes';
 import PrivateRoute from '@/routes/PrivateRoute';
-import { Collections } from '@/pages/Collections';
+import Collections from '@/pages/Collections';
 
 const AppRoutes = () => (
   <BrowserRouter>

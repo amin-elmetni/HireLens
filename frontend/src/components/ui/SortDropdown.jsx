@@ -1,33 +1,75 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-// Utility to split options into groups
-function groupOptions(options) {
-  const base = [];
-  const categories = [];
-  const skills = [];
-  options.forEach(option => {
-    if (option.value.startsWith('category:')) categories.push(option);
-    else if (option.value.startsWith('skill:')) skills.push(option);
-    else base.push(option);
-  });
-  return { base, categories, skills };
+// Utility to group options by group label
+function groupBy(options, getGroup) {
+  return options.reduce((acc, option) => {
+    const group = getGroup(option) || 'Default';
+    if (!acc[group]) acc[group] = [];
+    acc[group].push(option);
+    return acc;
+  }, {});
 }
 
-export default function SortDropdown({ options, value, onChange }) {
+// Overlay always closes dropdown
+function DropdownOverlay({ onClick }) {
+  useEffect(() => {
+    const prevent = e => {
+      e.preventDefault();
+    };
+    // Prevent scroll events (mouse and touch)
+    document.addEventListener('wheel', prevent, { passive: false });
+    document.addEventListener('touchmove', prevent, { passive: false });
+    document.addEventListener('scroll', prevent, { passive: false });
+
+    return () => {
+      document.removeEventListener('wheel', prevent, { passive: false });
+      document.removeEventListener('touchmove', prevent, { passive: false });
+      document.removeEventListener('scroll', prevent, { passive: false });
+    };
+  }, []);
+
+  return createPortal(
+    <div
+      className='fixed inset-0 z-[2000]'
+      role='presentation'
+      aria-hidden='true'
+      style={{ background: 'transparent', pointerEvents: 'auto' }}
+      onClick={onClick}
+      onWheel={e => e.preventDefault()}
+      onTouchMove={e => e.preventDefault()}
+    />,
+    document.body
+  );
+}
+
+const SortDropdown = ({
+  options,
+  value,
+  onChange,
+  getGroup = () => 'Default', // function to group options
+  groupOrder, // array of group labels to order columns
+  showLabels = true,
+  placeholder = 'Select...',
+  buttonClassName = '',
+  dropdownClassName = '',
+  zIndex = 3000,
+}) => {
   const [open, setOpen] = useState(false);
   const [show, setShow] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [highlighted, setHighlighted] = useState(-1);
   const ref = useRef();
 
-  // Group options
-  const { base, categories, skills } = groupOptions(options);
+  // Grouping
+  const grouped = groupBy(options, getGroup);
+  const groups = groupOrder || Object.keys(grouped);
+  // Flatten all options (for keyboard navigation)
+  const flatOptions = groups.flatMap(g => grouped[g] || []);
+  const selected = options.find(opt => opt.value === value);
 
-  // For navigation, flatten all options left-to-right (base, categories, skills)
-  const flatOptions = [...base, ...categories, ...skills];
-
-  // Animation: robust mount/unmount and transition
+  // Animation
   useEffect(() => {
     if (open) {
       setShow(true);
@@ -40,9 +82,7 @@ export default function SortDropdown({ options, value, onChange }) {
       return () => cancelAnimationFrame(raf1);
     } else if (show) {
       setDropdownVisible(false);
-      const timeout = setTimeout(() => {
-        setShow(false);
-      }, 200);
+      const timeout = setTimeout(() => setShow(false), 200);
       return () => clearTimeout(timeout);
     }
   }, [open, show]);
@@ -68,21 +108,19 @@ export default function SortDropdown({ options, value, onChange }) {
     return () => window.removeEventListener('keydown', handleKey);
   }, [open, highlighted, flatOptions, onChange]);
 
-  // Close on overlay click
-  const handleOverlayClick = e => {
-    if (e.target === e.currentTarget) setOpen(false);
-  };
-
-  const selected = options.find(opt => opt.value === value);
-
-  // Render one group column
-  const renderGroupColumn = (label, group, startIndex) => {
+  // Render column for a group
+  const renderGroupCol = (label, group, startIndex) => {
     if (!group.length) return null;
     return (
-      <div className='min-w-56 max-w-xs'>
-        <div className='px-4 pt-4 pb-2 text-xs font-bold text-gray-400 select-none cursor-default uppercase tracking-wider'>
-          {label}
-        </div>
+      <div
+        className='min-w-56 max-w-xs'
+        key={label}
+      >
+        {showLabels && (
+          <div className='px-4 pt-4 pb-2 text-xs font-bold text-gray-400 select-none cursor-default uppercase tracking-wider'>
+            {label}
+          </div>
+        )}
         <ul role='group'>
           {group.map((opt, idx) => {
             const flatIdx = startIndex + idx;
@@ -110,44 +148,16 @@ export default function SortDropdown({ options, value, onChange }) {
     );
   };
 
-  function ScrollLockOverlay({ onClick }) {
-    useEffect(() => {
-      const prevent = e => {
-        e.preventDefault();
-      };
-      // Prevent scroll events (mouse and touch)
-      document.addEventListener('wheel', prevent, { passive: false });
-      document.addEventListener('touchmove', prevent, { passive: false });
-      document.addEventListener('scroll', prevent, { passive: false });
+  // Compute start indices for groups
+  let startIndex = 0;
+  const groupStartIndices = {};
+  groups.forEach(g => {
+    groupStartIndices[g] = startIndex;
+    startIndex += (grouped[g] || []).length;
+  });
 
-      return () => {
-        document.removeEventListener('wheel', prevent, { passive: false });
-        document.removeEventListener('touchmove', prevent, { passive: false });
-        document.removeEventListener('scroll', prevent, { passive: false });
-      };
-    }, []);
-
-    return (
-      <div
-        className='fixed inset-0 z-20 cursor-default'
-        aria-hidden='true'
-        style={{ background: 'transparent', pointerEvents: 'auto' }}
-        onClick={onClick}
-        // Prevent scroll bubbling from overlay
-        onWheel={e => e.preventDefault()}
-        onTouchMove={e => e.preventDefault()}
-        onScroll={e => e.preventDefault()}
-      />
-    );
-  }
-
-  // Compute the starting index for each group in flatOptions
-  const baseStart = 0;
-  const catStart = base.length;
-  const skillStart = base.length + categories.length;
-
-  // Compute column count for dropdown width
-  const colCount = 1 + (categories.length ? 1 : 0) + (skills.length ? 1 : 0);
+  // Dynamic columns
+  const colCount = groups.filter(g => (grouped[g] || []).length > 0).length;
 
   return (
     <div
@@ -156,7 +166,7 @@ export default function SortDropdown({ options, value, onChange }) {
     >
       <button
         type='button'
-        className='flex items-center gap-2 pl-1 pr-4 py-2 font-semibold text-gray-700 focus:outline-none cursor-pointer'
+        className={`flex items-center gap-2 pl-1 pr-4 py-2 font-semibold text-gray-700 focus:outline-none cursor-pointer ${buttonClassName}`}
         onClick={() => {
           setOpen(o => !o);
           setHighlighted(flatOptions.findIndex(opt => opt.value === value));
@@ -164,30 +174,29 @@ export default function SortDropdown({ options, value, onChange }) {
         aria-haspopup='listbox'
         aria-expanded={open}
       >
-        <span>{selected ? selected.label : 'Select sort'}</span>
+        <span>{selected ? selected.label : placeholder}</span>
         <FontAwesomeIcon
           icon='fa-solid fa-caret-down'
           className={`
-      text-gray-400
-      transition-transform duration-200
-      ${open ? 'rotate-180' : ''}
-    `}
+            text-gray-400
+            transition-transform duration-200
+            ${open ? 'rotate-180' : ''}
+          `}
         />
       </button>
       {show && (
         <>
-          {/* Scroll lock overlay */}
-          <ScrollLockOverlay onClick={handleOverlayClick} />
-          {/* Dropdown */}
+          <DropdownOverlay onClick={() => setOpen(false)} />
           <div
             className={`
-              absolute right-0 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-opacity-5 z-30 flex
+              absolute right-0 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-opacity-5 z-[${zIndex}] flex
               transition-all duration-200 ease-out scrollbar-custom
               ${
                 dropdownVisible
                   ? 'opacity-100 scale-100 pointer-events-auto'
                   : 'opacity-0 scale-90 pointer-events-none'
               }
+              ${dropdownClassName}
             `}
             style={{
               transformOrigin: 'top right',
@@ -198,12 +207,12 @@ export default function SortDropdown({ options, value, onChange }) {
             tabIndex={-1}
             role='listbox'
           >
-            {renderGroupColumn('General', base, baseStart)}
-            {renderGroupColumn('Categories', categories, catStart)}
-            {renderGroupColumn('Skills', skills, skillStart)}
+            {groups.map(g => renderGroupCol(g, grouped[g] || [], groupStartIndices[g]))}
           </div>
         </>
       )}
     </div>
   );
-}
+};
+
+export default SortDropdown;

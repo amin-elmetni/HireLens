@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import ResumeCard from '@/components/Resumes/ResumesLayout/ResumeCard';
-import SortDropdown from '@/components/Resumes/ResumesLayout/SortDropdown';
+import SortDropdown from '@/components/ui/SortDropdown';
 import { useSearchParams } from 'react-router-dom';
 import { useFilteredResumes } from '@/hooks/resumes/useFilteredResumes';
 import { BASE_SORT_OPTIONS, getDynamicSortOptions } from '@/utils/resumeUtils';
@@ -63,6 +63,12 @@ const ResumesLayout = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentPage]);
 
+  const groupLogic = opt => {
+    if (opt.value.startsWith('category:')) return 'Categories';
+    if (opt.value.startsWith('skill:')) return 'Skills';
+    return 'General';
+  };
+
   return (
     <div>
       <div className='flex items-center justify-between mb-4'>
@@ -76,6 +82,9 @@ const ResumesLayout = () => {
             options={sortOptions}
             value={sortBy}
             onChange={setSortBy}
+            getGroup={groupLogic}
+            groupOrder={['General', 'Categories', 'Skills']}
+            placeholder='Select sort'
           />
         </h2>
       </div>

@@ -67,21 +67,19 @@ const SideFilters = ({ onClose }) => {
       </div>
 
       {/* Sticky footer for buttons */}
-      <div className='sticky bottom-0 left-0 right-0 pt-3 pb-4 px-2 z-20 flex flex-col gap-3'>
-        <div className='flex space-x-4'>
-          <button
-            onClick={handleApply}
-            className='flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark cursor-pointer hover:opacity-85 transition font-bold'
-          >
-            Apply
-          </button>
-          <button
-            onClick={handleReset}
-            className='flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition cursor-pointer font-bold'
-          >
-            Reset
-          </button>
-        </div>
+      <div className='sticky bottom-0 left-0 right-0 pt-3 pb-4 px-2 z-20 flex items-center justify-center gap-3'>
+        <button
+          onClick={handleApply}
+          className='flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark cursor-pointer hover:opacity-85 transition font-bold'
+        >
+          Apply
+        </button>
+        <button
+          onClick={handleReset}
+          className='flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition cursor-pointer font-bold'
+        >
+          Reset
+        </button>
       </div>
     </div>
   );

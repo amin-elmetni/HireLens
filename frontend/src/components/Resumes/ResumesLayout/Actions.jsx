@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import ToggleIconButton from './ToggleIconButton';
+import ToggleIconButton from '../../ui/ToggleIconButton';
 import { useLikes } from '@/hooks/resumes/useLikes';
 import { useComments } from '@/hooks/resumes/useComments';
 import { useSaves } from '@/hooks/resumes/useSaves';
@@ -42,7 +42,7 @@ const Actions = ({ uuid }) => {
   const actionButtons = [
     {
       onClick: collectionPicker.show,
-      regularIcon: 'fa-solid fa-folder-plus',
+      regularIcon: 'fa-regular fa-folder-closed',
       solidIcon: 'fa-regular fa-folder-open',
       activeColor: 'text-blue-500',
       isActive: false,

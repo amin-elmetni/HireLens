@@ -34,6 +34,7 @@ import {
   faPlus,
   faMagnifyingGlass,
   faArrowLeft,
+  faEllipsisVertical,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Add all icons to the library
@@ -67,5 +68,6 @@ library.add(
   faFolderPlus,
   faPlus,
   faMagnifyingGlass,
-  faArrowLeft
+  faArrowLeft,
+  faEllipsisVertical
 );
