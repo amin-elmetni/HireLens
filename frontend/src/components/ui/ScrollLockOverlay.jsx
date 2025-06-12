@@ -35,7 +35,7 @@ export default function ScrollLockOverlay({ open, onClick, fadeIn = true }) {
   return createPortal(
     <div
       className={`
-        fixed inset-0 z-[9998]
+        fixed inset-0 z-[1000]
         bg-black transition-opacity duration-200
         ${fadeIn ? 'opacity-50' : 'opacity-0'}
       `}

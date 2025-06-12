@@ -31,6 +31,7 @@ const AddToCollectionDrawer = ({
   const [inCreateMode, setInCreateMode] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
   const [newCollectionDescription, setNewCollectionDescription] = useState('');
+  const [animateOpen, setAnimateOpen] = useState(false);
 
   const inputRef = useRef();
   const newCollectionInputRef = useRef();
@@ -47,7 +48,7 @@ const AddToCollectionDrawer = ({
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
-      document.body.style.paddingRight = '0px';
+      document.body.style.paddingRight = '14px';
     } else {
       document.body.style.overflow = '';
       document.body.style.paddingRight = '';
@@ -56,6 +57,19 @@ const AddToCollectionDrawer = ({
       document.body.style.overflow = '';
       document.body.style.paddingRight = '';
     };
+  }, [open]);
+
+  useEffect(() => {
+    if (open) {
+      setShowDrawer(true);
+      // Wait a tick to trigger the transition (required for Tailwind + React)
+      setTimeout(() => setAnimateOpen(true), 10);
+    } else {
+      setAnimateOpen(false);
+      // After transition, unmount
+      const timeout = setTimeout(() => setShowDrawer(false), 300);
+      return () => clearTimeout(timeout);
+    }
   }, [open]);
 
   useEffect(() => {
@@ -124,13 +138,14 @@ const AddToCollectionDrawer = ({
   return createPortal(
     <>
       <aside
-        className={`fixed top-0 right-0 h-full w-full sm:w-[${DRAWER_WIDTH}px] max-w-full bg-white text-gray-900 z-[1010] shadow-lg flex flex-col transition-transform duration-300
-        ${open ? 'translate-x-0' : 'translate-x-full'}
-      `}
+        className={`
+          fixed top-0 right-0 h-full w-full sm:w-[${DRAWER_WIDTH}px] max-w-full bg-white text-gray-900 z-[1010] shadow-lg flex flex-col
+          transition-transform duration-400 ease-in-out
+          ${animateOpen ? 'translate-x-0' : 'translate-x-full'}
+        `}
         style={{
           width: '100%',
           maxWidth: `${DRAWER_WIDTH}px`,
-          transform: open ? 'translateX(0)' : `translateX(${DRAWER_WIDTH}px)`,
         }}
         aria-label='Add to Collection Drawer'
         onClick={e => e.stopPropagation()}

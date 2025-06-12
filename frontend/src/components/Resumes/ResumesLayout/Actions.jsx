@@ -9,6 +9,7 @@ import Overlay from '@/components/ui/Overlay';
 import AddToCollectionDrawer from './AddToCollectionDrawer';
 import { useMultiCollectionPicker } from '@/hooks/resumes/useMultiCollectionPicker';
 import ConfirmationToast from '@/components/ui/ConfirmationToast';
+import ScrollLockOverlay from '@/components/ui/ScrollLockOverlay';
 
 const Actions = ({ uuid }) => {
   const { liked, likeCount, toggleLike } = useLikes(uuid);
@@ -99,7 +100,7 @@ const Actions = ({ uuid }) => {
           ))}
         </div>
       </div>
-      <Overlay
+      <ScrollLockOverlay
         open={collectionPicker.open}
         onClick={collectionPicker.hide}
       />
