@@ -7,13 +7,13 @@ const StatItem = ({ icon, value, label }) => (
       icon={icon}
       className='text-primary text-xs'
     />
-    <span className='font-semibold'>{value}</span>
-    <span className='text-gray-500'>{label}</span>
+    <span>{value}</span>
+    <span>{label}</span>
   </div>
 );
 
 const Stats = ({ yearsOfExperience = 0, experiences = [], projects = [] }) => (
-  <div className='flex items-center justify-between text-[10px] text-gray-600 mb-2'>
+  <div className='flex items-center gap-4 text-[10px] text-gray-800 mb-2 font-semibold'>
     <StatItem
       icon='fa-solid fa-briefcase'
       value={yearsOfExperience}

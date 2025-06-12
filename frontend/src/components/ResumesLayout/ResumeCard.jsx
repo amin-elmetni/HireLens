@@ -2,12 +2,12 @@ import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
-import ScoresBars from '@/components/ResumeLayout/ScoresBars';
-import ResumeHeader from '@/components/ResumeLayout/ResumeHeader';
-import Stats from '@/components/ResumeLayout/Stats';
-import Actions from '@/components/ResumeLayout/Actions';
-import ExploreProfileBtn from '@/components/ResumeLayout/ExploreProfileBtn';
-import LanguagesTags from '@/components/ResumeLayout/LanguagesTags';
+import ScoresBars from '@/components/ResumesLayout/ScoresBars';
+import ResumeHeader from '@/components/ResumesLayout/ResumeHeader';
+import Stats from '@/components/ResumesLayout/Stats';
+import Actions from '@/components/ResumesLayout/Actions';
+import ExploreProfileBtn from '@/components/ResumesLayout/ExploreProfileBtn';
+import LanguagesTags from '@/components/ResumesLayout/LanguagesTags';
 import { useResumeMetrics } from '@/hooks/resumes/useResumeMetrics';
 
 const ResumeCard = ({ resume }) => {

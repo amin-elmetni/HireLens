@@ -21,6 +21,13 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
+        val path = request.requestURI
+        // Skip JWT check for public endpoints
+        if (path.startsWith("/api/auth")) {
+            filterChain.doFilter(request, response)
+            return
+        }
+
         val authHeader = request.getHeader("Authorization")
         val jwt = authHeader?.takeIf { it.startsWith("Bearer ") }?.substring(7)
 

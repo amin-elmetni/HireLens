@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import MatchingScoreCircle from '@/components/ResumeLayout/MatchingScoreCircle';
+import MatchingScoreCircle from '@/components/ResumesLayout/MatchingScoreCircle';
 
 const getInitials = name =>
   name

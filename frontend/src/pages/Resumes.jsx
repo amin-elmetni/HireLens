@@ -1,15 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TbLayoutSidebarLeftExpandFilled } from 'react-icons/tb';
 import { TbLayoutSidebarRightExpandFilled } from 'react-icons/tb';
 import NavBar from '@/components/NavBar/NavBar';
 import SideFilters from '@/components/SideFilters/SideFilters';
-import ResumesLayout from '@/components/ResumeLayout/ResumesLayout';
+import ResumesLayout from '@/components/ResumesLayout/ResumesLayout';
 import { useSideFilters } from '@/hooks/resumes/useSideFilters';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+const DEFAULT_EXP_MIN = 0;
+const DEFAULT_EXP_MAX = 21;
 
 const Resumes = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isClicked, setIsClicked] = useState(false);
   const { loading } = useSideFilters();
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Only render after redirect if necessary
+  const [redirecting, setRedirecting] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const hasMin = params.has('expMin');
+    const hasMax = params.has('expMax');
+    if (!hasMin || !hasMax) {
+      params.set('expMin', DEFAULT_EXP_MIN);
+      params.set('expMax', DEFAULT_EXP_MAX);
+      setRedirecting(true);
+      navigate({ pathname: location.pathname, search: params.toString() }, { replace: true });
+    } else {
+      setRedirecting(false);
+    }
+  }, [location, navigate]);
+
+  // While redirecting, render nothing
+  if (redirecting) return null;
 
   return (
     <div className='bg-background min-h-screen'>

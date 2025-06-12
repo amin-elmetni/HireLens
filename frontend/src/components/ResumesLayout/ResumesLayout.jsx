@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import ResumeCard from '@/components/ResumeLayout/ResumeCard';
-import SortDropdown from '@/components/ResumeLayout/SortDropdown';
+import ResumeCard from '@/components/ResumesLayout/ResumeCard';
+import SortDropdown from '@/components/ResumesLayout/SortDropdown';
 import { useSearchParams } from 'react-router-dom';
 import { useFilteredResumes } from '@/hooks/resumes/useFilteredResumes';
 import { BASE_SORT_OPTIONS, getDynamicSortOptions } from '@/utils/resumeUtils';

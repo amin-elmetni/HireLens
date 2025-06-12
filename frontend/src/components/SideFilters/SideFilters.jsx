@@ -71,13 +71,13 @@ const SideFilters = ({ onClose }) => {
         <div className='flex space-x-4'>
           <button
             onClick={handleApply}
-            className='flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark cursor-pointer hover:opacity-85 transition font-medium'
+            className='flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark cursor-pointer hover:opacity-85 transition font-bold'
           >
             Apply
           </button>
           <button
             onClick={handleReset}
-            className='flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition cursor-pointer font-medium'
+            className='flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition cursor-pointer font-bold'
           >
             Reset
           </button>
