@@ -5,10 +5,10 @@ import { useLikes } from '@/hooks/resumes/useLikes';
 import { useComments } from '@/hooks/resumes/useComments';
 import { useSaves } from '@/hooks/resumes/useSaves';
 import { useResumeActions } from '@/hooks/resumes/useResumeActions';
-import Overlay from '@/components/Overlay';
+import Overlay from '@/components/ui/Overlay';
 import AddToCollectionDrawer from './AddToCollectionDrawer';
 import { useMultiCollectionPicker } from '@/hooks/resumes/useMultiCollectionPicker';
-import ConfirmationToast from '@/components/ConfirmationToast';
+import ConfirmationToast from '@/components/ui/ConfirmationToast';
 
 const Actions = ({ uuid }) => {
   const { liked, likeCount, toggleLike } = useLikes(uuid);
