@@ -18,8 +18,11 @@ const Collections = () => {
   const [sort, setSort] = useState('recent');
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // The key part: Always reset the toast to a new object, not by spreading!
-  const [toast, setToast] = useState({ show: false, message: '' });
+  const [toast, setToast] = useState({ show: false, message: '', id: 0 });
+
+  const showToast = message => setToast(prev => ({ show: true, message, id: prev.id + 1 }));
+
+  const handleToastClose = () => setToast(prev => ({ ...prev, show: false, message: '' }));
 
   const user = getUser();
 
@@ -32,17 +35,6 @@ const Collections = () => {
   useEffect(() => {
     refreshCollections();
   }, [refreshCollections]);
-
-  // Show toast: always close then open (new object reference)
-  const showToast = message => {
-    setToast({ show: false, message: '' }); // close first
-    setTimeout(() => {
-      setToast({ show: true, message });
-    }, 30); // short delay to force transition
-  };
-
-  // Always reset to a new object
-  const handleToastClose = () => setToast({ show: false, message: '' });
 
   const filteredCollections = collections
     .filter(col => col.name.toLowerCase().includes(search.toLowerCase()))
@@ -114,6 +106,7 @@ const Collections = () => {
         )}
       </div>
       <ConfirmationToast
+        key={toast.id}
         message={toast.message}
         show={toast.show}
         onClose={handleToastClose}

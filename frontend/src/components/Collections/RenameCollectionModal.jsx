@@ -37,7 +37,7 @@ export default function RenameCollectionModal({ collection, currentName, onClose
       handleCloseWithFade();
     } catch (err) {
       setLoading(false);
-      setError('Failed to update collection.');
+      setError('Collection name already exists');
     }
   };
 

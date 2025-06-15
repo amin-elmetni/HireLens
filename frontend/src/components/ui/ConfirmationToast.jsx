@@ -1,14 +1,40 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
-const ConfirmationToast = ({ message, show, duration = 2500, onClose, width = '20rem' }) => {
+const ConfirmationToast = ({ message, show, duration = 2000, onClose, width = '20rem' }) => {
+  const [visible, setVisible] = useState(false);
+  const hideTimeout = useRef();
+
+  // Whenever show becomes true, display the toast and set an auto-hide timer
   useEffect(() => {
-    if (!show) return;
-    const timer = setTimeout(() => {
-      if (onClose) onClose();
-    }, duration);
-    return () => clearTimeout(timer);
-  }, [show, duration, onClose]);
+    if (show && message) {
+      setVisible(true);
+      // Clear any previous timers
+      if (hideTimeout.current) clearTimeout(hideTimeout.current);
+      // Hide after duration
+      hideTimeout.current = setTimeout(() => {
+        setVisible(false);
+      }, duration);
+    } else {
+      setVisible(false);
+      if (hideTimeout.current) clearTimeout(hideTimeout.current);
+    }
+    // Cleanup on unmount
+    return () => {
+      if (hideTimeout.current) clearTimeout(hideTimeout.current);
+    };
+  }, [show, message, duration]);
+
+  // Call parent's onClose when fully hidden (after fade out)
+  useEffect(() => {
+    if (!visible && show) {
+      // Give time for fade out (matches transition duration)
+      const transitionTimeout = setTimeout(() => {
+        if (onClose) onClose();
+      }, 300);
+      return () => clearTimeout(transitionTimeout);
+    }
+  }, [visible, show, onClose]);
 
   // The toast content
   const toastContent = (
@@ -16,8 +42,12 @@ const ConfirmationToast = ({ message, show, duration = 2500, onClose, width = '2
       aria-live='polite'
       aria-atomic='true'
       className={`fixed left-6 bottom-6 z-[9999] w-full min-h-[45px] px-4 flex items-center justify-center  
-        bg-gray-800 text-white rounded-xl shadow-lg text-base transition-all duration-300 
-        ${show ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none translate-y-4'}
+        bg-gray-800 text-white rounded-xl shadow-lg text-base transition-all duration-300
+        ${
+          visible
+            ? 'opacity-100 pointer-events-auto'
+            : 'opacity-0 pointer-events-none translate-y-4'
+        }
       `}
       style={{
         fontFamily: 'inherit',
@@ -29,7 +59,6 @@ const ConfirmationToast = ({ message, show, duration = 2500, onClose, width = '2
     </div>
   );
 
-  // Render the toast as a portal to document.body
   return createPortal(toastContent, document.body);
 };
 
