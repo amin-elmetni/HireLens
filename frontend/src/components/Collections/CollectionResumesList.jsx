@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { getItemsByCollection } from '@/api/collectionItemApi';
-import { getResumeByUuid, getResumeById } from '@/api/resumeApi';
+import { getResumeByUuid, getResumeById, getResumeMetadataByUuid } from '@/api/resumeApi';
 import { getLikeCount } from '@/api/likeApi';
 import { getCommentCount } from '@/api/commentApi';
 import ResumeItem from './ResumeItem';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useNavigate } from 'react-router-dom';
 import BackCancelButton from '../ui/BackCancelButton';
 
 export default function CollectionResumesList({ collection, onBack }) {
@@ -18,6 +16,7 @@ export default function CollectionResumesList({ collection, onBack }) {
       setLoading(true);
       try {
         const { data: items } = await getItemsByCollection(collection.id);
+
         const resumesWithData = await Promise.all(
           items.map(async item => {
             let resume;
@@ -30,28 +29,43 @@ export default function CollectionResumesList({ collection, onBack }) {
             } else {
               return null;
             }
+
+            // Always get metadata by uuid if available
+            let metadata = null;
+            if (resume.uuid) {
+              try {
+                const metaRes = await getResumeMetadataByUuid(resume.uuid);
+                metadata = metaRes.data;
+              } catch {}
+            }
+
             const [likesRes, commentsRes] = await Promise.all([
               getLikeCount(resume.id),
               getCommentCount(resume.id),
             ]);
-            const categories = resume.categories || [];
+
+            // Use metadata values if available, otherwise fall back to resume
+            const categories = metadata?.categories || [];
+            console.log('Categories:', categories);
             const topCategory = categories.length
               ? categories.reduce((prev, curr) => (curr.score > prev.score ? curr : prev)).name
               : 'Uncategorized';
+
             return {
               uuid: resume.uuid,
-              name: resume.name,
+              name: metadata?.name || resume.name,
               topCategory,
-              lastUpdated: resume.lastUpdated,
+              lastUpdated: metadata?.lastUpdated || resume.lastUpdated,
               likes: likesRes.data ?? 0,
               comments: commentsRes.data ?? 0,
-              yearsOfExperience: resume.yearsOfExperience,
-              experiencesCount: (resume.experiences || []).length,
-              projectsCount: (resume.projects || []).length,
+              yearsOfExperience: metadata?.yearsOfExperience,
+              experiencesCount: metadata?.experiences?.length ?? 0,
+              projectsCount: metadata?.projects?.length ?? 0,
+              // add any other metadata fields you want
             };
           })
         );
-        if (!cancelled) setResumes(resumesWithData);
+        if (!cancelled) setResumes(resumesWithData.filter(Boolean));
       } catch {
         if (!cancelled) setResumes([]);
       }

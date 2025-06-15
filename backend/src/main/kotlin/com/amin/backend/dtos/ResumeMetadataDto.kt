@@ -1,7 +1,6 @@
 package com.amin.backend.dtos
 
 import java.time.Instant
-import java.util.*
 
 
 data class ResumeMetadataDto(
@@ -23,7 +22,7 @@ data class ResumeMetadataDto(
     val categories: List<CategoryDto>? = listOf(),
     val finalScore: Double? = null,
     val lastUpdated: Instant = Instant.now(),
-    val uuid: UUID? = null,
+    val uuid: String? = null,
 )
 
 data class PersonalLinksDto(

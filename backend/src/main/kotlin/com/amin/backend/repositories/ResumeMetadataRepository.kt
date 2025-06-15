@@ -3,11 +3,10 @@ package com.amin.backend.repositories
 import com.amin.backend.models.ResumeMetadata
 import com.amin.backend.repositories.custom.ResumeMetadataCustomRepository
 import org.springframework.data.mongodb.repository.MongoRepository
-import java.util.*
 
 
 interface ResumeMetadataRepository : MongoRepository<ResumeMetadata, String>, ResumeMetadataCustomRepository {
-    fun findByUuid(uuid: UUID): ResumeMetadata?
+    fun findByUuid(uuid: String): ResumeMetadata?
 
     interface ResumeMetadataCustomRepository {
         fun findByFilters(

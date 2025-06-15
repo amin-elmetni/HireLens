@@ -4,7 +4,6 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 import java.time.Instant
-import java.util.*
 
 @Document(collection = "resumes")
 data class ResumeMetadata(
@@ -39,7 +38,7 @@ data class ResumeMetadata(
     @Field("last_updated")
     val lastUpdated: Instant = Instant.now(),
 
-    val uuid: UUID = UUID.randomUUID(),
+    val uuid: String? = null,
 )
 
 data class PersonalLinks(

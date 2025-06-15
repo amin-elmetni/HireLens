@@ -5,12 +5,11 @@ import com.amin.backend.dtos.ResumeMetadataDto
 import com.amin.backend.mappers.ResumeMetadataMapper
 import com.amin.backend.repositories.ResumeMetadataRepository
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class ResumeMetadataService(private val repo: ResumeMetadataRepository) {
 
-    fun getByUuid(uuid: UUID): ResumeMetadataDto? =
+    fun getByUuid(uuid: String): ResumeMetadataDto? =
         repo.findByUuid(uuid)?.let { ResumeMetadataMapper.toDto(it) }
 
     fun getFilterOptions(): ResumeFilterOptionsDto =
