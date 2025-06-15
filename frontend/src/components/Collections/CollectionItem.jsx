@@ -1,20 +1,76 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import DropdownMenu from '../ui/DropdownMenu';
+import RenameCollectionModal from './RenameCollectionModal';
+import DeleteCollectionModal from './DeleteCollectionModal';
+import { getItemsByCollection } from '@/api/collectionItemApi';
 
-export default function CollectionItem({ collection }) {
+export default function CollectionItem({ collection, onAction }) {
+  const [showRenameModal, setShowRenameModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [count, setCount] = useState(collection.count ?? null);
+
+  // Fetch count if not present
+  useEffect(() => {
+    let cancelled = false;
+    if (count == null && collection.id) {
+      getItemsByCollection(collection.id).then(res => {
+        if (!cancelled) setCount(res.data.length);
+      });
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [collection.id, count]);
+
   return (
-    <li className='flex items-center py-4 px-4 hover:bg-gray-50 group cursor-pointer'>
-      <span className='mr-4 text-xl'>📁</span>
-      <span className='font-semibold text-lg'>{collection.name}</span>
-      <span className='text-gray-500 ml-2'>({collection.count || 0})</span>
-      <div className='ml-auto'>
-        <button className='p-2 rounded-full hover:bg-gray-200 h-8 w-8 text-gray-500 group-hover:text-black flex items-center justify-center cursor-pointer'>
-          <FontAwesomeIcon
-            icon='fa-solid fa-ellipsis-vertical'
-            className=''
+    <>
+      <li className='flex items-center py-4 px-4 hover:bg-gray-50 group cursor-pointer relative'>
+        <span className='mr-4 text-xl'>📁</span>
+        <span className='font-semibold text-lg'>{collection.name}</span>
+        <span className='text-gray-500 ml-2'>
+          ({count !== null ? count : <span className='animate-pulse'>...</span>})
+        </span>
+        <div className='ml-auto'>
+          <DropdownMenu
+            align='right'
+            width='w-44'
+            trigger={
+              <button className='p-2 rounded-full hover:bg-gray-200 h-8 w-8 text-gray-500 group-hover:text-black flex items-center justify-center cursor-pointer'>
+                <FontAwesomeIcon icon='fa-solid fa-ellipsis' />
+              </button>
+            }
+            options={[
+              {
+                label: 'Rename',
+                value: 'rename',
+                onClick: () => setShowRenameModal(true),
+              },
+              {
+                label: 'Delete',
+                value: 'delete',
+                onClick: () => setShowDeleteModal(true),
+                destructive: true,
+              },
+            ]}
           />
-        </button>
-      </div>
-    </li>
+        </div>
+      </li>
+      {showRenameModal && (
+        <RenameCollectionModal
+          collection={collection}
+          currentName={collection.name}
+          onClose={() => setShowRenameModal(false)}
+          onRenamed={onAction}
+        />
+      )}
+      {showDeleteModal && (
+        <DeleteCollectionModal
+          collection={collection}
+          onClose={() => setShowDeleteModal(false)}
+          onDeleted={onAction}
+        />
+      )}
+    </>
   );
 }
