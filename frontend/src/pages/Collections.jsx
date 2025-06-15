@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import CollectionTabs from '@/components/Collections/CollectionTabs';
 import CollectionList from '@/components/Collections/CollectionList';
 import CreateCollectionModal from '@/components/Collections/CreateCollectionModal';
+import ConfirmationToast from '@/components/ui/ConfirmationToast'; // <--- ADD THIS
 import { getUser } from '@/utils/userUtils';
 import { getUserCollections } from '@/api/collectionApi';
 import Navbar from '@/components/NavBar/NavBar';
@@ -16,8 +17,10 @@ const Collections = () => {
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('recent');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '' }); // <--- ADD THIS
   const user = getUser();
 
+  // Centralized refresh
   const refreshCollections = useCallback(() => {
     if (user) {
       getUserCollections(user.id).then(res => setCollections(res.data));
@@ -28,11 +31,8 @@ const Collections = () => {
     refreshCollections();
   }, [refreshCollections]);
 
-  useEffect(() => {
-    if (user) {
-      getUserCollections(user.id).then(res => setCollections(res.data));
-    }
-  }, [user]);
+  // Handler to show toast
+  const showToast = message => setToast({ show: true, message });
 
   const filteredCollections = collections
     .filter(col => col.name.toLowerCase().includes(search.toLowerCase()))
@@ -88,20 +88,26 @@ const Collections = () => {
             <CollectionList
               collections={filteredCollections}
               onAction={refreshCollections}
+              onShowToast={showToast} // <--- PASS THIS TO LIST
             />
           </>
         )}
-        {/* TODO: Render Bookmarks and Favorites */}
         {showCreateModal && (
           <CreateCollectionModal
             onClose={() => setShowCreateModal(false)}
             onCreated={() => {
-              // TODO: reload collections
               setShowCreateModal(false);
+              refreshCollections();
+              showToast('Collection created!');
             }}
           />
         )}
       </div>
+      <ConfirmationToast
+        message={toast.message}
+        show={toast.show}
+        onClose={() => setToast({ ...toast, show: false })}
+      />
     </>
   );
 };
