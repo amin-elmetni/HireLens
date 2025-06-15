@@ -15,9 +15,9 @@ const RangeInput = ({ id, label, value, min, max, onChange, unit = 'yrs', classN
           max={max}
           value={value}
           onChange={onChange}
-          className={`w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none ${
+          className={`w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:border-primary outline-none ${
             (id === 'min-experience' && value > min) || (id === 'max-experience' && value < max)
-              ? 'ring-1 ring-primary'
+              ? 'border-primary'
               : ''
           } `}
         />

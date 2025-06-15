@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 // Same fade logic as the modal: syncs with modal's fadeIn state via prop
-export default function ScrollLockOverlay({ open, onClick, fadeIn = true }) {
+export default function ScrollLockOverlay({ open, onClick, fadeIn = true, lockScroll = true }) {
   const [visible, setVisible] = useState(open);
 
   // Handle mount/unmount with fade
   useEffect(() => {
     if (open) {
       setVisible(true);
+      // Delay adding opacity for next tick (ensures transition)
     } else {
       // Wait for fade-out animation before unmount
       const timeout = setTimeout(() => setVisible(false), 200);
@@ -17,8 +18,9 @@ export default function ScrollLockOverlay({ open, onClick, fadeIn = true }) {
   }, [open]);
 
   // Prevent scroll, keep scrollbar visible
+
   useEffect(() => {
-    if (!open) return;
+    if (!open || !lockScroll) return;
     const prevent = e => e.preventDefault();
     document.addEventListener('wheel', prevent, { passive: false });
     document.addEventListener('touchmove', prevent, { passive: false });

@@ -54,7 +54,7 @@ const SortDropdown = ({
   placeholder = 'Select...',
   buttonClassName = '',
   dropdownClassName = '',
-  zIndex = 3000,
+  zIndex = 10000,
 }) => {
   const [open, setOpen] = useState(false);
   const [show, setShow] = useState(false);
@@ -189,7 +189,7 @@ const SortDropdown = ({
           <DropdownOverlay onClick={() => setOpen(false)} />
           <div
             className={`
-              absolute right-0 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-opacity-5 z-[${zIndex}] flex
+              absolute right-0 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-opacity-5 z-[3000] flex
               transition-all duration-200 ease-out scrollbar-custom
               ${
                 dropdownVisible

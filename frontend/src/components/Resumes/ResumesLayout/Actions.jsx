@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ToggleIconButton from '../../ui/ToggleIconButton';
 import { useLikes } from '@/hooks/resumes/useLikes';
 import { useComments } from '@/hooks/resumes/useComments';
 import { useSaves } from '@/hooks/resumes/useSaves';
 import { useResumeActions } from '@/hooks/resumes/useResumeActions';
-import Overlay from '@/components/ui/Overlay';
 import AddToCollectionDrawer from './AddToCollectionDrawer';
 import { useMultiCollectionPicker } from '@/hooks/resumes/useMultiCollectionPicker';
 import ConfirmationToast from '@/components/ui/ConfirmationToast';
@@ -19,10 +18,22 @@ const Actions = ({ uuid }) => {
 
   const collectionPicker = useMultiCollectionPicker(uuid);
 
-  // Toast state
   const [toast, setToast] = useState({ show: false, message: '' });
 
-  // Wrap like handler
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [fadeIn, setFadeIn] = useState(false);
+
+  useEffect(() => {
+    if (collectionPicker.open) {
+      setShowOverlay(true); // Mount the overlay
+      setTimeout(() => setFadeIn(true), 10); // Animate in
+    } else {
+      setFadeIn(false); // Animate out
+      const timeout = setTimeout(() => setShowOverlay(false), 200); // Unmount after fade out (duration should match overlay's transition)
+      return () => clearTimeout(timeout);
+    }
+  }, [collectionPicker.open]);
+
   const handleToggleLike = async () => {
     await toggleLike();
     setToast({
@@ -103,6 +114,8 @@ const Actions = ({ uuid }) => {
       <ScrollLockOverlay
         open={collectionPicker.open}
         onClick={collectionPicker.hide}
+        fadeIn={fadeIn}
+        lockScroll={false}
       />
       <AddToCollectionDrawer
         open={collectionPicker.open}

@@ -45,8 +45,8 @@ export default function CreateCollectionModal({ onClose, onCreated }) {
       setLoading(false);
       if (err?.response?.status === 409) {
         setError(
-          err?.response?.data ||
-            `A collection named "${name}" already exists. Please choose a different name.`
+          // err?.response?.data ||
+          `Collection name already exists.`
         );
       } else if (err?.response?.data) {
         setError(`An error occurred: ${err.response.data}`);
@@ -89,6 +89,7 @@ export default function CreateCollectionModal({ onClose, onCreated }) {
           `}
         >
           <h3 className='text-3xl font-extrabold mb-4 text-gray-900'>New Collection</h3>
+          {error && <div className='text-sm text-red-600 mt-2 mb-1 font-semibold'>{error}</div>}
           <TextInput
             ref={nameRef}
             label='Collection Name'
@@ -109,7 +110,7 @@ export default function CreateCollectionModal({ onClose, onCreated }) {
             maxLength={150}
             disabled={loading}
           />
-          {error && <div className='text-sm text-red-600 mt-2 mb-1'>{error}</div>}
+
           <div className='flex gap-3 justify-end mt-4'>
             <BackCancelButton
               onClick={handleCloseWithFade}

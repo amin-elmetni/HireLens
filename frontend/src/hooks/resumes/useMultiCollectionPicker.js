@@ -19,8 +19,8 @@ export function useMultiCollectionPicker(resumeUuid) {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [newlyCreatedId, setNewlyCreatedId] = useState(null);
 
-  // Use a ref or state to cache the resolved numeric resumeId
   const [resumeId, setResumeId] = useState(null);
 
   // Fetch and resolve the numeric resumeId once
@@ -41,13 +41,11 @@ export function useMultiCollectionPicker(resumeUuid) {
     setError('');
     try {
       if (!userId) return;
-      // Resolve numeric resumeId first
       const resolvedResumeId = await resolveResumeId();
       if (!resolvedResumeId) throw new Error('Resume ID not found');
       setResumeId(resolvedResumeId);
 
       const { data: allCollections = [] } = await getUserCollections(userId);
-      setCollections(allCollections);
 
       // For each collection, check if resume is included (using numeric resumeId)
       const included = new Set();
@@ -61,12 +59,28 @@ export function useMultiCollectionPicker(resumeUuid) {
       );
       setIncludedIds(included);
       setSelectedIds(new Set(included));
+
+      // Sort: newlyCreatedId first, then included, then others
+      setCollections(
+        allCollections.slice().sort((a, b) => {
+          // Newly created always first
+          if (newlyCreatedId && a.id === newlyCreatedId) return -1;
+          if (newlyCreatedId && b.id === newlyCreatedId) return 1;
+          // Included first
+          const aIncluded = included.has(a.id) ? 1 : 0;
+          const bIncluded = included.has(b.id) ? 1 : 0;
+          if (aIncluded !== bIncluded) return bIncluded - aIncluded;
+          // Otherwise, keep original order
+          return 0;
+        })
+      );
     } catch (err) {
       setError('Failed to fetch collections.');
     } finally {
       setLoading(false);
     }
-  }, [userId, resolveResumeId]);
+    // Don't clear newlyCreatedId here; it should be used for sorting after creation as well.
+  }, [userId, resolveResumeId, newlyCreatedId]);
 
   const show = () => {
     fetchCollectionsAndIncluded();
@@ -121,6 +135,7 @@ export function useMultiCollectionPicker(resumeUuid) {
         visibility: 'PRIVATE',
         userId,
       });
+      setNewlyCreatedId(res.data.id); // Mark this as the newly created collection
       await fetchCollectionsAndIncluded();
       setSelectedIds(prev => new Set(prev).add(res.data.id));
       return true;
@@ -141,9 +156,22 @@ export function useMultiCollectionPicker(resumeUuid) {
     }
   };
 
-  const filteredCollections = search
-    ? collections.filter(c => c.name.toLowerCase().includes(search.toLowerCase()))
-    : collections;
+  // Sort filtered collections as well
+  const filteredCollections = (() => {
+    let filtered = search
+      ? collections.filter(c => c.name.toLowerCase().includes(search.toLowerCase()))
+      : collections;
+
+    // Sort again: newlyCreatedId first, then included, then others
+    return filtered.slice().sort((a, b) => {
+      if (newlyCreatedId && a.id === newlyCreatedId) return -1;
+      if (newlyCreatedId && b.id === newlyCreatedId) return 1;
+      const aIncluded = includedIds.has(a.id) ? 1 : 0;
+      const bIncluded = includedIds.has(b.id) ? 1 : 0;
+      if (aIncluded !== bIncluded) return bIncluded - aIncluded;
+      return 0;
+    });
+  })();
 
   return {
     open,
