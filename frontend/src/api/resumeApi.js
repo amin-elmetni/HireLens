@@ -3,7 +3,9 @@ import api from './index';
 const RESUME_BASE = '/api/resumes';
 const RESUME_METADATA_BASE = '/api/resume-metadata';
 
-export const getResumeByUuid = uuid => api.get(`/api/resumes/uuid/${uuid}`);
+export const getResumeById = id => api.get(`${RESUME_BASE}/${id}`);
+
+export const getResumeByUuid = uuid => api.get(`${RESUME_BASE}/uuid/${uuid}`);
 
 export const getFilteredResumes = params => api.get(RESUME_METADATA_BASE, { params });
 

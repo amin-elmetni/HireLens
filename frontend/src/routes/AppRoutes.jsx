@@ -3,7 +3,6 @@ import Login from '@/pages/Login';
 import Resumes from '@/pages/Resumes';
 import PrivateRoute from '@/routes/PrivateRoute';
 import Collections from '@/pages/Collections';
-import CollectionDetail from '@/pages/CollectionDetails';
 
 const AppRoutes = () => (
   <BrowserRouter>

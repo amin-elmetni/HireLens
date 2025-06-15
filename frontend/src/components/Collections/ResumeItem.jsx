@@ -12,29 +12,23 @@ const ResumeItem = ({
   experiencesCount,
   projectsCount,
 }) => (
-  <li className='flex items-center py-3'>
+  <li className='flex items-center justify-start py-3'>
     <div className='w-1/4 font-semibold'>{name}</div>
     <div className='w-1/6'>{topCategory}</div>
-    <div className='w-1/6 text-gray-500'>{formatDate(lastUpdated)}</div>
+    {/* <div className='w-1/6 text-gray-500'>{formatDate(lastUpdated)}</div> */}
     <div className='w-1/6 flex gap-2 items-center'>
       <span
         title='Likes'
         className='flex items-center gap-1'
       >
-        <FontAwesomeIcon
-          icon='fa-regular fa-thumbs-up'
-          className='text-yellow-500'
-        />
+        <FontAwesomeIcon icon='fa-regular fa-thumbs-up' />
         {likes}
       </span>
       <span
         title='Comments'
         className='flex items-center gap-1'
       >
-        <FontAwesomeIcon
-          icon='fa-regular fa-comment'
-          className='text-primary'
-        />
+        <FontAwesomeIcon icon='fa-regular fa-comment' />
         {comments}
       </span>
     </div>

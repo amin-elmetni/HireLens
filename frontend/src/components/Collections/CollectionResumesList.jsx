@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { getItemsByCollection } from '@/api/collectionItemApi';
-import { getResumeByUuid } from '@/api/resumeApi';
+import { getResumeByUuid, getResumeById } from '@/api/resumeApi';
 import { getLikeCount } from '@/api/likeApi';
 import { getCommentCount } from '@/api/commentApi';
 import ResumeItem from './ResumeItem';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
+import BackCancelButton from '../ui/BackCancelButton';
 
 export default function CollectionResumesList({ collection, onBack }) {
   const [resumes, setResumes] = useState([]);
@@ -19,9 +20,16 @@ export default function CollectionResumesList({ collection, onBack }) {
         const { data: items } = await getItemsByCollection(collection.id);
         const resumesWithData = await Promise.all(
           items.map(async item => {
-            const { data: resume } = await getResumeByUuid(
-              item.resumeId ?? item.resumeUUID ?? item.resumeUuid
-            );
+            let resume;
+            if (item.resumeUuid || item.resumeUUID) {
+              const res = await getResumeByUuid(item.resumeUuid || item.resumeUUID);
+              resume = res.data;
+            } else if (item.resumeId) {
+              const res = await getResumeById(item.resumeId);
+              resume = res.data;
+            } else {
+              return null;
+            }
             const [likesRes, commentsRes] = await Promise.all([
               getLikeCount(resume.id),
               getCommentCount(resume.id),
@@ -56,14 +64,14 @@ export default function CollectionResumesList({ collection, onBack }) {
   }, [collection.id]);
 
   return (
-    <div>
-      <button
+    <div className='-translate-y-4'>
+      <BackCancelButton
         onClick={onBack}
-        className='mb-4 text-sm px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2'
-      >
-        <FontAwesomeIcon icon='fa-solid fa-arrow-left' />
-        Back to Collections
-      </button>
+        icon='fa-solid fa-arrow-left'
+        text='Back to Collections'
+        className='mb-4'
+        ariaLabel='Close'
+      />
       <h2 className='text-xl font-semibold mb-4'>
         Resumes in: <span className='text-primary'>{collection.name}</span>
       </h2>

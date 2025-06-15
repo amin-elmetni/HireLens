@@ -80,7 +80,8 @@ const Collections = () => {
             <div className='flex items-center justify-between gap-4 mb-2'>
               <h2 className='text-2xl font-semibold'>
                 {selectedCollection
-                  ? `Resumes in "${selectedCollection.name}"`
+                  ? // ? `Resumes in "${selectedCollection.name}"`
+                    ``
                   : `Your Collections (${collections.length})`}
               </h2>
               {!selectedCollection && (
