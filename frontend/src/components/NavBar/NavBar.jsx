@@ -1,15 +1,34 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '@/assets/logo.png';
 import NavLink from './NavLink';
-import UserDropdown from './UserDropdown';
 import { useAuthUser } from '@/hooks/auth/useAuthUser';
+import DropdownMenu from '@/components/ui/DropdownMenu';
+import UserAvatar from './UserAvatar';
+import DisplayName from './DisplayName';
+import useLogout from '@/hooks/auth/useLogout';
 
 const Navbar = () => {
   const user = useAuthUser();
+  const navigate = useNavigate();
+  const logout = useLogout();
+
+  const userMenuOptions = [
+    {
+      label: 'My Profile',
+      value: 'profile',
+      onClick: () => navigate('/profile'),
+    },
+    {
+      label: 'Logout',
+      value: 'logout',
+      destructive: true,
+      onClick: logout,
+    },
+  ];
 
   return (
-    <nav className='bg-white sticky top-0 z-50'>
+    <nav className='bg-white sticky top-0 z-50 shadow-md'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex items-center justify-between h-18'>
           <Link
@@ -40,7 +59,33 @@ const Navbar = () => {
               />
             </div>
             <div className='h-9 border-l border-gray-300 cursor-pointer' />
-            {user && <UserDropdown user={user} />}
+            {user && (
+              <DropdownMenu
+                options={userMenuOptions}
+                align='right'
+                width='w-48'
+                trigger={
+                  <button className='flex items-center focus:outline-none px-2 py-1'>
+                    <UserAvatar
+                      name={user.name}
+                      avatar={user.avatar}
+                    />
+                    <div className='flex flex-col ml-2 text-[11px] items-start'>
+                      <p className='text-gray-500'>Hello!</p>
+                      <div className='flex items-center gap-2 cursor-pointer capitalize'>
+                        <p className='font-semibold'>
+                          <DisplayName name={user.name.toLowerCase()} />
+                        </p>
+                        <FontAwesomeIcon
+                          icon='fa-caret-down'
+                          className='text-gray-400'
+                        />
+                      </div>
+                    </div>
+                  </button>
+                }
+              />
+            )}
           </div>
         </div>
       </div>
