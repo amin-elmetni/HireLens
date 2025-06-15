@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, cloneElement } from 'react';
 import { createPortal } from 'react-dom';
 
-// Overlay always closes dropdown and prevents scroll
+// Overlay closes dropdown and prevents scroll
 function DropdownOverlay({ onClick, zIndex = 2000 }) {
   useEffect(() => {
     const prevent = e => e.preventDefault();
@@ -21,23 +21,17 @@ function DropdownOverlay({ onClick, zIndex = 2000 }) {
       aria-hidden='true'
       style={{ background: 'transparent', pointerEvents: 'auto' }}
       onClick={onClick}
-      onWheel={e => e.preventDefault()}
+      // onWheel={e => e.preventDefault()}
       onTouchMove={e => e.preventDefault()}
     />,
     document.body
   );
 }
 
-// options: [{label, value, onClick, icon, destructive?}]
+// DropdownMenu for ellipsis menus
 const DropdownMenu = ({
   options,
-  value,
-  onChange, // only for selectable dropdowns
-  trigger, // custom trigger element (e.g., ellipsis button)
-  showLabels = true,
-  placeholder = 'Select...',
-  buttonClassName = '',
-  dropdownClassName = '',
+  trigger,
   zIndex = 3000,
   align = 'right', // 'left' or 'right'
   width = 'w-44', // tailwind width class
@@ -76,8 +70,7 @@ const DropdownMenu = ({
         setHighlighted(h => (h - 1 + options.length) % options.length);
       } else if (e.key === 'Enter') {
         if (highlighted >= 0 && highlighted < options.length) {
-          if (options[highlighted].onClick) options[highlighted].onClick();
-          if (onChange) onChange(options[highlighted].value);
+          options[highlighted].onClick?.();
           setOpen(false);
         }
       } else if (e.key === 'Escape') {
@@ -86,7 +79,7 @@ const DropdownMenu = ({
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [open, highlighted, options, onChange]);
+  }, [open, highlighted, options]);
 
   // Close on click outside
   useEffect(() => {
@@ -100,32 +93,17 @@ const DropdownMenu = ({
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
 
-  // Render custom or default trigger
-  const triggerElement = trigger ? (
-    cloneElement(trigger, {
-      onClick: e => {
-        e.stopPropagation();
-        setOpen(o => !o);
-        setHighlighted(options.findIndex(opt => opt.value === value));
-        trigger.props.onClick?.(e);
-      },
-      'aria-haspopup': 'menu',
-      'aria-expanded': open,
-    })
-  ) : (
-    <button
-      type='button'
-      className={`flex items-center gap-2 pl-1 pr-4 py-2 font-semibold text-gray-700 focus:outline-none cursor-pointer ${buttonClassName}`}
-      onClick={() => {
-        setOpen(o => !o);
-        setHighlighted(options.findIndex(opt => opt.value === value));
-      }}
-      aria-haspopup='menu'
-      aria-expanded={open}
-    >
-      <span>{options.find(opt => opt.value === value)?.label ?? placeholder}</span>
-    </button>
-  );
+  // Custom trigger (required)
+  const triggerElement = cloneElement(trigger, {
+    onClick: e => {
+      e.stopPropagation();
+      setOpen(o => !o);
+      setHighlighted(-1);
+      trigger.props.onClick?.(e);
+    },
+    'aria-haspopup': 'menu',
+    'aria-expanded': open,
+  });
 
   return (
     <div
@@ -143,14 +121,14 @@ const DropdownMenu = ({
             className={`
               absolute ${
                 align === 'right' ? 'right-0' : 'left-0'
-              } mt-2 origin-top-${align} bg-white rounded-xl shadow-lg ring-opacity-5 z-[${zIndex}] flex flex-col
+              } mt-2 origin-top-${align} bg-white rounded-xl shadow-lg z-[${zIndex}] flex flex-col
               transition-all duration-200 ease-out
               ${
                 dropdownVisible
                   ? 'opacity-100 scale-100 pointer-events-auto'
                   : 'opacity-0 scale-90 pointer-events-none'
               }
-              ${width} ${dropdownClassName}
+              ${width}
             `}
             style={{
               transformOrigin: `top ${align}`,
@@ -165,7 +143,7 @@ const DropdownMenu = ({
               <button
                 key={opt.value}
                 role='menuitem'
-                aria-selected={opt.value === value}
+                aria-selected={false}
                 className={`
                   flex items-center w-full px-4 py-3 text-left text-sm whitespace-nowrap
                   ${idx === highlighted ? 'bg-gray-100 text-gray-900' : 'text-gray-700'}
@@ -176,11 +154,11 @@ const DropdownMenu = ({
                   hover:bg-gray-100 transition cursor-pointer
                 `}
                 onClick={() => {
-                  if (opt.onClick) opt.onClick();
-                  if (onChange) onChange(opt.value);
+                  opt.onClick?.();
                   setOpen(false);
                 }}
                 onMouseEnter={() => setHighlighted(idx)}
+                tabIndex={-1}
               >
                 {opt.icon && <span className='mr-2'>{opt.icon}</span>}
                 {opt.label}

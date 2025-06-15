@@ -42,9 +42,10 @@ export default function ScrollLockOverlay({ open, onClick, fadeIn = true, lockSc
         ${fadeIn ? 'opacity-50' : 'opacity-0'}
       `}
       tabIndex={-1}
+      // inert
       aria-hidden='true'
       onClick={onClick}
-      onWheel={e => e.preventDefault()}
+      // onWheel={e => e.preventDefault()}
       onTouchMove={e => e.preventDefault()}
       style={{ pointerEvents: 'auto' }}
     />,

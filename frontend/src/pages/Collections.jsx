@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import CollectionTabs from '@/components/Collections/CollectionTabs';
 import CollectionList from '@/components/Collections/CollectionList';
 import CreateCollectionModal from '@/components/Collections/CreateCollectionModal';
@@ -18,6 +18,16 @@ const Collections = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const user = getUser();
 
+  const refreshCollections = useCallback(() => {
+    if (user) {
+      getUserCollections(user.id).then(res => setCollections(res.data));
+    }
+  }, [user]);
+
+  useEffect(() => {
+    refreshCollections();
+  }, [refreshCollections]);
+
   useEffect(() => {
     if (user) {
       getUserCollections(user.id).then(res => setCollections(res.data));
@@ -35,7 +45,10 @@ const Collections = () => {
   return (
     <>
       <Navbar />
-      <div className='max-w-4xl mx-auto mt-8 px-4'>
+      <div
+        id='main-content'
+        className='max-w-4xl mx-auto mt-8 px-4'
+      >
         <div className='flex items-center justify-between mb-4'>
           <CollectionTabs
             activeTab={activeTab}
@@ -72,7 +85,10 @@ const Collections = () => {
               onChange={e => setSearch(e.target.value)}
               className='my-6'
             />
-            <CollectionList collections={filteredCollections} />
+            <CollectionList
+              collections={filteredCollections}
+              onAction={refreshCollections}
+            />
           </>
         )}
         {/* TODO: Render Bookmarks and Favorites */}

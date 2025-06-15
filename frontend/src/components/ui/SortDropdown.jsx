@@ -34,10 +34,11 @@ function DropdownOverlay({ onClick }) {
     <div
       className='fixed inset-0 z-[2000]'
       role='presentation'
+      // inert
       aria-hidden='true'
       style={{ background: 'transparent', pointerEvents: 'auto' }}
       onClick={onClick}
-      onWheel={e => e.preventDefault()}
+      // onWheel={e => e.preventDefault()}
       onTouchMove={e => e.preventDefault()}
     />,
     document.body
