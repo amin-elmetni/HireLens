@@ -10,7 +10,7 @@ export default function CollectionList({ collections, onAction, onShowToast }) {
           key={col.id}
           collection={col}
           onAction={onAction}
-          onShowToast={onShowToast} // <--- PASS DOWN
+          onShowToast={onShowToast}
         />
       ))}
     </ul>

@@ -1,16 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import DropdownMenu from '../ui/DropdownMenu';
 import RenameCollectionModal from './RenameCollectionModal';
 import DeleteCollectionModal from './DeleteCollectionModal';
 import { getItemsByCollection } from '@/api/collectionItemApi';
 
-export default function CollectionItem({ collection, onAction }) {
+export default function CollectionItem({ collection, onAction, onShowToast }) {
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [count, setCount] = useState(collection.count ?? null);
 
-  // Fetch count if not present
   useEffect(() => {
     let cancelled = false;
     if (count == null && collection.id) {
@@ -61,14 +60,22 @@ export default function CollectionItem({ collection, onAction }) {
           collection={collection}
           currentName={collection.name}
           onClose={() => setShowRenameModal(false)}
-          onRenamed={onAction}
+          onRenamed={() => {
+            onAction?.();
+            onShowToast?.('Collection updated!');
+            setShowRenameModal(false);
+          }}
         />
       )}
       {showDeleteModal && (
         <DeleteCollectionModal
           collection={collection}
           onClose={() => setShowDeleteModal(false)}
-          onDeleted={onAction}
+          onDeleted={() => {
+            onAction?.();
+            onShowToast?.('Collection deleted!');
+            setShowDeleteModal(false);
+          }}
         />
       )}
     </>
