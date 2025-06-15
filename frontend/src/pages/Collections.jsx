@@ -17,10 +17,12 @@ const Collections = () => {
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('recent');
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // The key part: Always reset the toast to a new object, not by spreading!
   const [toast, setToast] = useState({ show: false, message: '' });
+
   const user = getUser();
 
-  // Only one source of collection refresh
   const refreshCollections = useCallback(() => {
     if (user) {
       getUserCollections(user.id).then(res => setCollections(res.data));
@@ -31,12 +33,16 @@ const Collections = () => {
     refreshCollections();
   }, [refreshCollections]);
 
-  // Show toast for a short period
+  // Show toast: always close then open (new object reference)
   const showToast = message => {
-    setToast({ show: true, message });
+    setToast({ show: false, message: '' }); // close first
+    setTimeout(() => {
+      setToast({ show: true, message });
+    }, 30); // short delay to force transition
   };
 
-  const handleToastClose = () => setToast({ ...toast, show: false });
+  // Always reset to a new object
+  const handleToastClose = () => setToast({ show: false, message: '' });
 
   const filteredCollections = collections
     .filter(col => col.name.toLowerCase().includes(search.toLowerCase()))
