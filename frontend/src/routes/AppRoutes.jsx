@@ -3,6 +3,7 @@ import Login from '@/pages/Login';
 import Resumes from '@/pages/Resumes';
 import PrivateRoute from '@/routes/PrivateRoute';
 import Collections from '@/pages/Collections';
+import CollectionDetail from '@/pages/CollectionDetails';
 
 const AppRoutes = () => (
   <BrowserRouter>
@@ -21,6 +22,14 @@ const AppRoutes = () => (
       />
       <Route
         path='/collections'
+        element={
+          <PrivateRoute>
+            <Collections />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path='/collections/:collectionId'
         element={
           <PrivateRoute>
             <Collections />

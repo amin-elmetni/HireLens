@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import CollectionTabs from '@/components/Collections/CollectionTabs';
 import CollectionList from '@/components/Collections/CollectionList';
 import CreateCollectionModal from '@/components/Collections/CreateCollectionModal';
@@ -10,6 +11,7 @@ import SearchInput from '@/components/ui/SearchInput';
 import SortDropdown from '@/components/ui/SortDropdown';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import CollectionResumesList from '@/components/Collections/CollectionResumesList';
 
 const Collections = () => {
   const [activeTab, setActiveTab] = useState('collections');
@@ -25,6 +27,8 @@ const Collections = () => {
   const handleToastClose = () => setToast(prev => ({ ...prev, show: false, message: '' }));
 
   const user = getUser();
+  const { collectionId } = useParams();
+  const navigate = useNavigate();
 
   const refreshCollections = useCallback(() => {
     if (user) {
@@ -43,6 +47,10 @@ const Collections = () => {
         ? new Date(b.createdAt) - new Date(a.createdAt)
         : a.name.localeCompare(b.name)
     );
+
+  const selectedCollection = collectionId
+    ? collections.find(col => String(col.id) === String(collectionId))
+    : null;
 
   return (
     <>
@@ -70,28 +78,43 @@ const Collections = () => {
         {activeTab === 'collections' && (
           <>
             <div className='flex items-center justify-between gap-4 mb-2'>
-              <h2 className='text-2xl font-semibold'>Your Collections ({collections.length})</h2>
-              <SortDropdown
-                options={[
-                  { label: 'Recent', value: 'recent' },
-                  { label: 'Alphabetical', value: 'alphabetical' },
-                ]}
-                value={sort}
-                onChange={setSort}
-                showLabels={false}
-              />
+              <h2 className='text-2xl font-semibold'>
+                {selectedCollection
+                  ? `Resumes in "${selectedCollection.name}"`
+                  : `Your Collections (${collections.length})`}
+              </h2>
+              {!selectedCollection && (
+                <SortDropdown
+                  options={[
+                    { label: 'Recent', value: 'recent' },
+                    { label: 'Alphabetical', value: 'alphabetical' },
+                  ]}
+                  value={sort}
+                  onChange={setSort}
+                  showLabels={false}
+                />
+              )}
             </div>
-            <SearchInput
-              placeholder='Search Collections...'
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className='my-6'
-            />
-            <CollectionList
-              collections={filteredCollections}
-              onAction={refreshCollections}
-              onShowToast={showToast}
-            />
+            {!selectedCollection && (
+              <SearchInput
+                placeholder='Search Collections...'
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className='my-6'
+              />
+            )}
+            {!selectedCollection ? (
+              <CollectionList
+                collections={filteredCollections}
+                onAction={refreshCollections}
+                onShowToast={showToast}
+              />
+            ) : (
+              <CollectionResumesList
+                collection={selectedCollection}
+                onBack={() => navigate('/collections')}
+              />
+            )}
           </>
         )}
         {showCreateModal && (
