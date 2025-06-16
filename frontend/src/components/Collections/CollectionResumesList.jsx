@@ -4,10 +4,12 @@ import BackCancelButton from '../ui/BackCancelButton';
 import useCollectionResumes from '@/hooks/collections/useCollectionResumes';
 import { removeItemFromCollection } from '@/api/collectionItemApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import RemoveResumeModal from './RemoveResumeModal';
 
 export default function CollectionResumesList({ collection, onBack }) {
   const { resumes, loading, refresh } = useCollectionResumes(collection?.id);
   const [selected, setSelected] = useState([]);
+  const [showBulkRemoveModal, setShowBulkRemoveModal] = useState(false);
 
   // Toggle single resume selection
   const handleToggle = uuid => {
@@ -20,6 +22,10 @@ export default function CollectionResumesList({ collection, onBack }) {
 
   // Remove selected resumes from collection
   const handleBulkRemove = async () => {
+    setShowBulkRemoveModal(true);
+  };
+
+  const confirmBulkRemove = async () => {
     for (const uuid of selected) {
       const resume = resumes.find(r => r.uuid === uuid);
       if (resume && resume.resumeId) {
@@ -27,6 +33,7 @@ export default function CollectionResumesList({ collection, onBack }) {
       }
     }
     setSelected([]);
+    setShowBulkRemoveModal(false);
     refresh();
   };
 
@@ -92,6 +99,14 @@ export default function CollectionResumesList({ collection, onBack }) {
             />
           ))}
         </ul>
+      )}
+      {showBulkRemoveModal && (
+        <RemoveResumeModal
+          onClose={() => setShowBulkRemoveModal(false)}
+          onConfirm={confirmBulkRemove}
+          bulk
+          count={selected.length}
+        />
       )}
     </div>
   );

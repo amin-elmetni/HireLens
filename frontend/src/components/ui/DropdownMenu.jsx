@@ -38,7 +38,9 @@ const DropdownMenu = ({
   const [show, setShow] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [highlighted, setHighlighted] = useState(-1);
+  const [direction, setDirection] = useState('down'); // down or up
   const ref = useRef();
+  const menuRef = useRef();
 
   // Animation logic
   useEffect(() => {
@@ -83,13 +85,34 @@ const DropdownMenu = ({
   useEffect(() => {
     if (!open) return;
     const handleClick = e => {
-      if (ref.current && !ref.current.contains(e.target)) {
+      if (
+        ref.current &&
+        !ref.current.contains(e.target) &&
+        menuRef.current &&
+        !menuRef.current.contains(e.target)
+      ) {
         setOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
+
+  // Direction detection (open up if not enough space below)
+  useEffect(() => {
+    if (!open) return;
+    setTimeout(() => {
+      if (!ref.current || !menuRef.current) return;
+      const rect = menuRef.current.getBoundingClientRect();
+      const triggerRect = ref.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+      if (triggerRect.bottom + rect.height > windowHeight - 8) {
+        setDirection('up');
+      } else {
+        setDirection('down');
+      }
+    }, 10);
+  }, [open, show, options.length, width]);
 
   // Custom trigger (required)
   const triggerElement = cloneElement(trigger, {
@@ -119,10 +142,12 @@ const DropdownMenu = ({
           />
           {/* Dropdown menu always above overlay */}
           <div
+            ref={menuRef}
             className={`
-              absolute ${
-                align === 'right' ? 'right-0' : 'left-0'
-              } mt-2 origin-top-${align} bg-white rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.25)] py-2 z-[${zIndex}] flex flex-col
+              absolute
+              ${align === 'right' ? 'right-0' : 'left-0'}
+              ${direction === 'down' ? 'mt-2 origin-top-' + align : 'mb-2 origin-bottom-' + align}
+              bg-white rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.25)] py-2 z-[${zIndex}] flex flex-col
               transition-all duration-200 ease-out
               ${
                 dropdownVisible
@@ -132,9 +157,11 @@ const DropdownMenu = ({
               ${width}
             `}
             style={{
-              transformOrigin: `top ${align}`,
+              transformOrigin: direction === 'down' ? `top ${align}` : `bottom ${align}`,
               minWidth: align === 'right' ? '160px' : undefined,
               overflowY: 'auto',
+              top: direction === 'up' ? undefined : '100%',
+              bottom: direction === 'up' ? '100%' : undefined,
             }}
             tabIndex={-1}
             role='menu'
@@ -157,6 +184,7 @@ const DropdownMenu = ({
                 }}
                 onMouseEnter={() => setHighlighted(idx)}
                 tabIndex={-1}
+                type='button'
               >
                 {opt.icon && <span className='mr-4 text-[18px]'>{opt.icon}</span>}
                 {opt.label}
