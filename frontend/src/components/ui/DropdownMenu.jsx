@@ -16,10 +16,10 @@ function DropdownOverlay({ onClick, zIndex = 2000 }) {
   }, []);
   return createPortal(
     <div
-      className={`fixed inset-0 z-[${zIndex}]`}
+      className='fixed inset-0'
+      style={{ background: 'transparent', pointerEvents: 'auto', zIndex: zIndex }}
       role='presentation'
       aria-hidden='true'
-      style={{ background: 'transparent', pointerEvents: 'auto' }}
       onClick={onClick}
     />,
     document.body
@@ -106,7 +106,7 @@ const DropdownMenu = ({
       const rect = menuRef.current.getBoundingClientRect();
       const triggerRect = ref.current.getBoundingClientRect();
       const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-      if (triggerRect.bottom + rect.height > windowHeight - 8) {
+      if (triggerRect.bottom + rect.height > windowHeight - 30) {
         setDirection('up');
       } else {
         setDirection('down');
@@ -126,7 +126,6 @@ const DropdownMenu = ({
     'aria-expanded': open,
   });
 
-  // Instead of rendering overlay over dropdown, render overlay before dropdown so menu is always on top!
   return (
     <div
       className='relative inline-block text-left'
@@ -144,10 +143,10 @@ const DropdownMenu = ({
           <div
             ref={menuRef}
             className={`
-              absolute
+              absolute 
               ${align === 'right' ? 'right-0' : 'left-0'}
               ${direction === 'down' ? 'mt-2 origin-top-' + align : 'mb-2 origin-bottom-' + align}
-              bg-white rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.25)] py-2 z-[${zIndex}] flex flex-col
+              bg-white rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.25)] py-2 flex flex-col
               transition-all duration-200 ease-out
               ${
                 dropdownVisible
@@ -162,6 +161,7 @@ const DropdownMenu = ({
               overflowY: 'auto',
               top: direction === 'up' ? undefined : '100%',
               bottom: direction === 'up' ? '100%' : undefined,
+              zIndex: zIndex,
             }}
             tabIndex={-1}
             role='menu'
