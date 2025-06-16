@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ScrollLockOverlay from '@/components/ui/ScrollLockOverlay';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import BackCancelButton from '@/components/ui/BackCancelButton';
+import ModalPortal from '@/components/ui/ModalPortal';
 
 export default function RemoveResumeModal({ onClose, onConfirm, bulk = false, count = 0 }) {
   const [loading, setLoading] = useState(false);
@@ -25,7 +26,7 @@ export default function RemoveResumeModal({ onClose, onConfirm, bulk = false, co
   };
 
   return (
-    <>
+    <ModalPortal>
       <ScrollLockOverlay
         open
         fadeIn={fadeIn}
@@ -34,19 +35,17 @@ export default function RemoveResumeModal({ onClose, onConfirm, bulk = false, co
       <div className='fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none'>
         <div
           className={`
-            bg-white rounded-3xl shadow-lg p-8 w-full max-w-xl pointer-events-auto
+            bg-white rounded-3xl shadow-lg p-8 w-full max-w-[38rem] pointer-events-auto
             transition-opacity duration-200
             ${fadeIn ? 'opacity-100' : 'opacity-0'}
           `}
         >
           <h3 className='text-3xl font-extrabold mb-4 text-gray-900'>
-            {bulk
-              ? `Remove ${count} Resume${count !== 1 ? 's' : ''} from Collection?`
-              : 'Remove Resume from Collection?'}
+            Remove resumes from collection?
           </h3>
           <div className='mb-4 text-base text-gray-700'>
             {bulk
-              ? `Are you sure you want to remove ${count} resume${
+              ? `Are you sure you want to remove the ${count} resume${
                   count !== 1 ? 's' : ''
                 } from this collection?`
               : 'Are you sure you want to remove this resume from the collection?'}
@@ -68,6 +67,6 @@ export default function RemoveResumeModal({ onClose, onConfirm, bulk = false, co
           </div>
         </div>
       </div>
-    </>
+    </ModalPortal>
   );
 }
