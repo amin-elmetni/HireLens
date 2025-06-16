@@ -21,8 +21,6 @@ function DropdownOverlay({ onClick, zIndex = 2000 }) {
       aria-hidden='true'
       style={{ background: 'transparent', pointerEvents: 'auto' }}
       onClick={onClick}
-      // onWheel={e => e.preventDefault()}
-      onTouchMove={e => e.preventDefault()}
     />,
     document.body
   );
@@ -105,6 +103,7 @@ const DropdownMenu = ({
     'aria-expanded': open,
   });
 
+  // Instead of rendering overlay over dropdown, render overlay before dropdown so menu is always on top!
   return (
     <div
       className='relative inline-block text-left'
@@ -113,15 +112,17 @@ const DropdownMenu = ({
       {triggerElement}
       {show && (
         <>
+          {/* Overlay first */}
           <DropdownOverlay
             onClick={() => setOpen(false)}
             zIndex={zIndex - 1}
           />
+          {/* Dropdown menu always above overlay */}
           <div
             className={`
               absolute ${
                 align === 'right' ? 'right-0' : 'left-0'
-              } mt-2 origin-top-${align} bg-white rounded-xl shadow-lg z-[${zIndex}] flex flex-col
+              } mt-2 origin-top-${align} bg-white rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.25)] py-2 z-[${zIndex}] flex flex-col
               transition-all duration-200 ease-out
               ${
                 dropdownVisible
@@ -133,7 +134,6 @@ const DropdownMenu = ({
             style={{
               transformOrigin: `top ${align}`,
               minWidth: align === 'right' ? '160px' : undefined,
-              maxWidth: '220px',
               overflowY: 'auto',
             }}
             tabIndex={-1}
@@ -148,19 +148,17 @@ const DropdownMenu = ({
                   flex items-center w-full px-4 py-3 text-left text-sm whitespace-nowrap
                   ${idx === highlighted ? 'bg-gray-100 text-gray-900' : 'text-gray-700'}
                   ${opt.destructive ? 'text-red-600' : ''}
-                  ${idx === 0 ? 'rounded-t-xl' : ''} ${
-                  idx === options.length - 1 ? 'rounded-b-xl' : ''
-                }
-                  hover:bg-gray-100 transition cursor-pointer
+                  hover:bg-gray-100 transition cursor-pointer font-medium
                 `}
-                onClick={() => {
-                  opt.onClick?.();
+                onClick={e => {
+                  e.stopPropagation();
+                  opt.onClick?.(e);
                   setOpen(false);
                 }}
                 onMouseEnter={() => setHighlighted(idx)}
                 tabIndex={-1}
               >
-                {opt.icon && <span className='mr-2'>{opt.icon}</span>}
+                {opt.icon && <span className='mr-4 text-[18px]'>{opt.icon}</span>}
                 {opt.label}
               </button>
             ))}

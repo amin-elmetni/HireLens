@@ -12,6 +12,7 @@ import {
   faFolderOpen as farFolderOpen,
   faFolderClosed as farFolderClosed,
   faFolder as farFolder,
+  faTrashCan,
 } from '@fortawesome/free-regular-svg-icons';
 
 import {
@@ -37,6 +38,7 @@ import {
   faArrowLeft,
   faEllipsisVertical,
   faFolder as fasFolder,
+  faFolderMinus,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Add all icons to the library
@@ -73,5 +75,7 @@ library.add(
   faArrowLeft,
   faEllipsisVertical,
   fasFolder,
-  farFolder
+  farFolder,
+  faFolderMinus,
+  faTrashCan
 );
