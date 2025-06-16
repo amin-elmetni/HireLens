@@ -27,7 +27,7 @@ export default function CollectionResumesList({ collection, onBack }) {
       }
     }
     setSelected([]);
-    // refresh();
+    refresh();
   };
 
   return (
