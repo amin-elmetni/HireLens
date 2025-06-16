@@ -17,7 +17,7 @@ function DropdownOverlay({ onClick, zIndex = 2000 }) {
   return createPortal(
     <div
       className='fixed inset-0'
-      style={{ background: 'transparent', pointerEvents: 'auto', zIndex: zIndex }}
+      style={{ background: 'transparent', pointerEvents: 'auto', zIndex }}
       role='presentation'
       aria-hidden='true'
       onClick={onClick}
@@ -106,7 +106,7 @@ const DropdownMenu = ({
       const rect = menuRef.current.getBoundingClientRect();
       const triggerRect = ref.current.getBoundingClientRect();
       const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-      if (triggerRect.bottom + rect.height > windowHeight - 30) {
+      if (triggerRect.bottom + rect.height > windowHeight - 8) {
         setDirection('up');
       } else {
         setDirection('down');
@@ -126,73 +126,87 @@ const DropdownMenu = ({
     'aria-expanded': open,
   });
 
+  // Create menu portal to ensure it's at the top level of the DOM
+  const menuElement =
+    show &&
+    createPortal(
+      <>
+        {/* Overlay first */}
+        <DropdownOverlay
+          onClick={() => setOpen(false)}
+          zIndex={zIndex}
+        />
+        {/* Dropdown menu always above overlay */}
+        <div
+          ref={menuRef}
+          className={`
+            fixed bg-white rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.25)] py-2 flex flex-col
+            transition-all duration-200 ease-out
+            ${
+              dropdownVisible
+                ? 'opacity-100 scale-100 pointer-events-auto'
+                : 'opacity-0 scale-90 pointer-events-none'
+            }
+            ${width}
+          `}
+          style={{
+            zIndex: zIndex + 10, // Ensure menu is above overlay
+            transformOrigin: direction === 'down' ? `top ${align}` : `bottom ${align}`,
+            minWidth: align === 'right' ? '160px' : undefined,
+            overflowY: 'auto',
+            // Position the menu relative to the trigger
+            ...(() => {
+              if (!ref.current) return {};
+              const rect = ref.current.getBoundingClientRect();
+              return {
+                [align === 'right' ? 'right' : 'left']:
+                  align === 'right' ? window.innerWidth - rect.right : rect.left,
+                ...(direction === 'down'
+                  ? { top: rect.bottom + 8 }
+                  : { bottom: window.innerHeight - rect.top + 8 }),
+              };
+            })(),
+          }}
+          tabIndex={-1}
+          role='menu'
+          onClick={e => e.stopPropagation()}
+        >
+          {options.map((opt, idx) => (
+            <button
+              key={opt.value}
+              role='menuitem'
+              aria-selected={false}
+              className={`
+                flex items-center w-full px-4 py-3 text-left text-sm whitespace-nowrap
+                ${idx === highlighted ? 'bg-gray-100 text-gray-900' : 'text-gray-700'}
+                ${opt.destructive ? 'text-red-600' : ''}
+                hover:bg-gray-100 transition cursor-pointer font-medium
+              `}
+              onClick={e => {
+                e.stopPropagation();
+                opt.onClick?.(e);
+                setOpen(false);
+              }}
+              onMouseEnter={() => setHighlighted(idx)}
+              tabIndex={-1}
+              type='button'
+            >
+              {opt.icon && <span className='mr-4 text-[18px]'>{opt.icon}</span>}
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </>,
+      document.body
+    );
+
   return (
     <div
       className='relative inline-block text-left'
       ref={ref}
     >
       {triggerElement}
-      {show && (
-        <>
-          {/* Overlay first */}
-          <DropdownOverlay
-            onClick={() => setOpen(false)}
-            zIndex={zIndex - 1}
-          />
-          {/* Dropdown menu always above overlay */}
-          <div
-            ref={menuRef}
-            className={`
-              absolute 
-              ${align === 'right' ? 'right-0' : 'left-0'}
-              ${direction === 'down' ? 'mt-2 origin-top-' + align : 'mb-2 origin-bottom-' + align}
-              bg-white rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.25)] py-2 flex flex-col
-              transition-all duration-200 ease-out
-              ${
-                dropdownVisible
-                  ? 'opacity-100 scale-100 pointer-events-auto'
-                  : 'opacity-0 scale-90 pointer-events-none'
-              }
-              ${width}
-            `}
-            style={{
-              transformOrigin: direction === 'down' ? `top ${align}` : `bottom ${align}`,
-              minWidth: align === 'right' ? '160px' : undefined,
-              overflowY: 'auto',
-              top: direction === 'up' ? undefined : '100%',
-              bottom: direction === 'up' ? '100%' : undefined,
-              zIndex: zIndex,
-            }}
-            tabIndex={-1}
-            role='menu'
-          >
-            {options.map((opt, idx) => (
-              <button
-                key={opt.value}
-                role='menuitem'
-                aria-selected={false}
-                className={`
-                  flex items-center w-full px-4 py-3 text-left text-sm whitespace-nowrap
-                  ${idx === highlighted ? 'bg-gray-100 text-gray-900' : 'text-gray-700'}
-                  ${opt.destructive ? 'text-red-600' : ''}
-                  hover:bg-gray-100 transition cursor-pointer font-medium
-                `}
-                onClick={e => {
-                  e.stopPropagation();
-                  opt.onClick?.(e);
-                  setOpen(false);
-                }}
-                onMouseEnter={() => setHighlighted(idx)}
-                tabIndex={-1}
-                type='button'
-              >
-                {opt.icon && <span className='mr-4 text-[18px]'>{opt.icon}</span>}
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
+      {menuElement}
     </div>
   );
 };
