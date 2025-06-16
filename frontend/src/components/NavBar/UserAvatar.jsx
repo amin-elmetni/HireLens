@@ -1,12 +1,7 @@
-const UserAvatar = ({ name, avatar }) => {
-  const getInitials = name =>
-    name
-      .split(' ')
-      .slice(0, 2)
-      .map(n => n[0])
-      .join('')
-      .toUpperCase();
+import React from 'react';
+import { getInitials } from '@/utils/generalUtils';
 
+const UserAvatar = ({ name, avatar }) => {
   return avatar ? (
     <img
       src={avatar}

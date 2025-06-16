@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { formatDate } from '@/utils/formatDate';
+import { formatDate } from '@/utils/generalUtils';
 
 const normalize = s => s.toLowerCase().replace(/\s+/g, '_');
 

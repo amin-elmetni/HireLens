@@ -54,7 +54,7 @@ const Actions = ({ uuid }) => {
   const actionButtons = [
     {
       onClick: collectionPicker.show,
-      regularIcon: 'fa-regular fa-folder-closed',
+      regularIcon: 'fa-regular fa-folder',
       solidIcon: 'fa-regular fa-folder-open',
       activeColor: 'text-blue-500',
       isActive: false,

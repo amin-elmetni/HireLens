@@ -1,46 +1,35 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import CollectionTabs from '@/components/Collections/CollectionTabs';
 import CollectionList from '@/components/Collections/CollectionList';
 import CreateCollectionModal from '@/components/Collections/CreateCollectionModal';
 import ConfirmationToast from '@/components/ui/ConfirmationToast';
 import { getUser } from '@/utils/userUtils';
-import { getUserCollections } from '@/api/collectionApi';
 import Navbar from '@/components/NavBar/NavBar';
 import SearchInput from '@/components/ui/SearchInput';
 import SortDropdown from '@/components/ui/SortDropdown';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CollectionResumesList from '@/components/Collections/CollectionResumesList';
+import useUserCollections from '@/hooks/collections/useUserCollections';
 
 const Collections = () => {
   const [activeTab, setActiveTab] = useState('collections');
-  const [collections, setCollections] = useState([]);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('recent');
   const [showCreateModal, setShowCreateModal] = useState(false);
-
   const [toast, setToast] = useState({ show: false, message: '', id: 0 });
 
   const showToast = message => setToast(prev => ({ show: true, message, id: prev.id + 1 }));
-
   const handleToastClose = () => setToast(prev => ({ ...prev, show: false, message: '' }));
 
   const user = getUser();
   const { collectionId } = useParams();
   const navigate = useNavigate();
 
-  const refreshCollections = useCallback(() => {
-    if (user) {
-      getUserCollections(user.id).then(res => setCollections(res.data));
-    }
-  }, [user]);
+  const { collections, loading, refreshCollections } = useUserCollections(user?.id);
 
-  useEffect(() => {
-    refreshCollections();
-  }, [refreshCollections]);
-
-  const filteredCollections = collections
+  const filteredCollections = (collections || [])
     .filter(col => col.name.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) =>
       sort === 'recent'
@@ -49,7 +38,7 @@ const Collections = () => {
     );
 
   const selectedCollection = collectionId
-    ? collections.find(col => String(col.id) === String(collectionId))
+    ? collections?.find(col => String(col.id) === String(collectionId))
     : null;
 
   return (
@@ -57,7 +46,7 @@ const Collections = () => {
       <Navbar />
       <div
         id='main-content'
-        className='max-w-4xl mx-auto mt-8 px-4'
+        className='w-2/3 mx-auto mt-8 px-4'
       >
         <div className='flex items-center justify-between mb-4'>
           <CollectionTabs
@@ -79,10 +68,7 @@ const Collections = () => {
           <>
             <div className='flex items-center justify-between gap-4 mb-2'>
               <h2 className='text-2xl font-semibold'>
-                {selectedCollection
-                  ? // ? `Resumes in "${selectedCollection.name}"`
-                    ``
-                  : `Your Collections (${collections.length})`}
+                {selectedCollection ? '' : `Your Collections (${collections.length})`}
               </h2>
               {!selectedCollection && (
                 <SortDropdown
@@ -104,7 +90,9 @@ const Collections = () => {
                 className='my-6'
               />
             )}
-            {!selectedCollection ? (
+            {loading ? (
+              <div className='text-gray-400 pt-8'>Loading collections...</div>
+            ) : !selectedCollection ? (
               <CollectionList
                 collections={filteredCollections}
                 onAction={refreshCollections}

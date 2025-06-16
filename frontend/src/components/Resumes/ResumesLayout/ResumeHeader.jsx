@@ -1,14 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import MatchingScoreCircle from '@/components/Resumes/ResumesLayout/MatchingScoreCircle';
-
-const getInitials = name =>
-  name
-    ?.split(' ')
-    .slice(0, 2)
-    .map(p => p[0])
-    .join('')
-    .toUpperCase();
+import { getInitials } from '@/utils/generalUtils';
 
 const ResumeHeader = ({ name, title, matchingScore, date }) => (
   <div className='flex flex-col'>
