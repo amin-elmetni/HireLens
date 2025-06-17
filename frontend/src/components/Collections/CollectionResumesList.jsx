@@ -5,11 +5,62 @@ import useCollectionResumes from '@/hooks/collections/useCollectionResumes';
 import { removeItemFromCollection } from '@/api/collectionItemApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import RemoveResumeModal from './RemoveResumeModal';
+import ConfirmationToast from '@/components/ui/ConfirmationToast';
+import SearchInput from '@/components/ui/SearchInput';
+import SortDropdown from '@/components/ui/SortDropdown';
+
+// Utility to get sort value
+const getResumeSortValue = (resume, sortBy) => {
+  if (!resume) return '';
+  switch (sortBy) {
+    case 'name':
+      return resume.name?.toLowerCase() || '';
+    case 'lastUpdated':
+      return new Date(resume.lastUpdated || 0).getTime();
+    case 'yearsOfExperience':
+      return resume.yearsOfExperience ?? 0;
+    case 'experiencesCount':
+      return resume.experiencesCount ?? 0;
+    case 'projectsCount':
+      return resume.projectsCount ?? 0;
+    case 'likes':
+      return resume.likes ?? 0;
+    case 'comments':
+      return resume.comments ?? 0;
+    default:
+      return '';
+  }
+};
 
 export default function CollectionResumesList({ collection, onBack }) {
   const { resumes, loading, refresh } = useCollectionResumes(collection?.id);
   const [selected, setSelected] = useState([]);
   const [showBulkRemoveModal, setShowBulkRemoveModal] = useState(false);
+
+  // Toast state
+  const [toast, setToast] = useState({ show: false, message: '', id: 0 });
+  const showToast = message => setToast(prev => ({ show: true, message, id: prev.id + 1 }));
+  const handleToastClose = () => setToast(prev => ({ ...prev, show: false, message: '' }));
+
+  // Search and Sort state
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState('lastUpdated');
+
+  // Filtering & Sorting
+  const filteredSortedResumes = useMemo(() => {
+    let filtered = resumes;
+    if (search.trim()) {
+      filtered = filtered.filter(r => r.name?.toLowerCase().includes(search.toLowerCase()));
+    }
+    // For string fields (name), sort ascending; for others, descending
+    let sorted = [...filtered];
+    if (sort === 'name') {
+      sorted.sort((a, b) => getResumeSortValue(a, sort).localeCompare(getResumeSortValue(b, sort)));
+    } else {
+      sorted.sort((a, b) => getResumeSortValue(b, sort) - getResumeSortValue(a, sort));
+    }
+    return sorted;
+  }, [resumes, search, sort]);
 
   // Toggle single resume selection
   const handleToggle = uuid => {
@@ -17,8 +68,10 @@ export default function CollectionResumesList({ collection, onBack }) {
   };
 
   // Select all / Deselect all
-  const allChecked = resumes.length > 0 && selected.length === resumes.length;
-  const handleSelectAll = () => setSelected(allChecked ? [] : resumes.map(r => r.uuid));
+  const allChecked =
+    filteredSortedResumes.length > 0 && selected.length === filteredSortedResumes.length;
+  const handleSelectAll = () =>
+    setSelected(allChecked ? [] : filteredSortedResumes.map(r => r.uuid));
 
   // Remove selected resumes from collection
   const handleBulkRemove = async () => {
@@ -27,7 +80,7 @@ export default function CollectionResumesList({ collection, onBack }) {
 
   const confirmBulkRemove = async () => {
     for (const uuid of selected) {
-      const resume = resumes.find(r => r.uuid === uuid);
+      const resume = filteredSortedResumes.find(r => r.uuid === uuid);
       if (resume && resume.resumeId) {
         await removeItemFromCollection(collection.id, resume.resumeId);
       }
@@ -35,7 +88,19 @@ export default function CollectionResumesList({ collection, onBack }) {
     setSelected([]);
     setShowBulkRemoveModal(false);
     refresh();
+    showToast('Resumes removed from collection!');
   };
+
+  // Sorting options
+  const sortOptions = [
+    { label: 'Name', value: 'name' },
+    { label: 'Last Updated', value: 'lastUpdated' },
+    { label: 'Years of Experience', value: 'yearsOfExperience' },
+    { label: 'Number of Experiences', value: 'experiencesCount' },
+    { label: 'Number of Projects', value: 'projectsCount' },
+    { label: 'Number of Likes', value: 'likes' },
+    { label: 'Number of Comments', value: 'comments' },
+  ];
 
   return (
     <div className='-translate-y-4'>
@@ -53,8 +118,23 @@ export default function CollectionResumesList({ collection, onBack }) {
         />
         {collection.name}
       </h2>
+      {/* Search and Sort */}
+      <SearchInput
+        placeholder='Search resumes...'
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        className='w-full'
+      />
+      <div className='my-4 text-end'>
+        <SortDropdown
+          options={sortOptions}
+          value={sort}
+          onChange={setSort}
+          showLabels={false}
+        />
+      </div>
       {/* Select all and Bulk remove */}
-      {resumes.length > 0 && (
+      {filteredSortedResumes.length > 0 && (
         <div className='flex items-center justify-between gap-3 mb-2'>
           <label className='flex items-center'>
             <input
@@ -79,11 +159,11 @@ export default function CollectionResumesList({ collection, onBack }) {
       )}
       {loading ? (
         <div>Loading...</div>
-      ) : resumes.length === 0 ? (
+      ) : filteredSortedResumes.length === 0 ? (
         <div className='text-gray-400'>No resumes in this collection.</div>
       ) : (
         <ul className='divide-y divide-gray-200'>
-          {resumes.map(r => (
+          {filteredSortedResumes.map(r => (
             <ResumeItem
               key={r.uuid}
               {...r}
@@ -96,6 +176,7 @@ export default function CollectionResumesList({ collection, onBack }) {
                 setSelected(selected => selected.filter(id => id !== r.uuid));
                 refresh();
               }}
+              onShowToast={showToast}
             />
           ))}
         </ul>
@@ -108,6 +189,12 @@ export default function CollectionResumesList({ collection, onBack }) {
           count={selected.length}
         />
       )}
+      <ConfirmationToast
+        key={toast.id}
+        message={toast.message}
+        show={toast.show}
+        onClose={handleToastClose}
+      />
     </div>
   );
 }

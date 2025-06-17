@@ -13,7 +13,7 @@ function groupBy(options, getGroup) {
 }
 
 // Overlay always closes dropdown
-function DropdownOverlay({ onClick }) {
+function DropdownOverlay({ onClick, zIndex = 2000 }) {
   useEffect(() => {
     const prevent = e => {
       e.preventDefault();
@@ -32,13 +32,11 @@ function DropdownOverlay({ onClick }) {
 
   return createPortal(
     <div
-      className='fixed inset-0 z-[2000]'
+      className='fixed inset-0'
+      style={{ background: 'transparent', pointerEvents: 'auto', zIndex }}
       role='presentation'
-      // inert
       aria-hidden='true'
-      style={{ background: 'transparent', pointerEvents: 'auto' }}
       onClick={onClick}
-      // onWheel={e => e.preventDefault()}
       onTouchMove={e => e.preventDefault()}
     />,
     document.body
@@ -49,8 +47,8 @@ const SortDropdown = ({
   options,
   value,
   onChange,
-  getGroup = () => 'Default', // function to group options
-  groupOrder, // array of group labels to order columns
+  getGroup = () => 'Default',
+  groupOrder,
   showLabels = true,
   placeholder = 'Select...',
   buttonClassName = '',
@@ -61,6 +59,7 @@ const SortDropdown = ({
   const [show, setShow] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [highlighted, setHighlighted] = useState(-1);
+  const [direction, setDirection] = useState('down');
   const ref = useRef();
 
   // Grouping
@@ -108,6 +107,22 @@ const SortDropdown = ({
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, [open, highlighted, flatOptions, onChange]);
+
+  // Direction detection (up/down)
+  useEffect(() => {
+    if (!open) return;
+    setTimeout(() => {
+      if (!ref.current) return;
+      const rect = ref.current.getBoundingClientRect();
+      const dropdownHeight = 348; // 21.75rem * 16px per rem
+      const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+      if (rect.bottom + dropdownHeight > windowHeight - 8) {
+        setDirection('up');
+      } else {
+        setDirection('down');
+      }
+    }, 10);
+  }, [open, show, options.length, groupOrder]);
 
   // Render column for a group
   const renderGroupCol = (label, group, startIndex) => {
@@ -160,6 +175,68 @@ const SortDropdown = ({
   // Dynamic columns
   const colCount = groups.filter(g => (grouped[g] || []).length > 0).length;
 
+  /// Calculate menu position relative to trigger, with direction awareness
+  const getMenuStyle = () => {
+    if (!ref.current) return { zIndex: zIndex + 10 };
+    const rect = ref.current.getBoundingClientRect();
+    const colCount = groups.filter(g => (grouped[g] || []).length > 0).length;
+    const menuWidth = colCount * 14 * 16; // 14rem * 16px per rem
+    if (direction === 'down') {
+      return {
+        position: 'fixed',
+        top: rect.bottom + 8,
+        left: rect.right - menuWidth,
+        zIndex: zIndex + 10,
+        minWidth: `${colCount * 14}rem`,
+        maxHeight: '21.75rem',
+        overflowY: 'auto',
+        transformOrigin: 'top right',
+      };
+    } else {
+      return {
+        position: 'fixed',
+        bottom: window.innerHeight - rect.top + 8,
+        left: rect.right - menuWidth,
+        zIndex: zIndex + 10,
+        minWidth: `${colCount * 14}rem`,
+        maxHeight: '21.75rem',
+        overflowY: 'auto',
+        transformOrigin: 'bottom right',
+      };
+    }
+  };
+
+  // Portal dropdown menu to body
+  const menuElement =
+    show &&
+    createPortal(
+      <>
+        <DropdownOverlay
+          onClick={() => setOpen(false)}
+          zIndex={zIndex}
+        />
+        <div
+          className={`
+          bg-white rounded-md shadow-lg ring-opacity-5 flex
+          transition-all duration-200 ease-out scrollbar-custom
+          ${
+            dropdownVisible
+              ? 'opacity-100 scale-100 pointer-events-auto'
+              : 'opacity-0 scale-90 pointer-events-none'
+          }
+          ${dropdownClassName}
+        `}
+          style={getMenuStyle()}
+          tabIndex={-1}
+          role='listbox'
+          onClick={e => e.stopPropagation()}
+        >
+          {groups.map(g => renderGroupCol(g, grouped[g] || [], groupStartIndices[g]))}
+        </div>
+      </>,
+      document.body
+    );
+
   return (
     <div
       className='relative inline-block text-left'
@@ -185,33 +262,7 @@ const SortDropdown = ({
           `}
         />
       </button>
-      {show && (
-        <>
-          <DropdownOverlay onClick={() => setOpen(false)} />
-          <div
-            className={`
-              absolute right-0 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-opacity-5 z-[3000] flex
-              transition-all duration-200 ease-out scrollbar-custom
-              ${
-                dropdownVisible
-                  ? 'opacity-100 scale-100 pointer-events-auto'
-                  : 'opacity-0 scale-90 pointer-events-none'
-              }
-              ${dropdownClassName}
-            `}
-            style={{
-              transformOrigin: 'top right',
-              maxHeight: '21.75rem',
-              minWidth: `${colCount * 14}rem`,
-              overflowY: 'auto',
-            }}
-            tabIndex={-1}
-            role='listbox'
-          >
-            {groups.map(g => renderGroupCol(g, grouped[g] || [], groupStartIndices[g]))}
-          </div>
-        </>
-      )}
+      {menuElement}
     </div>
   );
 };

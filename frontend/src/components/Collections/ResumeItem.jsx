@@ -34,6 +34,7 @@ const ResumeItem = ({
   collectionId,
   resumeId,
   onRemovedSingle,
+  onShowToast, // <-- Add this prop
 }) => {
   const { viewResume, downloadResume } = useResumeActions();
   const { saved, toggleSave } = useSaves(uuid);
@@ -48,6 +49,17 @@ const ResumeItem = ({
     await removeItemFromCollection(collectionId, resumeId);
     setShowRemoveModal(false);
     if (onRemovedSingle) onRemovedSingle();
+    if (onShowToast) onShowToast('Resume removed from collection!');
+  };
+
+  const handleDownload = () => {
+    downloadResume(uuid);
+    if (onShowToast) onShowToast('Resume download started!');
+  };
+
+  const handleBookmark = () => {
+    toggleSave();
+    if (onShowToast) onShowToast(saved ? 'Bookmark removed!' : 'Resume bookmarked!');
   };
 
   return (
@@ -148,10 +160,9 @@ const ResumeItem = ({
                 icon: <FontAwesomeIcon icon='fa-regular fa-circle-down' />,
                 onClick: e => {
                   e?.stopPropagation?.();
-                  downloadResume(uuid);
+                  handleDownload();
                 },
               },
-
               {
                 label: saved ? 'Remove Bookmark' : 'Bookmark',
                 value: 'bookmark',
@@ -162,7 +173,7 @@ const ResumeItem = ({
                 ),
                 onClick: e => {
                   e?.stopPropagation?.();
-                  toggleSave();
+                  handleBookmark();
                 },
               },
               {
