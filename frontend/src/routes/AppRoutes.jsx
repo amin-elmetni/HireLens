@@ -35,6 +35,14 @@ const AppRoutes = () => (
           </PrivateRoute>
         }
       />
+      <Route
+        path='/bookmarks'
+        element={
+          <PrivateRoute>
+            <Collections />
+          </PrivateRoute>
+        }
+      />
     </Routes>
   </BrowserRouter>
 );

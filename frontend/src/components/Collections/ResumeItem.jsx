@@ -9,6 +9,7 @@ import DeleteConfirmationModal from '@/components/ui/DeleteConfirmationModal';
 import AddToCollectionDrawer from '@/components/Resumes/ResumesLayout/AddToCollectionDrawer';
 import useUserCollections from '@/hooks/collections/useUserCollections';
 import { getUser } from '@/utils/userUtils';
+import { useMultiCollectionPicker } from '@/hooks/resumes/useMultiCollectionPicker';
 
 const StatItem = ({ icon, value, label }) => (
   <div className='flex items-center text-gray-600 font-medium'>
@@ -39,6 +40,7 @@ const ResumeItem = ({
   onRemovedSingle,
   onShowToast,
   mode = 'collection', // mode: 'collection' | 'bookmarks'
+  onRefresh,
 }) => {
   const { viewResume, downloadResume } = useResumeActions();
   const { saved, toggleSave } = useSaves(uuid);
@@ -46,6 +48,8 @@ const ResumeItem = ({
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [removeLoading, setRemoveLoading] = useState(false);
   const [showAddToCollection, setShowAddToCollection] = useState(false);
+
+  const collectionPicker = useMultiCollectionPicker(uuid);
 
   // For AddToCollectionDrawer
   const user = getUser();
@@ -71,9 +75,11 @@ const ResumeItem = ({
     if (onShowToast) onShowToast('Resume download started!');
   };
 
-  const handleBookmark = () => {
-    toggleSave();
+  const handleBookmark = async () => {
+    await toggleSave();
     if (onShowToast) onShowToast(saved ? 'Bookmark removed!' : 'Resume bookmarked!');
+    // For bookmarks tab, refresh the list after unbookmark
+    if (mode === 'bookmarks' && onRefresh) onRefresh();
   };
 
   // Dropdown options
@@ -129,7 +135,7 @@ const ResumeItem = ({
       icon: <FontAwesomeIcon icon='fa-regular fa-folder-open' />,
       onClick: e => {
         e?.stopPropagation?.();
-        setShowAddToCollection(true);
+        collectionPicker.show();
       },
     });
   }
@@ -234,27 +240,25 @@ const ResumeItem = ({
       )}
       {/* Add to Collection Drawer for bookmarks mode */}
       {mode === 'bookmarks' && (
-        <AddToCollectionDrawer
-          open={showAddToCollection}
-          onClose={() => setShowAddToCollection(false)}
-          collections={collections}
-          selectedIds={new Set()} // not used for single
-          toggleCollection={() => {}}
-          onSearch={() => {}}
-          searchQuery=''
-          loading={loadingCollections}
-          canAdd={true}
-          handleAddAndRemove={async () => {
-            // You should implement logic to add this resume to the selected collection(s)
-            setShowAddToCollection(false);
-            if (onShowToast) onShowToast('Resume added to collection!');
-          }}
-          error={null}
-          setError={() => {}}
-          onActuallyCreateNew={refreshCollections}
-          setToast={onShowToast}
-          resumesToAdd={[{ uuid, resumeId, name }]}
-        />
+        <>
+          <AddToCollectionDrawer
+            open={collectionPicker.open}
+            onClose={collectionPicker.hide}
+            collections={collectionPicker.collections}
+            selectedIds={collectionPicker.selectedIds}
+            toggleCollection={collectionPicker.toggleCollection}
+            onSearch={collectionPicker.onSearch}
+            searchQuery={collectionPicker.searchQuery}
+            loading={collectionPicker.loading}
+            canAdd={collectionPicker.canAdd}
+            handleAddAndRemove={collectionPicker.handleAddAndRemove}
+            error={collectionPicker.error}
+            setError={collectionPicker.setError}
+            onActuallyCreateNew={collectionPicker.onActuallyCreateNew}
+            setToast={onShowToast}
+            resumesToAdd={[{ uuid, resumeId, name }]}
+          />
+        </>
       )}
     </>
   );

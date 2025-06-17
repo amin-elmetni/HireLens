@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getSavesByUser } from '@/api/saveApi';
 import { getResumeById, getResumeMetadataByUuid } from '@/api/resumeApi';
 import { getLikeCount } from '@/api/likeApi';
@@ -53,5 +53,20 @@ export default function useUserBookmarkedResumes() {
       .finally(() => setLoading(false));
   }, [user?.id]);
 
-  return { resumes, loading, refresh: () => {} }; // Optionally implement refresh
+  const fetchBookmarkedResumes = useCallback(() => {
+    if (!user?.id) return;
+    setLoading(true);
+    getSavesByUser(user.id)
+      .then(async ({ data }) => {
+        // ...same as before...
+      })
+      .catch(() => setResumes([]))
+      .finally(() => setLoading(false));
+  }, [user?.id]);
+
+  useEffect(() => {
+    fetchBookmarkedResumes();
+  }, [fetchBookmarkedResumes]);
+
+  return { resumes, loading, refresh: fetchBookmarkedResumes };
 }

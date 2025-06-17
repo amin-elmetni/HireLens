@@ -33,7 +33,7 @@ const getResumeSortValue = (resume, sortBy) => {
 };
 
 export default function BookmarksList() {
-  const { resumes, loading } = useUserBookmarkedResumes();
+  const { resumes, loading, refresh } = useUserBookmarkedResumes();
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('lastUpdated');
   const [selected, setSelected] = useState([]);
@@ -76,20 +76,28 @@ export default function BookmarksList() {
     setShowAddDrawer(true);
   };
 
-  // Add logic for AddToCollectionDrawer
   const handleBulkAddAndRemove = async () => {
-    // drawerSelectedIds: Set of collection IDs
-    // selected: array of resume UUIDs (we need resumeId for addItemToCollection)
     setDrawerLoading(true);
     try {
-      // Get resumes being added (from uuids)
       const resumesToAdd = filteredSortedResumes.filter(r => selected.includes(r.uuid));
-      // For each collection and each resume, add item
+      // fetch items for each collection first, to check for existing resumeIds
+      const collectionItems = {};
+      await Promise.all(
+        Array.from(drawerSelectedIds).map(async collectionId => {
+          const { data } = await getItemsByCollection(collectionId);
+          collectionItems[collectionId] = new Set(data.map(item => item.resumeId));
+        })
+      );
+      // Only add if not already present
       await Promise.all(
         Array.from(drawerSelectedIds).flatMap(collectionId =>
-          resumesToAdd.map(resume =>
-            addItemToCollection({ collectionId, resumeId: resume.resumeId })
-          )
+          resumesToAdd
+            .filter(resume => !collectionItems[collectionId].has(resume.resumeId))
+            .map(resume =>
+              addItemToCollection({ collectionId, resumeId: resume.resumeId }).catch(err => {
+                if (err.response?.status !== 409) throw err;
+              })
+            )
         )
       );
       setDrawerLoading(false);
@@ -101,7 +109,7 @@ export default function BookmarksList() {
         id: prev.id + 1,
       }));
       setShowAddDrawer(false);
-      setSelected([]); // Optionally clear selection after
+      setSelected([]);
       return true;
     } catch (err) {
       setDrawerError('Failed to add to collection(s).');
@@ -186,6 +194,7 @@ export default function BookmarksList() {
               selectionModeActive={selected.length > 0}
               mode='bookmarks'
               onShowToast={showToast}
+              onRefresh={refresh}
             />
           ))}
         </ul>

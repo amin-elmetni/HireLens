@@ -128,6 +128,14 @@ const AddToCollectionDrawer = ({
 
   return createPortal(
     <>
+      {showDrawer && (
+        <div
+          className={`fixed inset-0 z-[1009] bg-black/20 transition-opacity duration-300 ${
+            animateOpen ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={handleDrawerClose}
+        />
+      )}
       <aside
         className={`
           fixed top-0 right-0 h-full w-full sm:w-[${DRAWER_WIDTH}px] max-w-full bg-white text-gray-900 z-[1010] shadow-lg flex flex-col
