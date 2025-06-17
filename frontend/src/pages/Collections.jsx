@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import CollectionTabs from '@/components/Collections/CollectionTabs';
 import CollectionList from '@/components/Collections/CollectionList';
 import CollectionUpsertModal from '@/components/Collections/CollectionUpsertModal';
@@ -15,11 +15,11 @@ import useUserCollections from '@/hooks/collections/useUserCollections';
 import BookmarksList from '@/components/Collections/BookmarksList';
 
 const Collections = () => {
-  const [activeTab, setActiveTab] = useState('collections');
-  const [search, setSearch] = useState('');
-  const [sort, setSort] = useState('recent');
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [toast, setToast] = useState({ show: false, message: '', id: 0 });
+  // Remove: const [activeTab, setActiveTab] = useState('collections');
+  const [search, setSearch] = React.useState('');
+  const [sort, setSort] = React.useState('recent');
+  const [showCreateModal, setShowCreateModal] = React.useState(false);
+  const [toast, setToast] = React.useState({ show: false, message: '', id: 0 });
 
   const showToast = message => setToast(prev => ({ show: true, message, id: prev.id + 1 }));
   const handleToastClose = () => setToast(prev => ({ ...prev, show: false, message: '' }));
@@ -27,6 +27,13 @@ const Collections = () => {
   const user = getUser();
   const { collectionId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Compute activeTab based on URL
+  let activeTab = 'collections';
+  if (location.pathname.startsWith('/bookmarks')) {
+    activeTab = 'bookmarks';
+  }
 
   const { collections, loading, refreshCollections } = useUserCollections(user?.id);
 
@@ -50,10 +57,7 @@ const Collections = () => {
         className='w-2/3 mx-auto mt-8 px-4'
       >
         <div className='flex items-center justify-between mb-4'>
-          <CollectionTabs
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-          />
+          <CollectionTabs activeTab={activeTab} />
           {activeTab === 'collections' && (
             <PrimaryButton onClick={() => setShowCreateModal(true)}>
               <FontAwesomeIcon

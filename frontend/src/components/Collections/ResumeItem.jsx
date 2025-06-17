@@ -78,7 +78,7 @@ const ResumeItem = ({
   const handleBookmark = async () => {
     await toggleSave();
     if (onShowToast) onShowToast(saved ? 'Bookmark removed!' : 'Resume bookmarked!');
-    // For bookmarks tab, refresh the list after unbookmark
+    // Refresh bookmarks if in bookmarks mode
     if (mode === 'bookmarks' && onRefresh) onRefresh();
   };
 

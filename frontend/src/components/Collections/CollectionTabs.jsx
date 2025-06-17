@@ -1,11 +1,15 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const tabs = [
-  { label: 'Collections', value: 'collections' },
-  { label: 'Bookmarks', value: 'bookmarks' },
+  { label: 'Collections', value: 'collections', path: '/collections' },
+  { label: 'Bookmarks', value: 'bookmarks', path: '/bookmarks' },
 ];
 
-export default function CollectionTabs({ activeTab, onTabChange }) {
+export default function CollectionTabs({ activeTab }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   return (
     <div className='flex border-b border-gray-200 mb-6 pl-2'>
       {tabs.map(tab => (
@@ -16,7 +20,9 @@ export default function CollectionTabs({ activeTab, onTabChange }) {
               ? 'border-b-2 border-primary text-black font-bold'
               : 'text-gray-500 hover:text-black'
           }`}
-          onClick={() => onTabChange(tab.value)}
+          onClick={() => {
+            navigate(tab.path);
+          }}
         >
           {tab.label}
         </button>
