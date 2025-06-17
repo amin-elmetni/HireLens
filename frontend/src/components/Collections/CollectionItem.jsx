@@ -33,7 +33,7 @@ export default function CollectionItem({ collection, onAction, onShowToast, onCl
           icon='fa-regular fa-folder'
           className='mr-4 text-xl'
         />
-        <span className='font-semibold text-lg'>{collection.name}</span>
+        <span className='font-semibold text-md'>{collection.name}</span>
         <span className='text-gray-500 ml-2'>
           ({count !== null ? count : <span className='animate-pulse'>...</span>})
         </span>

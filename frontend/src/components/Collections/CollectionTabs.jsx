@@ -3,7 +3,6 @@ import React from 'react';
 const tabs = [
   { label: 'Collections', value: 'collections' },
   { label: 'Bookmarks', value: 'bookmarks' },
-  { label: 'Favorites', value: 'favorites' },
 ];
 
 export default function CollectionTabs({ activeTab, onTabChange }) {

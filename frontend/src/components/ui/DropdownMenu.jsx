@@ -106,7 +106,7 @@ const DropdownMenu = ({
       const rect = menuRef.current.getBoundingClientRect();
       const triggerRect = ref.current.getBoundingClientRect();
       const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-      if (triggerRect.bottom + rect.height > windowHeight - 8) {
+      if (triggerRect.bottom + rect.height > windowHeight - 35) {
         setDirection('up');
       } else {
         setDirection('down');

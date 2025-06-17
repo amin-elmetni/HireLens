@@ -68,7 +68,7 @@ export default function CollectionResumesList({ collection, onBack }) {
             </span>
           </label>
           <button
-            className='h-10 w-10 rounded-full hover:bg-gray-200 disabled:cursor-default disabled:bg-transparent disabled:text-gray-300 text-xl text-gray-900 cursor-pointer'
+            className='h-10 w-10 rounded-full hover:bg-gray-200 disabled:cursor-default disabled:bg-transparent disabled:text-gray-300 text-xl text-red-600 cursor-pointer'
             title='Remove selected items from the collection'
             onClick={handleBulkRemove}
             disabled={selected.length === 0}

@@ -151,16 +151,7 @@ const ResumeItem = ({
                   downloadResume(uuid);
                 },
               },
-              {
-                label: 'Remove From Collection',
-                value: 'remove',
-                icon: <FontAwesomeIcon icon='fa-regular fa-trash-can' />,
-                onClick: e => {
-                  e?.stopPropagation?.();
-                  handleRemove();
-                },
-                destructive: true,
-              },
+
               {
                 label: saved ? 'Remove Bookmark' : 'Bookmark',
                 value: 'bookmark',
@@ -173,6 +164,16 @@ const ResumeItem = ({
                   e?.stopPropagation?.();
                   toggleSave();
                 },
+              },
+              {
+                label: 'Remove From Collection',
+                value: 'remove',
+                icon: <FontAwesomeIcon icon='fa-regular fa-trash-can' />,
+                onClick: e => {
+                  e?.stopPropagation?.();
+                  handleRemove();
+                },
+                destructive: true,
               },
             ]}
           />

@@ -35,15 +35,17 @@ export default function RemoveResumeModal({ onClose, onConfirm, bulk = false, co
       <div className='fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none'>
         <div
           className={`
-            bg-white rounded-3xl shadow-lg p-8 w-full max-w-[38rem] pointer-events-auto
+            bg-white rounded-3xl shadow-lg p-8 w-full max-w-[40rem] pointer-events-auto
             transition-opacity duration-200
             ${fadeIn ? 'opacity-100' : 'opacity-0'}
           `}
         >
           <h3 className='text-3xl font-extrabold mb-4 text-gray-900'>
-            Remove resumes from collection?
+            {bulk
+              ? `Remove ${count} Resume${count !== 1 ? 's' : ''} from Collection?`
+              : 'Remove Resume from Collection?'}
           </h3>
-          <div className='mb-4 text-base text-gray-700'>
+          <div className='mb-8 text-base text-gray-700'>
             {bulk
               ? `Are you sure you want to remove the ${count} resume${
                   count !== 1 ? 's' : ''
