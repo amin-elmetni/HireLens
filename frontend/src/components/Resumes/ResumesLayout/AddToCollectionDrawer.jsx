@@ -94,7 +94,7 @@ const AddToCollectionDrawer = ({
       setInCreateMode(false);
       setNewCollectionName('');
       setNewCollectionDescription('');
-      setToast?.({ show: true, message: 'Collection Created Successfully!' });
+      setToast?.(prev => ({ ...prev, show: true, message: 'Collection Created Successfully!' }));
     }
   };
 
@@ -119,7 +119,11 @@ const AddToCollectionDrawer = ({
   const handleUpdate = async () => {
     const result = await handleAddAndRemove();
     if (result && setToast) {
-      setToast({ show: true, message: 'Resume(s) Added to Collection!' });
+      setToast(prev => ({
+        show: true,
+        message: 'Resume(s) Added to Collection!',
+        id: prev.id + 1,
+      }));
     }
     onClose();
   };

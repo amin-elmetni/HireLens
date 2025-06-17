@@ -45,10 +45,11 @@ const Actions = ({ uuid }) => {
   // Wrap save handler
   const handleToggleSave = async () => {
     await toggleSave();
-    setToast({
+    setToast(prev => ({
       show: true,
       message: saved ? 'Resume unsaved!' : 'Resume saved!',
-    });
+      id: prev.id + 1,
+    }));
   };
 
   const actionButtons = [
