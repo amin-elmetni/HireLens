@@ -27,4 +27,8 @@ class SaveController(private val saveService: SaveService) {
     @GetMapping("/count/{resumeId}")
     fun count(@PathVariable resumeId: Long): Int =
         saveService.countSaves(resumeId)
+
+    @GetMapping("/user/{userId}")
+    fun getSavesByUser(@PathVariable userId: Long): List<SaveDto> =
+        saveService.getSavesByUser(userId)
 }

@@ -9,4 +9,5 @@ interface SaveRepository : JpaRepository<Save, Long> {
     fun findByUserAndResumeId(user: User, resumeId: Long): Save?
     fun existsByUserAndResumeId(user: User, resumeId: Long): Boolean
     fun countByResumeId(resumeId: Long): Int
+    fun findByUserId(userId: Long): List<Save>
 }

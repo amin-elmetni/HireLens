@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import CollectionTabs from '@/components/Collections/CollectionTabs';
 import CollectionList from '@/components/Collections/CollectionList';
-import CreateCollectionModal from '@/components/Collections/CreateCollectionModal';
+import CollectionUpsertModal from '@/components/Collections/CollectionUpsertModal';
 import ConfirmationToast from '@/components/ui/ConfirmationToast';
 import { getUser } from '@/utils/userUtils';
 import Navbar from '@/components/NavBar/NavBar';
@@ -12,6 +12,7 @@ import PrimaryButton from '@/components/ui/PrimaryButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CollectionResumesList from '@/components/Collections/CollectionResumesList';
 import useUserCollections from '@/hooks/collections/useUserCollections';
+import BookmarksList from '@/components/Collections/BookmarksList';
 
 const Collections = () => {
   const [activeTab, setActiveTab] = useState('collections');
@@ -106,10 +107,12 @@ const Collections = () => {
             )}
           </>
         )}
+        {activeTab === 'bookmarks' && <BookmarksList />}
         {showCreateModal && (
-          <CreateCollectionModal
+          <CollectionUpsertModal
+            mode='create'
             onClose={() => setShowCreateModal(false)}
-            onCreated={() => {
+            onSuccess={() => {
               setShowCreateModal(false);
               refreshCollections();
               showToast('Collection created!');

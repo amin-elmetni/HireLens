@@ -4,10 +4,10 @@ import BackCancelButton from '../ui/BackCancelButton';
 import useCollectionResumes from '@/hooks/collections/useCollectionResumes';
 import { removeItemFromCollection } from '@/api/collectionItemApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import RemoveResumeModal from './RemoveResumeModal';
 import ConfirmationToast from '@/components/ui/ConfirmationToast';
 import SearchInput from '@/components/ui/SearchInput';
 import SortDropdown from '@/components/ui/SortDropdown';
+import DeleteConfirmationModal from '@/components/ui/DeleteConfirmationModal';
 
 // Utility to get sort value
 const getResumeSortValue = (resume, sortBy) => {
@@ -182,11 +182,17 @@ export default function CollectionResumesList({ collection, onBack }) {
         </ul>
       )}
       {showBulkRemoveModal && (
-        <RemoveResumeModal
+        <DeleteConfirmationModal
+          title={`Remove ${selected.length} Resume${
+            selected.length !== 1 ? 's' : ''
+          } from Collection?`}
+          description={`Are you sure you want to remove the ${selected.length} resume${
+            selected.length !== 1 ? 's' : ''
+          } from this collection?`}
+          confirmLabel='Remove'
+          confirmColor='bg-red-600'
           onClose={() => setShowBulkRemoveModal(false)}
           onConfirm={confirmBulkRemove}
-          bulk
-          count={selected.length}
         />
       )}
       <ConfirmationToast

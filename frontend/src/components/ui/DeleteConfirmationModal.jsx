@@ -4,7 +4,27 @@ import PrimaryButton from '@/components/ui/PrimaryButton';
 import BackCancelButton from '@/components/ui/BackCancelButton';
 import ModalPortal from '@/components/ui/ModalPortal';
 
-export default function RemoveResumeModal({ onClose, onConfirm, bulk = false, count = 0 }) {
+/**
+ * Generic modal for confirming destructive actions like delete/remove.
+ *
+ * Props:
+ * - title: (string) Modal title.
+ * - description: (string|ReactNode) Modal description.
+ * - confirmLabel: (string) Confirm button text (default "Delete").
+ * - confirmColor: (string) Tailwind bg class for confirm (default 'bg-red-600').
+ * - onClose: (function) Called when modal closes.
+ * - onConfirm: (function) Called on confirm, supports async.
+ * - loading: (boolean) External loader, or will manage internally if not provided.
+ */
+export default function DeleteConfirmationModal({
+  title = 'Are you sure?',
+  description = '',
+  confirmLabel = 'Delete',
+  confirmColor = 'bg-red-600',
+  onClose,
+  onConfirm,
+  loading: externalLoading,
+}) {
   const [loading, setLoading] = useState(false);
   const [fadeIn, setFadeIn] = useState(false);
 
@@ -13,6 +33,10 @@ export default function RemoveResumeModal({ onClose, onConfirm, bulk = false, co
   }, []);
 
   const handleConfirm = async () => {
+    if (externalLoading !== undefined) {
+      onConfirm?.();
+      return;
+    }
     setLoading(true);
     await onConfirm?.();
     setLoading(false);
@@ -24,6 +48,8 @@ export default function RemoveResumeModal({ onClose, onConfirm, bulk = false, co
       onClose?.();
     }, 200);
   };
+
+  const isLoading = externalLoading !== undefined ? externalLoading : loading;
 
   return (
     <ModalPortal>
@@ -40,31 +66,21 @@ export default function RemoveResumeModal({ onClose, onConfirm, bulk = false, co
             ${fadeIn ? 'opacity-100' : 'opacity-0'}
           `}
         >
-          <h3 className='text-3xl font-extrabold mb-4 text-gray-900'>
-            {bulk
-              ? `Remove ${count} Resume${count !== 1 ? 's' : ''} from Collection?`
-              : 'Remove Resume from Collection?'}
-          </h3>
-          <div className='mb-8 text-base text-gray-700'>
-            {bulk
-              ? `Are you sure you want to remove the ${count} resume${
-                  count !== 1 ? 's' : ''
-                } from this collection?`
-              : 'Are you sure you want to remove this resume from the collection?'}
-          </div>
+          <h3 className='text-3xl font-extrabold mb-4 text-gray-900'>{title}</h3>
+          {description && <div className='mb-8 text-base text-gray-700'>{description}</div>}
           <div className='flex gap-3 justify-end mt-6'>
             <BackCancelButton
               onClick={handleCloseWithFade}
               text='Cancel'
-              disabled={loading}
+              disabled={isLoading}
             />
             <PrimaryButton
               onClick={handleConfirm}
-              bgcolor='bg-red-600'
-              loading={loading}
-              disabled={loading}
+              bgcolor={confirmColor}
+              loading={isLoading}
+              disabled={isLoading}
             >
-              Remove
+              {confirmLabel}
             </PrimaryButton>
           </div>
         </div>

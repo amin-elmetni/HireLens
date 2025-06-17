@@ -5,7 +5,10 @@ import { useResumeActions } from '@/hooks/resumes/useResumeActions';
 import { useSaves } from '@/hooks/resumes/useSaves';
 import { removeItemFromCollection } from '@/api/collectionItemApi';
 import { formatDate } from '@/utils/generalUtils';
-import RemoveResumeModal from './RemoveResumeModal';
+import DeleteConfirmationModal from '@/components/ui/DeleteConfirmationModal';
+import AddToCollectionDrawer from '@/components/Resumes/ResumesLayout/AddToCollectionDrawer';
+import useUserCollections from '@/hooks/collections/useUserCollections';
+import { getUser } from '@/utils/userUtils';
 
 const StatItem = ({ icon, value, label }) => (
   <div className='flex items-center text-gray-600 font-medium'>
@@ -34,19 +37,30 @@ const ResumeItem = ({
   collectionId,
   resumeId,
   onRemovedSingle,
-  onShowToast, // <-- Add this prop
+  onShowToast,
+  mode = 'collection', // mode: 'collection' | 'bookmarks'
 }) => {
   const { viewResume, downloadResume } = useResumeActions();
   const { saved, toggleSave } = useSaves(uuid);
 
   const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [removeLoading, setRemoveLoading] = useState(false);
+  const [showAddToCollection, setShowAddToCollection] = useState(false);
 
-  const handleRemove = async () => {
-    setShowRemoveModal(true);
-  };
+  // For AddToCollectionDrawer
+  const user = getUser();
+  const {
+    collections,
+    loading: loadingCollections,
+    refreshCollections,
+  } = useUserCollections(user?.id);
+
+  const handleRemove = () => setShowRemoveModal(true);
 
   const confirmRemove = async () => {
+    setRemoveLoading(true);
     await removeItemFromCollection(collectionId, resumeId);
+    setRemoveLoading(false);
     setShowRemoveModal(false);
     if (onRemovedSingle) onRemovedSingle();
     if (onShowToast) onShowToast('Resume removed from collection!');
@@ -61,6 +75,64 @@ const ResumeItem = ({
     toggleSave();
     if (onShowToast) onShowToast(saved ? 'Bookmark removed!' : 'Resume bookmarked!');
   };
+
+  // Dropdown options
+  const dropdownOptions = [
+    {
+      label: 'View Resume',
+      value: 'view',
+      icon: <FontAwesomeIcon icon='fa-regular fa-eye' />,
+      onClick: e => {
+        e?.stopPropagation?.();
+        viewResume(uuid);
+      },
+    },
+    {
+      label: 'Download',
+      value: 'download',
+      icon: <FontAwesomeIcon icon='fa-regular fa-circle-down' />,
+      onClick: e => {
+        e?.stopPropagation?.();
+        handleDownload();
+      },
+    },
+    {
+      label: saved ? 'Remove Bookmark' : 'Bookmark',
+      value: 'bookmark',
+      icon: saved ? (
+        <FontAwesomeIcon icon='fa-solid fa-bookmark' />
+      ) : (
+        <FontAwesomeIcon icon='fa-regular fa-bookmark' />
+      ),
+      onClick: e => {
+        e?.stopPropagation?.();
+        handleBookmark();
+      },
+    },
+  ];
+
+  if (mode === 'collection') {
+    dropdownOptions.push({
+      label: 'Remove From Collection',
+      value: 'remove',
+      icon: <FontAwesomeIcon icon='fa-regular fa-trash-can' />,
+      onClick: e => {
+        e?.stopPropagation?.();
+        handleRemove();
+      },
+      destructive: true,
+    });
+  } else if (mode === 'bookmarks') {
+    dropdownOptions.push({
+      label: 'Add to Collection',
+      value: 'add_to_collection',
+      icon: <FontAwesomeIcon icon='fa-regular fa-folder-open' />,
+      onClick: e => {
+        e?.stopPropagation?.();
+        setShowAddToCollection(true);
+      },
+    });
+  }
 
   return (
     <>
@@ -144,56 +216,44 @@ const ResumeItem = ({
                 <FontAwesomeIcon icon='fa-solid fa-ellipsis' />
               </button>
             }
-            options={[
-              {
-                label: 'View Resume',
-                value: 'view',
-                icon: <FontAwesomeIcon icon='fa-regular fa-eye' />,
-                onClick: e => {
-                  e?.stopPropagation?.();
-                  viewResume(uuid);
-                },
-              },
-              {
-                label: 'Download',
-                value: 'download',
-                icon: <FontAwesomeIcon icon='fa-regular fa-circle-down' />,
-                onClick: e => {
-                  e?.stopPropagation?.();
-                  handleDownload();
-                },
-              },
-              {
-                label: saved ? 'Remove Bookmark' : 'Bookmark',
-                value: 'bookmark',
-                icon: saved ? (
-                  <FontAwesomeIcon icon='fa-solid fa-bookmark' />
-                ) : (
-                  <FontAwesomeIcon icon='fa-regular fa-bookmark' />
-                ),
-                onClick: e => {
-                  e?.stopPropagation?.();
-                  handleBookmark();
-                },
-              },
-              {
-                label: 'Remove From Collection',
-                value: 'remove',
-                icon: <FontAwesomeIcon icon='fa-regular fa-trash-can' />,
-                onClick: e => {
-                  e?.stopPropagation?.();
-                  handleRemove();
-                },
-                destructive: true,
-              },
-            ]}
+            options={dropdownOptions}
           />
         </div>
       </li>
+      {/* Remove from collection modal */}
       {showRemoveModal && (
-        <RemoveResumeModal
+        <DeleteConfirmationModal
+          title='Remove Resume from Collection?'
+          description='Are you sure you want to remove this resume from the collection?'
+          confirmLabel='Remove'
+          confirmColor='bg-red-600'
           onClose={() => setShowRemoveModal(false)}
           onConfirm={confirmRemove}
+          loading={removeLoading}
+        />
+      )}
+      {/* Add to Collection Drawer for bookmarks mode */}
+      {mode === 'bookmarks' && (
+        <AddToCollectionDrawer
+          open={showAddToCollection}
+          onClose={() => setShowAddToCollection(false)}
+          collections={collections}
+          selectedIds={new Set()} // not used for single
+          toggleCollection={() => {}}
+          onSearch={() => {}}
+          searchQuery=''
+          loading={loadingCollections}
+          canAdd={true}
+          handleAddAndRemove={async () => {
+            // You should implement logic to add this resume to the selected collection(s)
+            setShowAddToCollection(false);
+            if (onShowToast) onShowToast('Resume added to collection!');
+          }}
+          error={null}
+          setError={() => {}}
+          onActuallyCreateNew={refreshCollections}
+          setToast={onShowToast}
+          resumesToAdd={[{ uuid, resumeId, name }]}
         />
       )}
     </>

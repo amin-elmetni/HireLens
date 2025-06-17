@@ -17,3 +17,7 @@ export const getSaveCount = resumeId => {
 export const hasSavedResume = (userId, resumeId) => {
   return api.get(`${SAVE_BASE}/check/${userId}/${resumeId}`);
 };
+
+export const getSavesByUser = userId => {
+  return api.get(`${SAVE_BASE}/user/${userId}`);
+};

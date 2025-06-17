@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import DropdownMenu from '../ui/DropdownMenu';
-import RenameCollectionModal from './RenameCollectionModal';
-import DeleteCollectionModal from './DeleteCollectionModal';
+import CollectionUpsertModal from './CollectionUpsertModal';
 import { getItemsByCollection } from '@/api/collectionItemApi';
+import { deleteCollection } from '@/api/collectionApi';
+import DeleteConfirmationModal from '@/components/ui/DeleteConfirmationModal';
 
 export default function CollectionItem({ collection, onAction, onShowToast, onClick }) {
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [count, setCount] = useState(collection.count ?? null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -22,13 +24,24 @@ export default function CollectionItem({ collection, onAction, onShowToast, onCl
     };
   }, [collection.id, count]);
 
+  const handleDelete = async () => {
+    setDeleteLoading(true);
+    try {
+      await deleteCollection(collection.id);
+      onAction?.();
+      onShowToast?.('Collection deleted!');
+      setShowDeleteModal(false);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   return (
     <>
       <li
         className='flex items-center py-4 px-4 hover:bg-gray-50 group cursor-pointer relative'
         onClick={onClick}
       >
-        {/* <span className='mr-4 text-xl'>📁</span> */}
         <FontAwesomeIcon
           icon='fa-regular fa-folder'
           className='mr-4 text-xl'
@@ -55,7 +68,7 @@ export default function CollectionItem({ collection, onAction, onShowToast, onCl
                   label: 'Rename',
                   value: 'rename',
                   onClick: e => {
-                    e?.stopPropagation?.(); // For extra safety if DropdownMenu passes event
+                    e?.stopPropagation?.();
                     setShowRenameModal(true);
                   },
                 },
@@ -74,11 +87,11 @@ export default function CollectionItem({ collection, onAction, onShowToast, onCl
         </div>
       </li>
       {showRenameModal && (
-        <RenameCollectionModal
+        <CollectionUpsertModal
+          mode='edit'
           collection={collection}
-          currentName={collection.name}
           onClose={() => setShowRenameModal(false)}
-          onRenamed={() => {
+          onSuccess={() => {
             onAction?.();
             onShowToast?.('Collection updated!');
             setShowRenameModal(false);
@@ -86,14 +99,14 @@ export default function CollectionItem({ collection, onAction, onShowToast, onCl
         />
       )}
       {showDeleteModal && (
-        <DeleteCollectionModal
-          collection={collection}
+        <DeleteConfirmationModal
+          title='Delete Collection?'
+          description='The individual files within this project will not be deleted.'
+          confirmLabel='Delete'
+          confirmColor='bg-red-600'
           onClose={() => setShowDeleteModal(false)}
-          onDeleted={() => {
-            onAction?.();
-            onShowToast?.('Collection deleted!');
-            setShowDeleteModal(false);
-          }}
+          onConfirm={handleDelete}
+          loading={deleteLoading}
         />
       )}
     </>

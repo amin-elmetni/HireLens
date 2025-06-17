@@ -44,4 +44,8 @@ class SaveService(
 
     fun countSaves(resumeId: Long): Int =
         saveRepository.countByResumeId(resumeId)
+
+    // Add this to SaveService:
+    fun getSavesByUser(userId: Long): List<SaveDto> =
+        saveRepository.findByUserId(userId).map(SaveMapper::toDto)
 }

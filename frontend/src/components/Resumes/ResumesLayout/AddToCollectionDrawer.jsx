@@ -7,8 +7,6 @@ import SearchInput from '@/components/ui/SearchInput';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import BackCancelButton from '@/components/ui/BackCancelButton';
 
-// ========== MAIN DRAWER COMPONENT ==========
-
 const DRAWER_WIDTH = 550;
 
 const AddToCollectionDrawer = ({
@@ -26,6 +24,7 @@ const AddToCollectionDrawer = ({
   setError,
   onActuallyCreateNew,
   setToast,
+  resumesToAdd = [], // Array of resumes to add (single or bulk)
 }) => {
   const [showDrawer, setShowDrawer] = useState(open);
   const [inCreateMode, setInCreateMode] = useState(false);
@@ -120,7 +119,7 @@ const AddToCollectionDrawer = ({
   const handleUpdate = async () => {
     const result = await handleAddAndRemove();
     if (result && setToast) {
-      setToast({ show: true, message: 'Resume Collections Updated!' });
+      setToast({ show: true, message: 'Resume(s) Added to Collection!' });
     }
     onClose();
   };
@@ -155,6 +154,17 @@ const AddToCollectionDrawer = ({
         {/* Content */}
         <div className='p-6 flex-1 flex flex-col overflow-y-auto'>
           {error && <div className='text-red-600 mb-4 font-medium transition-all'>{error}</div>}
+          {/* Show selected resumes to add if multiple */}
+          {/* {resumesToAdd && resumesToAdd.length > 1 && (
+            <div className='mb-4'>
+              <span className='text-sm text-gray-500 font-semibold'>Resumes to add:</span>
+              <ul className='list-disc list-inside mt-1 text-sm text-gray-700'>
+                {resumesToAdd.map(r => (
+                  <li key={r.uuid}>{r.name}</li>
+                ))}
+              </ul>
+            </div>
+          )} */}
           {inCreateMode ? (
             <div>
               <BackCancelButton
@@ -216,7 +226,7 @@ const AddToCollectionDrawer = ({
                         type='checkbox'
                         checked={selectedIds.has(col.id)}
                         onChange={() => toggleCollection(col.id)}
-                        className="form-checkbox appearance-none mr-3 h-[17px] w-[17px] border-2 border-gray-400 rounded-xs checked:bg-primary checked:border-primary relative after:absolute after:content-[''] after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1 after:w-[10px] after:h-[6px] after:border-l-2 after:border-b-2 after:border-white after:rotate-[-45deg] after:opacity-0 checked:after:opacity-100"
+                        className="form-checkbox appearance-none mr-3 h-[17px] w-[17px] border-2 border-gray-400 rounded-xs checked:bg-primary checked:border-primary relative after:absolute after:content-[''] after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1 after:w-[12px] after:h-[6px] after:border-l-2 after:border-b-2 after:border-white after:rotate-[-45deg] after:opacity-0 checked:after:opacity-100 cursor-pointer"
                       />
                       <span className='text-gray-800'>{col.name}</span>
                     </label>
@@ -238,7 +248,7 @@ const AddToCollectionDrawer = ({
               onClick={handleUpdate}
               disabled={loading || !canAdd}
             >
-              Update
+              {resumesToAdd?.length > 1 ? 'Add All to Collection' : 'Add to Collection'}
             </PrimaryButton>
           )}
         </div>
