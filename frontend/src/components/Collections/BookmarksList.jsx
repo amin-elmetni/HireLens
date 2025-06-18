@@ -169,7 +169,7 @@ export default function BookmarksList() {
             </span>
           </label>
           <button
-            className='h-10 w-10 rounded-full hover:bg-blue-100 text-xl text-blue-600 cursor-pointer'
+            className='h-10 w-10 rounded-full hover:bg-gray-200 disabled:cursor-default disabled:bg-transparent disabled:text-gray-300 text-xl text-black cursor-pointer'
             title='Add selected resumes to collection'
             onClick={handleBulkAddToCollection}
             disabled={selected.length === 0}

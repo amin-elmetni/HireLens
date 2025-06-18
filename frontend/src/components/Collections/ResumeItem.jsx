@@ -41,6 +41,7 @@ const ResumeItem = ({
   onShowToast,
   mode = 'collection', // mode: 'collection' | 'bookmarks'
   onRefresh,
+  onParentRefreshCollections,
 }) => {
   const { viewResume, downloadResume } = useResumeActions();
   const { saved, toggleSave } = useSaves(uuid);
@@ -53,11 +54,6 @@ const ResumeItem = ({
 
   // For AddToCollectionDrawer
   const user = getUser();
-  const {
-    collections,
-    loading: loadingCollections,
-    refreshCollections,
-  } = useUserCollections(user?.id);
 
   const handleRemove = () => setShowRemoveModal(true);
 
@@ -257,7 +253,6 @@ const ResumeItem = ({
             onActuallyCreateNew={collectionPicker.onActuallyCreateNew}
             setToast={onShowToast}
             resumesToAdd={[{ uuid, resumeId, name }]}
-            onParentRefreshCollections={refreshCollections}
           />
         </>
       )}

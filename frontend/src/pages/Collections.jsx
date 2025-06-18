@@ -37,6 +37,12 @@ const Collections = () => {
 
   const { collections, loading, refreshCollections } = useUserCollections(user?.id);
 
+  React.useEffect(() => {
+    if (activeTab === 'collections') {
+      refreshCollections();
+    }
+  }, [activeTab, refreshCollections]);
+
   const filteredCollections = (collections || [])
     .filter(col => col.name.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) =>
@@ -112,7 +118,7 @@ const Collections = () => {
           </>
         )}
         {activeTab === 'bookmarks' && (
-          <BookmarksList onParentRefreshCollections={refreshCollections} />
+          <BookmarksList />
         )}
         {showCreateModal && (
           <CollectionUpsertModal
