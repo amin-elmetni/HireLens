@@ -24,8 +24,7 @@ const AddToCollectionDrawer = ({
   setError,
   onActuallyCreateNew,
   setToast,
-  resumesToAdd = [],
-  onParentRefreshCollections,
+  resumesToAdd = [], // Array of resumes to add (single or bulk)
 }) => {
   const [showDrawer, setShowDrawer] = useState(open);
   const [inCreateMode, setInCreateMode] = useState(false);
@@ -100,9 +99,6 @@ const AddToCollectionDrawer = ({
           show: true,
           message: 'Collection Created Successfully!',
         });
-      }
-      if (typeof onParentRefreshCollections === 'function') {
-        onParentRefreshCollections();
       }
     }
   };
