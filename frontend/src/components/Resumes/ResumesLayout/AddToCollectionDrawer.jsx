@@ -24,7 +24,8 @@ const AddToCollectionDrawer = ({
   setError,
   onActuallyCreateNew,
   setToast,
-  resumesToAdd = [], // Array of resumes to add (single or bulk)
+  resumesToAdd = [],
+  onParentRefreshCollections,
 }) => {
   const [showDrawer, setShowDrawer] = useState(open);
   const [inCreateMode, setInCreateMode] = useState(false);
@@ -94,7 +95,15 @@ const AddToCollectionDrawer = ({
       setInCreateMode(false);
       setNewCollectionName('');
       setNewCollectionDescription('');
-      setToast?.(prev => ({ ...prev, show: true, message: 'Collection Created Successfully!' }));
+      if (setToast) {
+        setToast({
+          show: true,
+          message: 'Collection Created Successfully!',
+        });
+      }
+      if (typeof onParentRefreshCollections === 'function') {
+        onParentRefreshCollections();
+      }
     }
   };
 
@@ -119,11 +128,10 @@ const AddToCollectionDrawer = ({
   const handleUpdate = async () => {
     const result = await handleAddAndRemove();
     if (result && setToast) {
-      setToast(prev => ({
+      setToast({
         show: true,
-        message: 'Resume(s) Added to Collection!',
-        id: prev.id + 1,
-      }));
+        message: 'Collections Updated Successfully!',
+      });
     }
     onClose();
   };

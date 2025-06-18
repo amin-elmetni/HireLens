@@ -257,6 +257,7 @@ const ResumeItem = ({
             onActuallyCreateNew={collectionPicker.onActuallyCreateNew}
             setToast={onShowToast}
             resumesToAdd={[{ uuid, resumeId, name }]}
+            onParentRefreshCollections={refreshCollections}
           />
         </>
       )}

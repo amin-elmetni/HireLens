@@ -5,9 +5,22 @@ const ConfirmationToast = ({ message, show, duration = 2000, onClose, width = '2
   const [visible, setVisible] = useState(false);
   const hideTimeout = useRef();
 
+  // Handle the message, which could be a string, a function, or an object
+  const getDisplayMessage = () => {
+    if (typeof message === 'function') {
+      return message();
+    } else if (typeof message === 'object' && message !== null) {
+      return message.message || '';
+    } else {
+      return message || '';
+    }
+  };
+
+  const displayMessage = getDisplayMessage();
+
   // Whenever show becomes true, display the toast and set an auto-hide timer
   useEffect(() => {
-    if (show && message) {
+    if (show && displayMessage) {
       setVisible(true);
       // Clear any previous timers
       if (hideTimeout.current) clearTimeout(hideTimeout.current);
@@ -23,7 +36,7 @@ const ConfirmationToast = ({ message, show, duration = 2000, onClose, width = '2
     return () => {
       if (hideTimeout.current) clearTimeout(hideTimeout.current);
     };
-  }, [show, message, duration]);
+  }, [show, displayMessage, duration]);
 
   // Call parent's onClose when fully hidden (after fade out)
   useEffect(() => {
@@ -55,7 +68,7 @@ const ConfirmationToast = ({ message, show, duration = 2000, onClose, width = '2
         maxWidth: width,
       }}
     >
-      {message}
+      {displayMessage}
     </div>
   );
 

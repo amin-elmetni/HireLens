@@ -111,7 +111,9 @@ const Collections = () => {
             )}
           </>
         )}
-        {activeTab === 'bookmarks' && <BookmarksList />}
+        {activeTab === 'bookmarks' && (
+          <BookmarksList onParentRefreshCollections={refreshCollections} />
+        )}
         {showCreateModal && (
           <CollectionUpsertModal
             mode='create'
