@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import { useLogin } from '@/hooks/auth/useLogin';
 import SocialLoginIcons from '@/components/Login/SocialLoginIcons';
 import Logo from '@/components/Login/Logo';
@@ -10,17 +9,17 @@ const Login = () => {
   return (
     <div className='flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4'>
       <div className='flex flex-col justify-center w-full max-w-4xl items-center'>
-        <div className='bg-white rounded-2xl shadow-2xl flex flex-col md:flex-row w-full'>
+        <div className='bg-white rounded-2xl shadow-2xl flex flex-col items-stretch md:flex-row w-full '>
           {/* Sign in section */}
-          <div className='w-full md:w-3/5 p-6 md:p-10'>
-            <Logo />
+          <div className='flex flex-col justify-center w-full md:w-3/5 p-6 md:p-10'>
+            <Logo className='-translate-y-14' />
             <div className='flex flex-col items-center'>
               <h2 className='text-2xl md:text-3xl font-bold text-primary mb-4 text-center'>
                 Sign in to Account
               </h2>
               <div className='border-2 w-10 border-primary inline-block mb-4'></div>
-              <SocialLoginIcons />
-              <p className='text-gray-400 my-3 text-sm'>or use your email account</p>
+              {/* <SocialLoginIcons /> */}
+              {/* <p className='text-gray-400 my-3 text-sm'>or use your email account</p> */}
 
               <form
                 onSubmit={handleSubmit}

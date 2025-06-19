@@ -146,13 +146,14 @@ const AddToCollectionDrawer = ({
       )}
       <aside
         className={`
-          fixed top-0 right-0 h-full w-full sm:w-[${DRAWER_WIDTH}px] max-w-full bg-white text-gray-900 z-[1010] shadow-lg flex flex-col
+          fixed top-0 right-0 h-full w-full sm:w-[${DRAWER_WIDTH}px]  max-w-full bg-white text-gray-900 z-[1010] shadow-lg flex flex-col
           transition-transform duration-500 ease-in-out
           ${animateOpen ? 'translate-x-0' : 'translate-x-full'}
         `}
         style={{
           width: '100%',
-          maxWidth: `${DRAWER_WIDTH}px`,
+          // maxWidth: `${DRAWER_WIDTH}px`,
+          maxWidth: `45rem`,
         }}
         aria-label='Add to Collection Drawer'
         onClick={e => e.stopPropagation()}

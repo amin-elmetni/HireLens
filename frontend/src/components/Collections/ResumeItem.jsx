@@ -162,7 +162,7 @@ const ResumeItem = ({
           </div>
           <div className='flex flex-col self-stretch justify-between min-w-0'>
             <div className='flex flex-col gap-[1px] min-w-0'>
-              <div className='font-semibold truncate'>{name}</div>
+              <div className='font-semibold truncate capitalize'>{name?.toLowerCase()}</div>
               <div className='text-xs text-primary font-medium capitalize'>
                 {topCategory?.toLowerCase()}
               </div>

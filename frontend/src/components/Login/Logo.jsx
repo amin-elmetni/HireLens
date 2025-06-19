@@ -1,7 +1,7 @@
 import logo from '@/assets/logo.png';
 
-const Logo = () => (
-  <div className='flex items-center gap-2 mb-4'>
+const Logo = ({ className }) => (
+  <div className={`flex items-center gap-2 mb-4 ${className}`}>
     <img
       src={logo}
       className='w-6'

@@ -1,9 +1,9 @@
 const SignUpPrompt = () => (
   <div className='w-full md:w-2/5 bg-primary text-white rounded-b-2xl md:rounded-tr-2xl md:rounded-br-2xl md:rounded-bl-none py-10 md:py-36 px-8 flex flex-col items-center justify-center gap-4'>
-    <h2 className='text-2xl md:text-3xl font-bold text-center'>Hello, Friend</h2>
+    <h2 className='text-2xl md:text-3xl font-bold text-center'>Hello, Recruiter</h2>
     <div className='border-2 w-10 border-white inline-block'></div>
     <p className='text-center mb-6 text-sm px-2'>
-      Fill up personal information and start your journey with us.
+      Fill in your details and start building better teams with the power of AI.
     </p>
     <a
       href='/register'

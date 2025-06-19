@@ -217,7 +217,7 @@ const SortDropdown = ({
         />
         <div
           className={`
-          bg-white rounded-md shadow-lg ring-opacity-5 flex
+          bg-white rounded-md shadow-[0_1px_4px_rgba(0,0,0,0.25)] ring-opacity-5 flex
           transition-all duration-200 ease-out scrollbar-custom
           ${
             dropdownVisible

@@ -7,7 +7,7 @@ import SortDropdown from '@/components/ui/SortDropdown';
 import AddToCollectionDrawer from '@/components/Resumes/ResumesLayout/AddToCollectionDrawer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import useUserCollections from '@/hooks/collections/useUserCollections';
-import { addItemToCollection } from '@/api/collectionItemApi';
+import { addItemToCollection, getItemsByCollection } from '@/api/collectionItemApi'; // Added import here
 import { getUser } from '@/utils/userUtils';
 
 const getResumeSortValue = (resume, sortBy) => {
@@ -80,39 +80,77 @@ export default function BookmarksList() {
     setDrawerLoading(true);
     try {
       const resumesToAdd = filteredSortedResumes.filter(r => selected.includes(r.uuid));
+
+      if (resumesToAdd.length === 0 || drawerSelectedIds.size === 0) {
+        setDrawerError('Please select at least one resume and one collection');
+        setDrawerLoading(false);
+        return false;
+      }
+
       // fetch items for each collection first, to check for existing resumeIds
       const collectionItems = {};
       await Promise.all(
         Array.from(drawerSelectedIds).map(async collectionId => {
-          const { data } = await getItemsByCollection(collectionId);
-          collectionItems[collectionId] = new Set(data.map(item => item.resumeId));
+          try {
+            const { data } = await getItemsByCollection(collectionId);
+            collectionItems[collectionId] = new Set(data.map(item => item.resumeId));
+          } catch (error) {
+            console.error(`Failed to get items for collection ${collectionId}:`, error);
+            collectionItems[collectionId] = new Set(); // Empty set as fallback
+          }
         })
       );
+
+      // Track how many were actually added (excluding duplicates)
+      let addedCount = 0;
+
       // Only add if not already present
       await Promise.all(
         Array.from(drawerSelectedIds).flatMap(collectionId =>
           resumesToAdd
-            .filter(resume => !collectionItems[collectionId].has(resume.resumeId))
+            .filter(resume => {
+              // Skip if already in the collection
+              const alreadyInCollection = collectionItems[collectionId].has(resume.resumeId);
+              if (!alreadyInCollection) addedCount++;
+              return !alreadyInCollection;
+            })
             .map(resume =>
               addItemToCollection({ collectionId, resumeId: resume.resumeId }).catch(err => {
+                console.error(
+                  `Failed to add resume ${resume.resumeId} to collection ${collectionId}:`,
+                  err
+                );
                 if (err.response?.status !== 409) throw err;
               })
             )
         )
       );
+
       setDrawerLoading(false);
-      setToast(prev => ({
-        show: true,
-        message: `Added ${resumesToAdd.length} resume${resumesToAdd.length > 1 ? 's' : ''} to ${
-          drawerSelectedIds.size
-        } collection${drawerSelectedIds.size > 1 ? 's' : ''}!`,
-        id: prev.id + 1,
-      }));
+
+      // Show an appropriate message based on how many were actually added
+      if (addedCount > 0) {
+        setToast({
+          show: true,
+          message: `Added ${resumesToAdd.length} resume${resumesToAdd.length > 1 ? 's' : ''} to ${
+            drawerSelectedIds.size
+          } collection${drawerSelectedIds.size > 1 ? 's' : ''}!`,
+          id: Date.now(), // Using timestamp as id to ensure uniqueness
+        });
+      } else {
+        setToast({
+          show: true,
+          message: `All selected resumes were already in the chosen collections.`,
+          id: Date.now(),
+        });
+      }
+
       setShowAddDrawer(false);
       setSelected([]);
       return true;
     } catch (err) {
-      setDrawerError('Failed to add to collection(s).');
+      console.error('Error in handleBulkAddAndRemove:', err);
+      setDrawerError('Failed to add to collection(s). Please try again.');
       setDrawerLoading(false);
       return false;
     }
@@ -135,19 +173,17 @@ export default function BookmarksList() {
 
   return (
     <div>
-      <h2 className='text-2xl font-bold mb-4 flex items-center gap-2'>
-        <FontAwesomeIcon
-          icon='fa-regular fa-bookmark'
-          className='text-primary'
-        />
-        Bookmarked Resumes
+      <h2 className='text-2xl font-bold mb-6 flex items-center gap-4'>
+        <FontAwesomeIcon icon='fa-regular fa-bookmark' />
+        Bookmarked Resumes ({resumes.length})
       </h2>
-      <div className='flex items-center justify-between gap-4 mb-4'>
-        <SearchInput
-          placeholder='Search resumes...'
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+      <SearchInput
+        placeholder='Search resumes...'
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        className='w-full'
+      />
+      <div className='my-4 text-end'>
         <SortDropdown
           options={sortOptions}
           value={sort}
@@ -162,7 +198,7 @@ export default function BookmarksList() {
               type='checkbox'
               checked={allChecked}
               onChange={handleSelectAll}
-              className="form-checkbox appearance-none mr-3 h-[20px] w-[20px] border-2 border-gray-400 rounded-xs checked:bg-primary checked:border-primary relative after:absolute after:content-[''] after:block"
+              className="form-checkbox appearance-none mr-3 h-[20px] w-[20px] border-2 border-gray-400 rounded-xs checked:bg-primary checked:border-primary relative after:absolute after:content-[''] after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1 after:w-[12px] after:h-[6px] after:border-l-2 after:border-b-2 after:border-white after:rotate-[-45deg] after:opacity-0 checked:after:opacity-100 cursor-pointer"
             />
             <span className='ml-2 text-gray-700 text-sm'>
               {selected.length > 0 ? `${selected.length} selected` : 'Select All'}
