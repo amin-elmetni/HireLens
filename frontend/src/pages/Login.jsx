@@ -8,11 +8,11 @@ const Login = () => {
 
   return (
     <div className='flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4'>
-      <div className='flex flex-col justify-center w-full max-w-4xl items-center'>
-        <div className='bg-white rounded-2xl shadow-2xl flex flex-col items-stretch md:flex-row w-full '>
+      <div className='flex flex-col justify-center w-full max-w-5xl items-center'>
+        <div className='bg-white rounded-2xl shadow-2xl flex flex-col items-stretch md:flex-row w-full min-h-[500px]'>
           {/* Sign in section */}
           <div className='flex flex-col justify-center w-full md:w-3/5 p-6 md:p-10'>
-            <Logo className='-translate-y-14' />
+            <Logo className='-translate-y-20' />
             <div className='flex flex-col items-center'>
               <h2 className='text-2xl md:text-3xl font-bold text-primary mb-4 text-center'>
                 Sign in to Account

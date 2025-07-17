@@ -39,6 +39,7 @@ import {
   faEllipsisVertical,
   faFolder as fasFolder,
   faFolderMinus,
+  faPaperPlane,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Add all icons to the library
@@ -77,5 +78,6 @@ library.add(
   fasFolder,
   farFolder,
   faFolderMinus,
-  faTrashCan
+  faTrashCan,
+  faPaperPlane
 );

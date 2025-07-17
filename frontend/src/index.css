@@ -65,3 +65,11 @@
 .scroll-anchor {
   scroll-margin-top: 0px;
 }
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}

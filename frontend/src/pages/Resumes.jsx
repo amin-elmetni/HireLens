@@ -6,6 +6,7 @@ import SideFilters from '@/components/Resumes/SideFilters/SideFilters';
 import ResumesLayout from '@/components/Resumes/ResumesLayout/ResumesLayout';
 import { useSideFilters } from '@/hooks/resumes/useSideFilters';
 import { useNavigate, useLocation } from 'react-router-dom';
+import JobDescriptionInput from '@/components/Resumes/JobDescriptionInput';
 
 const DEFAULT_EXP_MIN = 0;
 const DEFAULT_EXP_MAX = 21;
@@ -20,6 +21,8 @@ const Resumes = () => {
 
   // Only render after redirect if necessary
   const [redirecting, setRedirecting] = useState(false);
+
+  const { filters, tempSelections, setTempSelections, loading: loadingSidebar } = useSideFilters();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -89,6 +92,14 @@ const Resumes = () => {
         <div className={`${sidebarOpen ? 'w-[75%]' : 'w-full'} transition-all duration-300`}>
           <ResumesLayout />
         </div>
+        {/* Job Description Input */}
+        <JobDescriptionInput
+          visible={sidebarOpen}
+          sidebarOpen={sidebarOpen}
+          filters={filters}
+          setTempSelections={setTempSelections}
+          isLoadingSidebar={loading}
+        />
       </div>
     </div>
   );

@@ -17,7 +17,6 @@ const SideFilters = ({ onClose }) => {
     isExpanded,
     toggleExpand,
     toggleTempSelection,
-    applySelections,
     handleExperienceChange,
     handleMinInputChange,
     handleMaxInputChange,
