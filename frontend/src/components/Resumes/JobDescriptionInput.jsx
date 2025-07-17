@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { extractSkillsAndCategories } from '@/api/textAnalysisApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+const toId = label => label.toLowerCase().replace(/\s+/g, '_');
+
 const JobDescriptionInput = ({
   visible,
   onExtract,
@@ -9,18 +11,16 @@ const JobDescriptionInput = ({
   setTempSelections,
   isLoadingSidebar,
   sidebarOpen,
+  handleApply,
 }) => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const textareaRef = useRef(null);
 
-  // Auto-resize textarea based on content
   useEffect(() => {
     if (textareaRef.current) {
-      // Reset height to get the correct scrollHeight
       textareaRef.current.style.height = 'auto';
-      // Set height to scrollHeight, but not more than max height (8em)
-      const maxHeight = 8 * 16; // Convert 8em to pixels (assuming 1em = 16px)
+      const maxHeight = 8 * 16;
       textareaRef.current.style.height = `${Math.min(
         textareaRef.current.scrollHeight,
         maxHeight
@@ -28,24 +28,57 @@ const JobDescriptionInput = ({
     }
   }, [input]);
 
-  // Helper to map backend match to current filter items
-  const matchItems = (items, matchedLabels) =>
-    items.filter(item => matchedLabels.includes(item.label.toLowerCase()));
+  const matchItems = (items, matchedLabels, debugType) => {
+    const matchedIds = matchedLabels.map(toId);
+    const matched = items.filter(item => matchedIds.includes(item.id));
+    console.log(
+      `[DEBUG][${debugType}] matchedLabels:`,
+      matchedLabels,
+      '| matchedIds:',
+      matchedIds,
+      '| items:',
+      items.map(i => i.id),
+      '| matched:',
+      matched.map(i => i.id)
+    );
+    return matched;
+  };
 
   const handleSend = async () => {
     if (!input.trim()) return;
     setLoading(true);
     try {
+      console.log('[DEBUG] Sending job description:', input);
       const { skills = [], categories = [] } = await extractSkillsAndCategories(input);
-      setTempSelections(prev => ({
-        ...prev,
-        skills: matchItems(filters.skills, skills),
-        categories: matchItems(filters.categories, categories),
-      }));
+      console.log('[DEBUG] API Response:', { skills, categories });
+      if (!filters) {
+        console.log('[DEBUG] No filters found!');
+        return;
+      }
+      const matchedSkills = matchItems(filters.skills, skills, 'skills');
+      const matchedCategories = matchItems(filters.categories, categories, 'categories');
+      setTempSelections(prev => {
+        const updated = {
+          ...prev,
+          skills: matchedSkills,
+          categories: matchedCategories,
+        };
+        console.log('[DEBUG] setTempSelections:', updated);
+        return updated;
+      });
       onExtract && onExtract();
       setInput('');
+      // Call handleApply after updating selections
+      setTimeout(() => {
+        if (handleApply) {
+          console.log('[DEBUG] Calling handleApply...');
+          handleApply();
+        } else {
+          console.log('[DEBUG] No handleApply provided!');
+        }
+      }, 0);
     } catch (e) {
-      // Optionally show notification
+      console.log('[DEBUG] Error in handleSend:', e);
     } finally {
       setLoading(false);
     }
@@ -82,8 +115,8 @@ const JobDescriptionInput = ({
           style={{
             resize: 'none',
             maxHeight: '8em',
-            scrollbarWidth: 'none', // For Firefox
-            msOverflowStyle: 'none', // For IE
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
           }}
         />
         <button

@@ -213,6 +213,7 @@ export const useSideFilters = () => {
   return {
     filters,
     tempSelections,
+    setTempSelections,
     isExpanded,
     toggleExpand: () => setIsExpanded(prev => !prev),
     toggleTempSelection,

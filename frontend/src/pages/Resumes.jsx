@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TbLayoutSidebarLeftExpandFilled } from 'react-icons/tb';
-import { TbLayoutSidebarRightExpandFilled } from 'react-icons/tb';
+import { TbLayoutSidebarLeftExpandFilled, TbLayoutSidebarRightExpandFilled } from 'react-icons/tb';
 import NavBar from '@/components/NavBar/NavBar';
 import SideFilters from '@/components/Resumes/SideFilters/SideFilters';
 import ResumesLayout from '@/components/Resumes/ResumesLayout/ResumesLayout';
@@ -14,15 +13,20 @@ const DEFAULT_EXP_MAX = 21;
 const Resumes = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isClicked, setIsClicked] = useState(false);
-  const { loading } = useSideFilters();
+  const {
+    loading,
+    filters,
+    tempSelections,
+    setTempSelections,
+    loading: loadingSidebar,
+    handleApply,
+  } = useSideFilters();
 
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Only render after redirect if necessary
   const [redirecting, setRedirecting] = useState(false);
 
-  const { filters, tempSelections, setTempSelections, loading: loadingSidebar } = useSideFilters();
+  console.log('[DEBUG] setTempSelections:', setTempSelections, typeof setTempSelections);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -38,7 +42,11 @@ const Resumes = () => {
     }
   }, [location, navigate]);
 
-  // While redirecting, render nothing
+  useEffect(() => {
+    console.log('[DEBUG] filters:', filters);
+    console.log('[DEBUG] tempSelections:', tempSelections);
+  }, [filters, tempSelections]);
+
   if (redirecting) return null;
 
   return (
@@ -72,7 +80,6 @@ const Resumes = () => {
 
         {/* Sidebar Container */}
         <div className={`${sidebarOpen ? 'w-[25%]' : 'w-0'} transition-all duration-300`}>
-          {/* Sticky Sidebar Content - Fixed height calculation */}
           <div
             className={`sticky top-[100px] h-[calc(100vh-140px)] overflow-y-auto overflow-x-hidden pr-2 scrollbar-custom`}
           >
@@ -82,7 +89,7 @@ const Resumes = () => {
                   <div className='text-center text-gray-500'>Loading filters...</div>
                 ) : (
                   <SideFilters onClose={() => setSidebarOpen(false)} />
-                )}{' '}
+                )}
               </>
             )}
           </div>
@@ -99,6 +106,7 @@ const Resumes = () => {
           filters={filters}
           setTempSelections={setTempSelections}
           isLoadingSidebar={loading}
+          handleApply={handleApply}
         />
       </div>
     </div>
