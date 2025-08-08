@@ -40,7 +40,15 @@ import {
   faFolder as fasFolder,
   faFolderMinus,
   faPaperPlane,
+  faEnvelope,
+  faPhone,
+  faUser,
+  faLocationDot,
+  faLanguage,
+  faCertificate,
 } from '@fortawesome/free-solid-svg-icons';
+
+import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
 
 // Add all icons to the library
 library.add(
@@ -79,5 +87,13 @@ library.add(
   farFolder,
   faFolderMinus,
   faTrashCan,
-  faPaperPlane
+  faPaperPlane,
+  faEnvelope,
+  faPhone,
+  faUser,
+  faGithub,
+  faLinkedin,
+  faLocationDot,
+  faLanguage,
+  faCertificate
 );

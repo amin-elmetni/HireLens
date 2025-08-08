@@ -12,10 +12,14 @@ const JobDescriptionInput = ({
   isLoadingSidebar,
   sidebarOpen,
   handleApply,
+  tempSelections, // <-- add this!
 }) => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const textareaRef = useRef(null);
+
+  // Only allow input when filters are loaded
+  const isFiltersReady = filters.skills.length > 0 && filters.categories.length > 0;
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -27,6 +31,14 @@ const JobDescriptionInput = ({
       )}px`;
     }
   }, [input]);
+
+  // Auto-apply when tempSelections updates and input is cleared (after submit)
+  useEffect(() => {
+    if (input === '' && handleApply) {
+      handleApply();
+    }
+    // eslint-disable-next-line
+  }, [tempSelections]);
 
   const matchItems = (items, matchedLabels, debugType) => {
     const matchedIds = matchedLabels.map(toId);
@@ -45,7 +57,7 @@ const JobDescriptionInput = ({
   };
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !isFiltersReady) return;
     setLoading(true);
     try {
       console.log('[DEBUG] Sending job description:', input);
@@ -68,15 +80,7 @@ const JobDescriptionInput = ({
       });
       onExtract && onExtract();
       setInput('');
-      // Call handleApply after updating selections
-      setTimeout(() => {
-        if (handleApply) {
-          console.log('[DEBUG] Calling handleApply...');
-          handleApply();
-        } else {
-          console.log('[DEBUG] No handleApply provided!');
-        }
-      }, 0);
+      // handleApply will be called by useEffect after setTempSelections
     } catch (e) {
       console.log('[DEBUG] Error in handleSend:', e);
     } finally {
@@ -94,7 +98,7 @@ const JobDescriptionInput = ({
   return (
     <div
       className={`
-        fixed z-30 bottom-10 right-20 left-135 transition-all duration-300 text-center
+        fixed z-30 bottom-11 right-20 left-100 transition-all duration-300 text-center
         ${
           sidebarOpen
             ? 'opacity-100 translate-y-0 pointer-events-auto'
@@ -102,7 +106,7 @@ const JobDescriptionInput = ({
         }
       `}
     >
-      <div className='bg-gray-100 rounded-full shadow-lg px-4 py-2 flex items-center gap-2 border border-primary hide-scrollbar'>
+      <div className='bg-gray-100 rounded-full px-4 py-2 flex items-center gap-2 border border-primary hide-scrollbar shadow-[0_0_40px_6px_rgba(0,0,0,0.4)]'>
         <textarea
           ref={textareaRef}
           className='flex-1 bg-transparent outline-none border-none resize-none text-base px-0 py-1 overflow-hidden'
@@ -111,7 +115,7 @@ const JobDescriptionInput = ({
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder='Enter a job description here...'
-          disabled={loading || isLoadingSidebar}
+          disabled={loading || isLoadingSidebar || !isFiltersReady}
           style={{
             resize: 'none',
             maxHeight: '8em',
@@ -121,15 +125,18 @@ const JobDescriptionInput = ({
         />
         <button
           onClick={handleSend}
-          disabled={loading || !input.trim()}
-          className='text-primary hover:bg-primary/10 rounded-full p-2 transition disabled:opacity-50'
+          disabled={loading || !input.trim() || !isFiltersReady}
+          className='text-primary hover:bg-primary/10 rounded-full p-2 transition disabled:opacity-50 disabled:bg-transparent cursor-pointer disabled:cursor-auto'
           title='Extract requirements'
         >
           {loading ? (
-            <span className='w-5 h-5 animate-spin border-2 border-primary border-t-transparent rounded-full' />
+            <div className='w-5 h-5 relative'>
+              <div className='absolute w-full h-full border-2 border-primary border-t-transparent rounded-full animate-spin'></div>
+              <div className='absolute w-full h-full border-2 border-primary/50 border-t-transparent rounded-full animate-spin-slow'></div>
+            </div>
           ) : (
             <FontAwesomeIcon
-              icon='paper-plane'
+              icon='fa-solid fa-magnifying-glass'
               className='text-xl'
             />
           )}

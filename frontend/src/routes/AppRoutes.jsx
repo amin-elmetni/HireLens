@@ -3,6 +3,7 @@ import Login from '@/pages/Login';
 import Resumes from '@/pages/Resumes';
 import PrivateRoute from '@/routes/PrivateRoute';
 import Collections from '@/pages/Collections';
+import ResumeDetails from '@/pages/ResumeDetails';
 
 const AppRoutes = () => (
   <BrowserRouter>
@@ -16,6 +17,14 @@ const AppRoutes = () => (
         element={
           <PrivateRoute>
             <Resumes />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path='/resumedetails'
+        element={
+          <PrivateRoute>
+            <ResumeDetails />
           </PrivateRoute>
         }
       />

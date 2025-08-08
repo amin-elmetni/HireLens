@@ -107,6 +107,7 @@ const Resumes = () => {
           setTempSelections={setTempSelections}
           isLoadingSidebar={loading}
           handleApply={handleApply}
+          tempSelections={tempSelections} 
         />
       </div>
     </div>

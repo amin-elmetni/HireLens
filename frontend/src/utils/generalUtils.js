@@ -12,3 +12,15 @@ export const getInitials = name =>
     .map(n => n[0])
     .join('')
     .toUpperCase();
+
+export const extractUsernameFromUrl = url => {
+  if (!url) return '';
+
+  try {
+    // Remove trailing slashes and extract last part
+    const cleanUrl = url.replace(/\/+$/, '');
+    return cleanUrl.split('/').pop();
+  } catch {
+    return '';
+  }
+};
