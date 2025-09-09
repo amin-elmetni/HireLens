@@ -1,24 +1,32 @@
 // src/hooks/useLogin.js
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { loginUser } from '@/api/userApi';
-import { saveUser } from '@/utils/userUtils';
-import { saveToken } from '@/utils/tokenUtils';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '@/context/AuthProvider';
+import Swal from 'sweetalert2';
 
 export const useLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const handleSubmit = async e => {
     e.preventDefault();
     try {
       const res = await loginUser({ email, password });
-      saveUser(res.data.user);
-      saveToken(res.data.token);
+
+      // Use the AuthContext login method to properly update state
+      login(res.data.user, res.data.token);
+
       navigate('/');
     } catch (err) {
-      alert('Invalid email or password');
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: 'Invalid email or password. Please try again.',
+        confirmButtonColor: '#00b3b3',
+      });
     }
   };
 

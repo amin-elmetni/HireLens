@@ -5,7 +5,7 @@ export default function ResumeLanguagesCerts({ resume }) {
     <div className='flex flex-col'>
       {/* Certifications Section - Wider */}
       {resume.certifications?.length > 0 && (
-        <section className='flex-1 flex flex-col gap-2 bg-[#F9F9F9] p-4 border-l-2 border-primary rounded-r-xl'>
+        <section className='flex-1 flex flex-col gap-2 bg-[#F9F9F9] p-4 border-l-2 border-primary rounded-r-xl mb-6'>
           <h3 className='font-bold text-2xl text-primary'>Certifications</h3>
           <div className='h-[1px] bg-gray-200'></div>
           <ul className='text-gray-700 text-sm space-y-2 mt-2'>
@@ -24,7 +24,7 @@ export default function ResumeLanguagesCerts({ resume }) {
 
       {/* Languages Section */}
       {resume.languages?.length > 0 && (
-        <div className='flex flex-wrap gap-3 mt-6 items-center'>
+        <div className='flex flex-wrap gap-3 items-center'>
           {resume.languages.map((lang, i) => (
             <div
               key={i}

@@ -206,7 +206,7 @@ const AddToCollectionDrawer = ({
                 onChange={handleDescriptionChange}
                 maxLength={150}
               />
-              <div className='flex items-center justify-end'>
+              <div className='flex items-center justify-end mt-4'>
                 <PrimaryButton
                   onClick={handleCreateCollection}
                   disabled={!newCollectionName.trim() || loading}

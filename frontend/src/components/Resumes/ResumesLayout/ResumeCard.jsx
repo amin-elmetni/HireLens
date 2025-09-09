@@ -12,6 +12,7 @@ import { useResumeMetrics } from '@/hooks/resumes/useResumeMetrics';
 import AddToCollectionDrawer from '@/components/Resumes/ResumesLayout/AddToCollectionDrawer';
 import { useResumeActions } from '@/hooks/resumes/useResumeActions';
 import { useMultiCollectionPicker } from '@/hooks/resumes/useMultiCollectionPicker';
+import ConfirmationToast from '@/components/ui/ConfirmationToast';
 
 const ResumeCard = ({ resume }) => {
   const {
@@ -40,6 +41,9 @@ const ResumeCard = ({ resume }) => {
 
   // Resume actions
   const { viewResume, downloadResume } = useResumeActions();
+
+  // Toast state for collection addition confirmation
+  const [toast, setToast] = useState({ show: false, message: '' });
 
   // Handlers for dropdown
   const handleViewResume = () => viewResume(uuid);
@@ -114,7 +118,14 @@ const ResumeCard = ({ resume }) => {
         error={collectionPicker.error}
         setError={collectionPicker.setError}
         onActuallyCreateNew={collectionPicker.onActuallyCreateNew}
-        setToast={() => {}}
+        setToast={setToast}
+      />
+
+      {/* Confirmation Toast for Collection Addition */}
+      <ConfirmationToast
+        message={toast.message}
+        show={toast.show}
+        onClose={() => setToast({ show: false, message: '' })}
       />
     </motion.div>
   );
