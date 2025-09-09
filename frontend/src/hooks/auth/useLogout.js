@@ -9,7 +9,7 @@ const useLogout = () => {
   const logout = () => {
     removeUser();
     removeToken();
-    navigate('/login');
+    navigate('/auth');
   };
 
   return logout;

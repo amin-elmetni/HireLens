@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Login from '@/pages/Login';
-import Resumes from '@/pages/Resumes';
 import PrivateRoute from '@/routes/PrivateRoute';
+import Auth from '@/pages/Auth';
+import Resumes from '@/pages/Resumes';
 import Collections from '@/pages/Collections';
 import ResumeDetails from '@/pages/ResumeDetails';
 import AnalyzeResumes from '@/pages/AnalyzeResumes';
@@ -10,8 +10,8 @@ const AppRoutes = () => (
   <BrowserRouter>
     <Routes>
       <Route
-        path='/login'
-        element={<Login />}
+        path='/auth'
+        element={<Auth />}
       />
       <Route
         path='/'

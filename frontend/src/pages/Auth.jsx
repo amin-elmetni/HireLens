@@ -1,8 +1,8 @@
 import { useLogin } from '@/hooks/auth/useLogin';
-import Logo from '@/components/Login/Logo';
-import SignUpPrompt from '@/components/Login/SignUpPrompt';
+import Logo from '@/components/Auth/Logo';
+import SignUpPrompt from '@/components/Auth/SignUpPrompt';
 
-const Login = () => {
+const Auth = () => {
   const { email, setEmail, password, setPassword, handleSubmit } = useLogin();
 
   return (
@@ -77,4 +77,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Auth;
