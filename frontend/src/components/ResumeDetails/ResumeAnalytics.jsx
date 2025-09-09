@@ -4,6 +4,11 @@ import ScoresBars from '@/components/Resumes/ResumesLayout/ScoresBars';
 export default function ResumeAnalytics({ resume }) {
   const topSkills = [...resume.skills].sort((a, b) => b.score - a.score).slice(0, 5);
   const otherSkills = [...resume.skills].sort((a, b) => b.score - a.score).slice(5);
+
+  // Filter out categories with 0 score and sort by highest score first
+  const sortedCategories =
+    resume.categories?.filter(c => c.score > 0)?.sort((a, b) => b.score - a.score) || [];
+
   const toPercent = x => Math.round((x || 0) * 100);
 
   return (
@@ -16,12 +21,12 @@ export default function ResumeAnalytics({ resume }) {
           <ScoresBars criteria={topSkills.map(s => ({ name: s.name, score: s.score }))} />
         </div>
       )}
-      {resume.categories?.length > 0 && (
+      {sortedCategories.length > 0 && (
         <div>
           <div className='font-bold text-primary mb-2 uppercase text-sm tracking-wider'>
             Categories
           </div>
-          <ScoresBars criteria={resume.categories.map(c => ({ name: c.name, score: c.score }))} />
+          <ScoresBars criteria={sortedCategories.map(c => ({ name: c.name, score: c.score }))} />
         </div>
       )}
       {otherSkills.length > 0 && (

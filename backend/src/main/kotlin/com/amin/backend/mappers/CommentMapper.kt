@@ -6,7 +6,7 @@ import com.amin.backend.models.User
 
 object CommentMapper {
 
-    fun toDto(comment: Comment): CommentDto =
+    fun toDto(comment: Comment, likes: Int = 0, dislikes: Int = 0, userLikeStatus: String? = null): CommentDto =
         CommentDto(
             id = comment.id,
             userId = comment.user.id ?: 0,
@@ -15,7 +15,10 @@ object CommentMapper {
             content = comment.content,
             parentCommentId = comment.parentCommentId,
             createdAt = comment.createdAt,
-            updatedAt = comment.updatedAt
+            updatedAt = comment.updatedAt,
+            likes = likes,
+            dislikes = dislikes,
+            userLikeStatus = userLikeStatus
         )
 
     fun toEntity(dto: CommentDto, user: User): Comment =
@@ -26,6 +29,6 @@ object CommentMapper {
             content = dto.content,
             parentCommentId = dto.parentCommentId,
             createdAt = dto.createdAt,
-            updatedAt = dto.updatedAt
+            updatedAt = dto.updatedAt,
         )
 }

@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import DropdownMenu from '../ui/DropdownMenu';
 import { useResumeActions } from '@/hooks/resumes/useResumeActions';
 import { useSaves } from '@/hooks/resumes/useSaves';
+import { useLikes } from '@/hooks/resumes/useLikes';
 import { removeItemFromCollection } from '@/api/collectionItemApi';
 import { formatDate } from '@/utils/generalUtils';
 import DeleteConfirmationModal from '@/components/ui/DeleteConfirmationModal';
@@ -47,6 +48,7 @@ const ResumeItem = ({
   const navigate = useNavigate();
   const { viewResume, downloadResume } = useResumeActions();
   const { saved, toggleSave } = useSaves(uuid);
+  const { liked, toggleLike } = useLikes(uuid);
 
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [removeLoading, setRemoveLoading] = useState(false);
@@ -80,6 +82,11 @@ const ResumeItem = ({
     if (mode === 'bookmarks' && onRefresh) onRefresh();
   };
 
+  const handleLike = async () => {
+    await toggleLike();
+    if (onShowToast) onShowToast(liked ? 'Resume unliked!' : 'Resume liked!');
+  };
+
   // Dropdown options
   const dropdownOptions = [
     {
@@ -104,13 +111,32 @@ const ResumeItem = ({
       label: saved ? 'Remove Bookmark' : 'Bookmark',
       value: 'bookmark',
       icon: saved ? (
-        <FontAwesomeIcon icon='fa-solid fa-bookmark' />
+        <FontAwesomeIcon
+          icon='fa-solid fa-bookmark'
+          className='text-yellow-400'
+        />
       ) : (
         <FontAwesomeIcon icon='fa-regular fa-bookmark' />
       ),
       onClick: e => {
         e?.stopPropagation?.();
         handleBookmark();
+      },
+    },
+    {
+      label: liked ? 'Unlike' : 'Like',
+      value: 'like',
+      icon: liked ? (
+        <FontAwesomeIcon
+          icon='fa-solid fa-heart'
+          className='text-red-500'
+        />
+      ) : (
+        <FontAwesomeIcon icon='fa-regular fa-heart' />
+      ),
+      onClick: e => {
+        e?.stopPropagation?.();
+        handleLike();
       },
     },
   ];
@@ -145,12 +171,18 @@ const ResumeItem = ({
         onClick={() => navigate(`/resumedetails/${uuid}`)}
       >
         {/* Custom Checkbox */}
-        <div className='flex items-center gap-2 min-w-[30px]'>
+        <div
+          className='flex items-center gap-2 min-w-[30px]'
+          onClick={e => e.stopPropagation()}
+        >
           <label className='flex items-center'>
             <input
               type='checkbox'
               checked={checked}
-              onChange={onCheck}
+              onChange={e => {
+                e.stopPropagation();
+                onCheck();
+              }}
               className="form-checkbox appearance-none mr-3 h-[20px] w-[20px] border-2 border-gray-400 rounded-xs checked:bg-primary checked:border-primary relative after:absolute after:content-[''] after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1 after:w-[12px] after:h-[6px] after:border-l-2 after:border-b-2 after:border-white after:rotate-[-45deg] after:opacity-0 checked:after:opacity-100 cursor-pointer"
             />
             <span className='sr-only'>Select resume</span>
@@ -192,7 +224,10 @@ const ResumeItem = ({
           </div>
         </div>
         {/* Stats & Dropdown */}
-        <div className='flex flex-col self-stretch justify-between items-end min-w-[110px]'>
+        <div
+          className='flex flex-col self-stretch justify-between items-end min-w-[110px]'
+          onClick={e => e.stopPropagation()}
+        >
           <div className='flex flex-col items-end gap-[1px]'>
             <div className='text-xs text-gray-500 mb-1'>{formatDate(lastUpdated)}</div>
             <div className='flex gap-2 items-center text-xs text-gray-500'>

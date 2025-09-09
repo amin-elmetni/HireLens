@@ -1,0 +1,85 @@
+/* Rich Text Formatting Styles */
+.rich-text-content {
+  line-height: 1.5;
+}
+
+.rich-text-content strong {
+  font-weight: 600;
+}
+
+.rich-text-content em {
+  font-style: italic;
+}
+
+.rich-text-content u {
+  text-decoration: underline;
+}
+
+.rich-text-content br {
+  display: block;
+  margin: 0.25em 0;
+}
+
+/* Emoji Picker Styles */
+.emoji-picker-container {
+  z-index: 1000;
+}
+
+.emoji-picker-container .EmojiPickerReact {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+}
+
+/* Format toolbar styles */
+.format-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 4px 0;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 8px;
+}
+
+.format-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 12px;
+}
+
+.format-button:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.format-button:active {
+  background-color: #e5e7eb;
+}
+
+.format-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Preview styles */
+.comment-preview {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 8px;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.comment-preview-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}

@@ -4,6 +4,7 @@ import Resumes from '@/pages/Resumes';
 import PrivateRoute from '@/routes/PrivateRoute';
 import Collections from '@/pages/Collections';
 import ResumeDetails from '@/pages/ResumeDetails';
+import AnalyzeResumes from '@/pages/AnalyzeResumes';
 
 const AppRoutes = () => (
   <BrowserRouter>
@@ -49,6 +50,14 @@ const AppRoutes = () => (
         element={
           <PrivateRoute>
             <Collections />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path='/analyze-resumes'
+        element={
+          <PrivateRoute>
+            <AnalyzeResumes />
           </PrivateRoute>
         }
       />

@@ -18,3 +18,8 @@ export const getResumeMetadataByUuid = uuid => api.get(`${RESUME_METADATA_BASE}/
 export const getFilteredResumes = params => api.get(RESUME_METADATA_BASE, { params });
 
 export const getResumeMetadataFilters = () => api.get(`${RESUME_METADATA_BASE}/filters`);
+
+export const getSimilarResumes = (uuid, category) => {
+  const params = category ? { category } : {};
+  return api.get(`${RESUME_METADATA_BASE}/${uuid}/similar`, { params });
+};

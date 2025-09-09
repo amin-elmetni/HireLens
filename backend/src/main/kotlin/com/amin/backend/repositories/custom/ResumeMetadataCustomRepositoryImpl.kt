@@ -122,4 +122,48 @@ class ResumeMetadataCustomRepositoryImpl(
         return mongoTemplate.find(query, ResumeMetadata::class.java)
     }
 
+    override fun findByCategory(categoryName: String, excludeUuid: String?): List<ResumeMetadata> {
+        println("Debug - Repository searching for resumes where '$categoryName' is the TOP category")
+        
+        // Get all resumes first
+        val query = Query()
+        if (excludeUuid != null) {
+            query.addCriteria(Criteria.where("uuid").ne(excludeUuid))
+        }
+        
+        val allResumes = mongoTemplate.find(query, ResumeMetadata::class.java)
+        
+        // Filter resumes where the specified category is the top category (highest score)
+        val filteredResumes = allResumes.filter { resume ->
+            val categories = resume.categories
+            if (categories.isNullOrEmpty()) {
+                false
+            } else {
+                // Find the category with the highest score
+                val topCategory = categories
+                    .filter { it.score != null && it.name != null }
+                    .maxByOrNull { it.score!! }
+                
+                // Check if the top category matches our target category (case-insensitive)
+                topCategory?.name?.trim()?.equals(categoryName.trim(), ignoreCase = true) == true
+            }
+        }
+        
+        println("Debug - Repository found ${filteredResumes.size} resumes where '$categoryName' is the TOP category")
+        
+        // Debug: Print the first few results
+        filteredResumes.take(5).forEach { resume ->
+            val categories = resume.categories
+                ?.sortedByDescending { it.score ?: 0.0 }
+                ?.map { "${it.name} (${it.score})" }
+            val topCat = resume.categories
+                ?.filter { it.score != null && it.name != null }
+                ?.maxByOrNull { it.score!! }
+                ?.name
+            println("Debug - Found resume: ${resume.name} with TOP category: '$topCat' - All categories: $categories")
+        }
+        
+        return filteredResumes
+    }
+
 }

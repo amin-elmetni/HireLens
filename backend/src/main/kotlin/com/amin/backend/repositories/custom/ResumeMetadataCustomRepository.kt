@@ -12,4 +12,6 @@ interface ResumeMetadataCustomRepository {
         expMin: Int?,
         expMax: Int?
     ): List<ResumeMetadata>
+    
+    fun findByCategory(categoryName: String, excludeUuid: String? = null): List<ResumeMetadata>
 }

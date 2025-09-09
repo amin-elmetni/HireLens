@@ -16,5 +16,7 @@ interface ResumeMetadataRepository : MongoRepository<ResumeMetadata, String>, Re
             expMin: Int?,
             expMax: Int?
         ): List<ResumeMetadata>
+        
+        fun findByCategory(categoryName: String, excludeUuid: String? = null): List<ResumeMetadata>
     }
 }

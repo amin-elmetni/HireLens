@@ -29,4 +29,17 @@ class ResumeMetadataController(private val resumeMetadataService: ResumeMetadata
     ): List<ResumeMetadataDto> {
         return resumeMetadataService.getFilteredResumes(categories, skills, languages, expMin, expMax)
     }
+
+    @GetMapping("/{uuid}/similar")
+    fun getSimilarResumes(
+        @PathVariable uuid: String,
+        @RequestParam(required = false) category: String?
+    ): List<ResumeMetadataDto> {
+        return resumeMetadataService.getSimilarResumes(uuid, category)
+    }
+
+    @GetMapping("/debug/categories")
+    fun debugCategories(): Map<String, Any> {
+        return resumeMetadataService.debugCategories()
+    }
 }

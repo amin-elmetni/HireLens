@@ -10,8 +10,11 @@ import org.springframework.web.bind.annotation.*
 class CommentController(private val commentService: CommentService) {
 
     @GetMapping("/resume/{resumeId}")
-    fun getCommentsByResume(@PathVariable resumeId: Long): List<CommentDto> =
-        commentService.getAllByResumeId(resumeId)
+    fun getCommentsByResume(
+        @PathVariable resumeId: Long,
+        @RequestHeader(value = "X-User-Id", required = false) currentUserId: Long?
+    ): List<CommentDto> =
+        commentService.getAllByResumeId(resumeId, currentUserId)
 
     @PostMapping
     fun postComment(@RequestBody dto: CommentDto): CommentDto =
@@ -37,4 +40,18 @@ class CommentController(private val commentService: CommentService) {
 
     @GetMapping("/count/{resumeId}")
     fun countComments(@PathVariable resumeId: Long): Int = commentService.countComments(resumeId)
+
+    @PostMapping("/{commentId}/like")
+    fun toggleLike(
+        @PathVariable commentId: Long,
+        @RequestHeader("X-User-Id") userId: Long
+    ): CommentDto =
+        commentService.toggleLike(commentId, userId)
+
+    @PostMapping("/{commentId}/dislike")
+    fun toggleDislike(
+        @PathVariable commentId: Long,
+        @RequestHeader("X-User-Id") userId: Long
+    ): CommentDto =
+        commentService.toggleDislike(commentId, userId)
 }

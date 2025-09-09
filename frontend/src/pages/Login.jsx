@@ -1,5 +1,4 @@
 import { useLogin } from '@/hooks/auth/useLogin';
-import SocialLoginIcons from '@/components/Login/SocialLoginIcons';
 import Logo from '@/components/Login/Logo';
 import SignUpPrompt from '@/components/Login/SignUpPrompt';
 
@@ -18,8 +17,6 @@ const Login = () => {
                 Sign in to Account
               </h2>
               <div className='border-2 w-10 border-primary inline-block mb-4'></div>
-              {/* <SocialLoginIcons /> */}
-              {/* <p className='text-gray-400 my-3 text-sm'>or use your email account</p> */}
 
               <form
                 onSubmit={handleSubmit}
