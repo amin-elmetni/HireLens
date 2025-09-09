@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import ResumeCard from '@/components/Resumes/ResumesLayout/ResumeCard';
 import SortDropdown from '@/components/ui/SortDropdown';
+import SearchInput from '@/components/ui/SearchInput'; // <-- Add this import
 import { useSearchParams } from 'react-router-dom';
 import { useFilteredResumes } from '@/hooks/resumes/useFilteredResumes';
 import { BASE_SORT_OPTIONS, getDynamicSortOptions } from '@/utils/resumeUtils';
@@ -18,6 +19,7 @@ const ResumesLayout = () => {
   const [searchParams] = useSearchParams();
   const [sortBy, setSortBy] = useState('matchingScore');
   const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState(''); // <-- Add search state
 
   const selectedSkills = useMemo(
     () => (searchParams.get('skills') || '').split(',').filter(Boolean),
@@ -45,7 +47,14 @@ const ResumesLayout = () => {
     selectedCategories,
     resumeCounts
   );
-  const sortedResumes = useSortedResumes(processedResumes, sortBy);
+
+  // Filter by search input (name)
+  const filteredResumes = useMemo(() => {
+    if (!search.trim()) return processedResumes;
+    return processedResumes.filter(r => r.name?.toLowerCase().includes(search.toLowerCase()));
+  }, [processedResumes, search]);
+
+  const sortedResumes = useSortedResumes(filteredResumes, sortBy);
 
   // Pagination calculations
   const totalResumes = sortedResumes.length;
@@ -55,8 +64,8 @@ const ResumesLayout = () => {
     currentPage * PAGE_SIZE
   );
 
-  // Reset to first page if sort or filters change
-  useMemo(() => setCurrentPage(1), [sortBy, searchParams]);
+  // Reset to first page if sort or filters or search change
+  useMemo(() => setCurrentPage(1), [sortBy, searchParams, search]);
 
   // Scroll window to absolute top when changing page
   useEffect(() => {
@@ -87,6 +96,16 @@ const ResumesLayout = () => {
             placeholder='Select sort'
           />
         </h2>
+      </div>
+
+      {/* Search Input */}
+      <div className='mb-6'>
+        <SearchInput
+          placeholder='Search resumes by name...'
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className='w-full bg-white'
+        />
       </div>
 
       {loading ? (

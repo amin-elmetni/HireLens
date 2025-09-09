@@ -1,7 +1,9 @@
-import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const ExploreProfileBtn = () => {
+const ExploreProfileBtn = ({ uuid }) => {
+  const navigate = useNavigate();
   return (
     <div className='mb-2'>
       <button
@@ -15,11 +17,12 @@ const ExploreProfileBtn = () => {
       flex items-center justify-center gap-2 cursor-pointer
       group
     '
+        onClick={() => navigate(`/resumedetails/${uuid}`)}
       >
-        Explore Full Profile
+        <span>Explore Full Profile</span>
         <FontAwesomeIcon
-          icon='fa-solid fa-angle-right'
-          className='text-primary group-hover:translate-x-1 transition-transform duration-200'
+          icon='chevron-right'
+          className='ml-1 group-hover:translate-x-1 transition-transform duration-200'
         />
       </button>
     </div>

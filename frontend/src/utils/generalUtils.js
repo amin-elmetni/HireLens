@@ -1,9 +1,13 @@
-export const formatDate = isoDate =>
-  new Intl.DateTimeFormat('en-GB', {
+export const formatDate = isoDate => {
+  if (!isoDate) return '';
+  const date = new Date(isoDate);
+  if (isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat('en-GB', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
-  }).format(new Date(isoDate));
+  }).format(date);
+};
 
 export const getInitials = name =>
   name

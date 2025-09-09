@@ -12,11 +12,21 @@ const SearchInput = React.forwardRef(({ value, onChange, placeholder, className 
     <input
       ref={ref}
       type='text'
-      className='w-full pl-4 pr-6 py-3 bg-transparent focus:outline-none'
+      className='w-full pl-4 pr-2 py-3 bg-transparent focus:outline-none'
       placeholder={placeholder}
       value={value}
       onChange={onChange}
     />
+    {value && value.length > 0 && (
+      <button
+        type='button'
+        onClick={() => onChange({ target: { value: '' } })}
+        className='pr-4 text-gray-400 hover:text-gray-700 focus:outline-none cursor-pointer'
+        aria-label='Clear search'
+      >
+        <FontAwesomeIcon icon='fa-solid fa-xmark' />
+      </button>
+    )}
   </div>
 ));
 

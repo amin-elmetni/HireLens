@@ -10,6 +10,7 @@ import AddToCollectionDrawer from '@/components/Resumes/ResumesLayout/AddToColle
 import useUserCollections from '@/hooks/collections/useUserCollections';
 import { getUser } from '@/utils/userUtils';
 import { useMultiCollectionPicker } from '@/hooks/resumes/useMultiCollectionPicker';
+import { useNavigate } from 'react-router-dom';
 
 const StatItem = ({ icon, value, label }) => (
   <div className='flex items-center text-gray-600 font-medium'>
@@ -43,6 +44,7 @@ const ResumeItem = ({
   onRefresh,
   onParentRefreshCollections,
 }) => {
+  const navigate = useNavigate();
   const { viewResume, downloadResume } = useResumeActions();
   const { saved, toggleSave } = useSaves(uuid);
 
@@ -138,7 +140,10 @@ const ResumeItem = ({
 
   return (
     <>
-      <li className='flex items-center justify-between py-4 gap-3 hover:bg-gray-50 transition-colors cursor-pointer px-8'>
+      <li
+        className='flex items-center justify-between py-4 gap-3 hover:bg-gray-50 transition-colors cursor-pointer px-8'
+        onClick={() => navigate(`/resumedetails/${uuid}`)}
+      >
         {/* Custom Checkbox */}
         <div className='flex items-center gap-2 min-w-[30px]'>
           <label className='flex items-center'>

@@ -21,7 +21,7 @@ const AppRoutes = () => (
         }
       />
       <Route
-        path='/resumedetails'
+        path='/resumedetails/:uuid'
         element={
           <PrivateRoute>
             <ResumeDetails />

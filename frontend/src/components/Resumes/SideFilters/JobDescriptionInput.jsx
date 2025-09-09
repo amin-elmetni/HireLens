@@ -98,15 +98,17 @@ const JobDescriptionInput = ({
   return (
     <div
       className={`
-        fixed z-30 bottom-11 right-20 left-100 transition-all duration-300 text-center
+        fixed bottom-0 left-0 z-30 transition-all duration-300 text-center w-[74%] ml-[25%] px-14
+
         ${
           sidebarOpen
-            ? 'opacity-100 translate-y-0 pointer-events-auto'
+            ? 'opacity-100 -translate-y-10 pointer-events-auto'
             : 'opacity-0 translate-y-8 pointer-events-none'
         }
       `}
+      style={{ maxWidth: '100vw' }}
     >
-      <div className='bg-gray-100 rounded-full px-4 py-2 flex items-center gap-2 border border-primary hide-scrollbar shadow-[0_0_40px_6px_rgba(0,0,0,0.4)]'>
+      <div className='bg-gray-100 rounded-4xl pr-4 pl-5 py-3 flex items-center gap-2 border border-primary hide-scrollbar shadow-[0_0_40px_6px_rgba(0,0,0,0.4)] w-full'>
         <textarea
           ref={textareaRef}
           className='flex-1 bg-transparent outline-none border-none resize-none text-base px-0 py-1 overflow-hidden'

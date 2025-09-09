@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -9,6 +9,9 @@ import Actions from '@/components/Resumes/ResumesLayout/Actions';
 import ExploreProfileBtn from '@/components/Resumes/ResumesLayout/ExploreProfileBtn';
 import LanguagesTags from '@/components/Resumes/ResumesLayout/LanguagesTags';
 import { useResumeMetrics } from '@/hooks/resumes/useResumeMetrics';
+import AddToCollectionDrawer from '@/components/Resumes/ResumesLayout/AddToCollectionDrawer';
+import { useResumeActions } from '@/hooks/resumes/useResumeActions';
+import { useMultiCollectionPicker } from '@/hooks/resumes/useMultiCollectionPicker';
 
 const ResumeCard = ({ resume }) => {
   const {
@@ -32,6 +35,17 @@ const ResumeCard = ({ resume }) => {
     skillsSectionTitle,
   } = useResumeMetrics(resume, searchParams);
 
+  // Add to collection drawer logic
+  const collectionPicker = useMultiCollectionPicker(uuid);
+
+  // Resume actions
+  const { viewResume, downloadResume } = useResumeActions();
+
+  // Handlers for dropdown
+  const handleViewResume = () => viewResume(uuid);
+  const handleDownloadResume = () => downloadResume(uuid);
+  const handleAddToCollection = () => collectionPicker.show();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -44,6 +58,9 @@ const ResumeCard = ({ resume }) => {
         title={topCategory}
         matchingScore={matchingScore}
         date={formattedDate}
+        onViewResume={handleViewResume}
+        onDownloadResume={handleDownloadResume}
+        onAddToCollection={handleAddToCollection}
       />
 
       <Stats
@@ -78,9 +95,27 @@ const ResumeCard = ({ resume }) => {
 
       <div className='flex flex-col gap-2'>
         <LanguagesTags languages={languages} />
-        <ExploreProfileBtn />
+        <ExploreProfileBtn uuid={uuid} />
         <Actions uuid={uuid} />
       </div>
+
+      {/* Add to Collection Drawer */}
+      <AddToCollectionDrawer
+        open={collectionPicker.open}
+        onClose={collectionPicker.hide}
+        collections={collectionPicker.collections}
+        selectedIds={collectionPicker.selectedIds}
+        toggleCollection={collectionPicker.toggleCollection}
+        onSearch={collectionPicker.onSearch}
+        searchQuery={collectionPicker.searchQuery}
+        handleAddAndRemove={collectionPicker.handleAddAndRemove}
+        loading={collectionPicker.loading}
+        canAdd={collectionPicker.canAdd}
+        error={collectionPicker.error}
+        setError={collectionPicker.setError}
+        onActuallyCreateNew={collectionPicker.onActuallyCreateNew}
+        setToast={() => {}}
+      />
     </motion.div>
   );
 };

@@ -5,7 +5,7 @@ import SideFilters from '@/components/Resumes/SideFilters/SideFilters';
 import ResumesLayout from '@/components/Resumes/ResumesLayout/ResumesLayout';
 import { useSideFilters } from '@/hooks/resumes/useSideFilters';
 import { useNavigate, useLocation } from 'react-router-dom';
-import JobDescriptionInput from '@/components/Resumes/JobDescriptionInput';
+import JobDescriptionInput from '@/components/Resumes/SideFilters/JobDescriptionInput';
 
 const DEFAULT_EXP_MIN = 0;
 const DEFAULT_EXP_MAX = 21;
@@ -26,8 +26,6 @@ const Resumes = () => {
   const location = useLocation();
   const [redirecting, setRedirecting] = useState(false);
 
-  console.log('[DEBUG] setTempSelections:', setTempSelections, typeof setTempSelections);
-
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const hasMin = params.has('expMin');
@@ -41,11 +39,6 @@ const Resumes = () => {
       setRedirecting(false);
     }
   }, [location, navigate]);
-
-  useEffect(() => {
-    console.log('[DEBUG] filters:', filters);
-    console.log('[DEBUG] tempSelections:', tempSelections);
-  }, [filters, tempSelections]);
 
   if (redirecting) return null;
 
@@ -99,17 +92,17 @@ const Resumes = () => {
         <div className={`${sidebarOpen ? 'w-[75%]' : 'w-full'} transition-all duration-300`}>
           <ResumesLayout />
         </div>
-        {/* Job Description Input */}
-        <JobDescriptionInput
-          visible={sidebarOpen}
-          sidebarOpen={sidebarOpen}
-          filters={filters}
-          setTempSelections={setTempSelections}
-          isLoadingSidebar={loading}
-          handleApply={handleApply}
-          tempSelections={tempSelections} 
-        />
       </div>
+      {/* Job Description Input */}
+      <JobDescriptionInput
+        visible={sidebarOpen}
+        sidebarOpen={sidebarOpen}
+        filters={filters}
+        setTempSelections={setTempSelections}
+        isLoadingSidebar={loading}
+        handleApply={handleApply}
+        tempSelections={tempSelections}
+      />
     </div>
   );
 };

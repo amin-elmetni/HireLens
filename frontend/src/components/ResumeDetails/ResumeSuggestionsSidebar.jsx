@@ -1,11 +1,13 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function ResumeSuggestionCard({ resume }) {
+  const navigate = useNavigate();
   return (
-    <a
-      href={`/resumes/${resume.id}/details`}
+    <div
       className='flex items-center gap-3 px-4 py-3 border border-gray-200 hover:shadow-md hover:border-primary cursor-pointer transition rounded-xl'
+      onClick={() => navigate(`/resumedetails/${resume.id}`)}
     >
       <div className='h-[65px] w-[65px] bg-gray-100 rounded-xl flex items-center justify-center font-bold text-xl text-primary border border-gray-300'>
         {resume.avatar ? (
@@ -36,7 +38,7 @@ function ResumeSuggestionCard({ resume }) {
           </div>
         </div>
       </div>
-    </a>
+    </div>
   );
 }
 

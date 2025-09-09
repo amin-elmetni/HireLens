@@ -17,7 +17,7 @@ const InfoBlock = ({ value, icon, label }) => (
 export default function ResumeInfoBlocks({ resume }) {
   const blocks = [
     {
-      value: resume.years_of_experience,
+      value: resume.yearsOfExperience,
       icon: 'fa-solid fa-briefcase',
       label: 'Years Exp',
     },
@@ -38,13 +38,13 @@ export default function ResumeInfoBlocks({ resume }) {
     },
     {
       value: resume.certifications.length,
-      icon: 'fa-solid fa-certificate',
+      icon: 'fa-solid fa-graduation-cap',
       label: 'Certifications',
     },
   ];
 
   return (
-    <div className='grid grid-cols-2 md:grid-cols-5 gap-4 mt-8'>
+    <div className='grid grid-cols-2 md:grid-cols-5 gap-4 mt-4'>
       {blocks.map((block, index) => (
         <InfoBlock
           key={index}

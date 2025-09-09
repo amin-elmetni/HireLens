@@ -2,6 +2,8 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getInitials, formatDate, extractUsernameFromUrl } from '@/utils/generalUtils';
 import { IoLocationOutline } from 'react-icons/io5';
+import { useLikes } from '@/hooks/resumes/useLikes';
+import { useComments } from '@/hooks/resumes/useComments';
 
 export default function ResumeMainInfo({ resume }) {
   const {
@@ -12,13 +14,16 @@ export default function ResumeMainInfo({ resume }) {
     categories,
     years_of_experience,
     address,
-    final_score,
-    last_updated,
+    finalScore,
+    lastUpdated,
     uuid,
     age,
   } = resume;
   const category = categories?.[0]?.name || 'Uncategorized';
   const toPercent = x => Math.round((x || 0) * 100);
+  const { likeCount } = useLikes(uuid);
+  const { commentCount } = useComments(uuid);
+
   return (
     <>
       <div className='flex flex-col gap-4'>
@@ -30,21 +35,21 @@ export default function ResumeMainInfo({ resume }) {
           </div>
           <div className='flex-1 flex flex-col gap-[6px]'>
             <div className='flex items-center gap-3 flex-wrap '>
-              <span className='text-xs bg-purple-100 text-primary px-3 py-1 rounded-full font-semibold'>
+              <span className='text-xs bg-primary/5 text-primary px-3 py-1 rounded-full font-semibold'>
                 {category}
               </span>
               <div className='flex gap-2 text-sm'>
                 <div className='flex gap-[3px] items-center text-primary font-bold'>
                   <FontAwesomeIcon icon='fa-regular fa-thumbs-up' />
-                  <span>4</span>
+                  <span>{likeCount}</span>
                 </div>
                 <div className='flex gap-[3px] items-center text-primary font-bold'>
                   <FontAwesomeIcon icon='fa-regular fa-comment' />
-                  <span>6</span>
+                  <span>{commentCount}</span>
                 </div>
               </div>
             </div>
-            <h1 className='text-2xl font-bold'>{name}</h1>
+            <h1 className='text-2xl font-bold capitalize'>{name.toLowerCase()}</h1>
             <div className='flex items-center gap-1 text-sm'>
               <IoLocationOutline className='text-[16px]' />
               <span>
@@ -53,7 +58,7 @@ export default function ResumeMainInfo({ resume }) {
             </div>
           </div>
           <div className='flex flex-col items-center gap-4 min-w-[120px]'>
-            <span className='text-xs text-gray-400'>{formatDate(last_updated)}</span>
+            <span className='text-xs text-gray-400'>{formatDate(lastUpdated)}</span>
             <div className='flex flex-col items-center'>
               <div className='relative w-22 h-22'>
                 <svg
@@ -76,62 +81,68 @@ export default function ResumeMainInfo({ resume }) {
                     strokeWidth='9'
                     fill='none'
                     strokeDasharray={2 * Math.PI * 45}
-                    strokeDashoffset={(2 * Math.PI * 45 * (100 - toPercent(final_score))) / 100}
+                    strokeDashoffset={(2 * Math.PI * 45 * (100 - toPercent(finalScore))) / 100}
                     strokeLinecap='round'
                   />
                 </svg>
                 <div className='absolute inset-0 flex items-center justify-center flex-col'>
-                  <span className='text-lg font-bold text-primary'>{toPercent(final_score)}%</span>
+                  <span className='text-lg font-bold text-primary'>{toPercent(finalScore)}%</span>
                   <span className='text-xs text-gray-400'>Score</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div className='flex gap-6 text-sm font-semibold'>
-          <span className='flex items-center'>
-            <FontAwesomeIcon
-              icon='fa-solid fa-envelope'
-              className='mr-[6px]'
-            />
-            {email}
-          </span>
-          <span className='flex items-center'>
-            <FontAwesomeIcon
-              icon='fa-solid fa-phone'
-              className='mr-[6px]'
-            />
-            {phone}
-          </span>
-          {personal_links?.github && (
-            <a
-              href={personal_links.github}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='text-gray-700  flex items-center'
-            >
-              <FontAwesomeIcon
-                icon='fa-brands fa-github'
-                className='mr-[6px] text-lg text-orange-600'
-              />
-              <span>Github</span>
-            </a>
-          )}
-          {personal_links?.linkedin && (
-            <a
-              href={personal_links.linkedin}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='text-gray-700  flex items-center'
-            >
-              <FontAwesomeIcon
-                icon='fa-brands fa-linkedin'
-                className='mr-[6px] text-lg text-blue-600'
-              />
-              <span>Linkdin</span>
-            </a>
-          )}
-        </div>
+        {(email || phone || personal_links?.github || personal_links?.linkedin) && (
+          <div className='flex gap-6 text-sm font-semibold text-gray-600'>
+            {email && (
+              <span className='flex items-center'>
+                <FontAwesomeIcon
+                  icon='fa-solid fa-envelope'
+                  className='mr-[6px]'
+                />
+                {email}
+              </span>
+            )}
+            {phone && (
+              <span className='flex items-center'>
+                <FontAwesomeIcon
+                  icon='fa-solid fa-phone'
+                  className='mr-[6px]'
+                />
+                {phone}
+              </span>
+            )}
+            {personal_links?.github && (
+              <a
+                href={personal_links.github}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-gray-700  flex items-center'
+              >
+                <FontAwesomeIcon
+                  icon='fa-brands fa-github'
+                  className='mr-[6px] text-lg text-orange-600'
+                />
+                <span>Github</span>
+              </a>
+            )}
+            {personal_links?.linkedin && (
+              <a
+                href={personal_links.linkedin}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-gray-700  flex items-center'
+              >
+                <FontAwesomeIcon
+                  icon='fa-brands fa-linkedin'
+                  className='mr-[6px] text-lg text-blue-600'
+                />
+                <span>Linkdin</span>
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </>
   );

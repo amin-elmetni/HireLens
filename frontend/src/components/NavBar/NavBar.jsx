@@ -48,7 +48,7 @@ const Navbar = () => {
           <div className='hidden md:flex items-center space-x-8'>
             <NavLink to='/'>Find Resumes</NavLink>
             <NavLink to='/collections'>My Collections</NavLink>
-            <NavLink to='/profile'>My Profile</NavLink>
+            <NavLink to='/analyze-resumes'>Analyze Resumes</NavLink>
           </div>
 
           <div className='flex items-center gap-4'>

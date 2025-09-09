@@ -13,6 +13,8 @@ import {
   faFolderClosed as farFolderClosed,
   faFolder as farFolder,
   faTrashCan,
+  faImage,
+  faFaceSmile,
 } from '@fortawesome/free-regular-svg-icons';
 
 import {
@@ -46,6 +48,14 @@ import {
   faLocationDot,
   faLanguage,
   faCertificate,
+  faBold,
+  faItalic,
+  faUnderline,
+  faLink,
+  faAt,
+  faGraduationCap,
+  faChevronRight,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
@@ -95,5 +105,15 @@ library.add(
   faLinkedin,
   faLocationDot,
   faLanguage,
-  faCertificate
+  faCertificate,
+  faBold,
+  faItalic,
+  faUnderline,
+  faLink,
+  faImage,
+  faFaceSmile,
+  faAt,
+  faGraduationCap,
+  faChevronRight,
+  faXmark
 );

@@ -1,38 +1,19 @@
 import React from 'react';
-
-function StarRating({ rating }) {
-  const full = Math.floor(rating);
-  const half = rating - full >= 0.299;
-  return (
-    <div className='flex items-center gap-1 text-[#FFBF00]'>
-      {[...Array(full)].map((_, i) => (
-        <i
-          key={i}
-          className='fa-solid fa-star'
-        />
-      ))}
-      {half && <i className='fa-solid fa-star-half-stroke' />}
-      {[...Array(5 - full - (half ? 1 : 0))].map((_, i) => (
-        <i
-          key={i}
-          className='fa-regular fa-star'
-        />
-      ))}
-    </div>
-  );
-}
+import { ThumbsUp, ThumbsDown, MessageCircle } from 'lucide-react';
 
 export default function ResumeCommentItem({ comment }) {
-  const { user, date, comment: text } = comment;
+  const { user, date, comment: text, likes = 0, replies = 0 } = comment;
+
   return (
-    <div className='flex flex-col h-[195px] border border-gray-600 p-4 rounded'>
-      <div className='flex gap-4'>
-        <div className='w-[50px] h-[50px] rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold text-xl border border-gray-400'>
+    <div className='py-4'>
+      <div className='flex items-center gap-3'>
+        {/* Avatar */}
+        <div className='w-[38px] h-[38px] rounded-full overflow-hidden bg-gray-200 flex items-center justify-center text-gray-500 font-bold'>
           {user.avatar ? (
             <img
               src={user.avatar}
               alt={user.name}
-              className='h-[50px] w-[50px] object-cover rounded-full'
+              className='h-full w-full object-cover'
             />
           ) : (
             user.name
@@ -42,15 +23,28 @@ export default function ResumeCommentItem({ comment }) {
               .slice(0, 2)
           )}
         </div>
-        <div className='flex flex-col'>
-          <span className='font-medium'>{user.name}</span>
-          <div className='flex gap-3 text-sm'>
-            {/* <StarRating rating={user.rating} /> */}
-            <span className='text-gray-500'>{date}</span>
-          </div>
+        {/* Name and date */}
+        <div className='flex items-center justify-center gap-2'>
+          <span className='font-semibold text-base text-gray-900'>{user.name}</span>
+          <span className='text-xs text-gray-500'>{date}</span>
         </div>
       </div>
-      <p className='mt-3 px-[5px] overflow-y-auto scrollbar-custom text-[15px]'>{text}</p>
+      {/* Comment text */}
+      <div className='ml-12 mt-2'>
+        <p className='text-sm text-gray-800'>{text}</p>
+        {/* Actions */}
+        <div className='flex items-center gap-[10px] mt-2 text-gray-500 text-sm'>
+          <button className='flex items-center gap-1 hover:text-primary cursor-pointer'>
+            <ThumbsUp size={16} /> {likes}
+          </button>
+          <button className='flex items-center gap-1 hover:text-primary cursor-pointer'>
+            <ThumbsDown size={16} /> {likes}
+          </button>
+          <button className='flex items-center gap-1 hover:text-primary ml-[10px] cursor-pointer'>
+            <MessageCircle size={16} /> Reply
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
