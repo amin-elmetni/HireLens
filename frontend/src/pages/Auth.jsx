@@ -29,16 +29,18 @@ const Auth = () => {
   } = useSignup(() => setIsSignUp(false));
 
   return (
-    <div className='flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-cyan-100 px-4 relative overflow-hidden'>
+    <div className='flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-primary/5 via-primary/5 to-primary/30 px-4 relative overflow-hidden'>
       {/* Background decorative elements */}
-      <div className='absolute top-0 left-0 w-80 h-80 bg-gradient-to-br from-pink-300 to-red-400 rounded-full opacity-20 -translate-x-40 -translate-y-40'></div>
+      {/* <div className='absolute top-0 left-0 w-80 h-80 bg-gradient-to-br from-primary-light to-primary-dark rounded-full opacity-20 -translate-x-40 -translate-y-40'></div>
       <div className='absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-br from-cyan-300 to-blue-400 rounded-full opacity-20 translate-x-48 translate-y-48'></div>
-      <div className='absolute top-1/2 left-0 w-32 h-32 bg-gradient-to-br from-yellow-300 to-orange-400 rounded-full opacity-20 -translate-x-16'></div>
+      <div className='absolute top-1/2 left-0 w-32 h-32 bg-gradient-to-br from-primary to-primary/20 rounded-full opacity-20 -translate-x-16'></div> */}
 
       <div className='flex justify-center items-center w-full max-w-5xl relative'>
         <div className='bg-white rounded-2xl shadow-2xl flex w-full h-[500px] relative overflow-hidden'>
           {/* Logo positioned on the teal panel */}
-          <Logo className='absolute top-6 left-6 z-10' />
+          <a href='/'>
+            <Logo className='absolute top-6 left-6 z-10' />
+          </a>
 
           {/* Sign In Panel */}
           <div
@@ -46,7 +48,7 @@ const Auth = () => {
               isSignUp ? 'opacity-0 pointer-events-none' : 'opacity-100'
             }`}
           >
-            <h2 className='text-3xl font-bold text-teal-600 mb-4'>User login</h2>
+            <h2 className='text-3xl font-bold text-primary mb-4'>User login</h2>
             <p className='text-gray-600 text-center mb-8'>
               To keep connected with us please login with your personal info
             </p>
@@ -105,7 +107,7 @@ const Auth = () => {
 
               <button
                 type='submit'
-                className='bg-teal-600 text-white rounded-full px-12 py-3 font-semibold hover:bg-teal-700 transition-all shadow-lg cursor-pointer'
+                className='bg-primary text-white rounded-full px-12 py-3 font-semibold hover:bg-primary/90 transition-all shadow-lg cursor-pointer'
               >
                 SIGN IN
               </button>
@@ -226,7 +228,7 @@ const Auth = () => {
 
               <button
                 type='submit'
-                className='bg-teal-600 text-white rounded-full px-12 py-3 font-semibold hover:bg-teal-700 transition-all shadow-lg cursor-pointer'
+                className='bg-primary text-white rounded-full px-12 py-3 font-semibold hover:bg-primary/90 transition-all shadow-lg cursor-pointer'
               >
                 SIGN UP
               </button>
@@ -235,7 +237,7 @@ const Auth = () => {
 
           {/* Teal Sliding Panel */}
           <div
-            className={`w-2/5 bg-gradient-to-br from-teal-500 to-teal-600 text-white flex flex-col items-center justify-center p-8 transition-all duration-700 ease-in-out ${
+            className={`w-2/5 bg-gradient-to-br from-primary to-primary-dark text-white flex flex-col items-center justify-center p-8 transition-all duration-700 ease-in-out ${
               isSignUp ? 'rounded-l-2xl' : 'rounded-r-2xl'
             } ${isSignUp ? 'translate-x-0' : 'translate-x-0'}`}
           >
@@ -249,7 +251,7 @@ const Auth = () => {
                 </p>
                 <button
                   onClick={() => setIsSignUp(true)}
-                  className='border-2 border-white text-white rounded-full px-12 py-3 font-semibold hover:bg-white hover:text-teal-600 transition-all cursor-pointer'
+                  className='border-2 border-white text-white rounded-full px-12 py-3 font-semibold hover:bg-white hover:text-primary transition-all cursor-pointer'
                 >
                   SIGN UP
                 </button>
@@ -264,7 +266,7 @@ const Auth = () => {
                 </p>
                 <button
                   onClick={() => setIsSignUp(false)}
-                  className='border-2 border-white text-white rounded-full px-12 py-3 font-semibold hover:bg-white hover:text-teal-600 transition-all cursor-pointer'
+                  className='border-2 border-white text-white rounded-full px-12 py-3 font-semibold hover:bg-white hover:text-primary transition-all cursor-pointer'
                 >
                   SIGN IN
                 </button>

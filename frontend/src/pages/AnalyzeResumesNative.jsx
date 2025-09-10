@@ -12,20 +12,16 @@ import {
   faExclamationCircle,
   faTimes,
 } from '@fortawesome/free-solid-svg-icons';
-import resumeAnalysisService from '@/services/resumeAnalysisService';
-import Swal from 'sweetalert2';
+import aiApi from '@/api/aiIndex';
 
-// Import react-dropzone - install with: npm install react-dropzone
-import { useDropzone } from 'react-dropzone';
-
-const AnalyzeResumes = () => {
+const AnalyzeResumesNative = () => {
   const [files, setFiles] = useState([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState({});
   const [analysisResults, setAnalysisResults] = useState({});
   const [isUploadMode, setIsUploadMode] = useState(true); // true for files, false for folder
   const [isDragOver, setIsDragOver] = useState(false);
-  const fileInputRef = React.useRef(null); // Add ref for file input
+  const fileInputRef = useRef(null);
 
   // File validation
   const isValidFile = file => {
@@ -38,43 +34,32 @@ const AnalyzeResumes = () => {
 
   // Handle files (from drop or file input)
   const handleFiles = useCallback(fileList => {
-    const validation = resumeAnalysisService.validateFiles(fileList);
+    const files = Array.from(fileList);
 
-    // Add valid files
-    if (validation.hasValidFiles) {
-      const newFiles = validation.validFiles.map(file => ({
-        id: Math.random().toString(36).substr(2, 9),
-        file,
-        name: file.name,
-        size: file.size,
-        status: 'ready',
-        progress: 0,
-      }));
+    // Filter valid files
+    const validFiles = files.filter(isValidFile).map(file => ({
+      id: Math.random().toString(36).substr(2, 9),
+      file,
+      name: file.name,
+      size: file.size,
+      status: 'ready', // ready, analyzing, completed, error
+      progress: 0,
+    }));
 
-      setFiles(prevFiles => [...prevFiles, ...newFiles]);
-    }
+    // Add to existing files
+    setFiles(prevFiles => [...prevFiles, ...validFiles]);
 
     // Show error for invalid files
-    if (validation.hasInvalidFiles) {
-      const errorMessage = validation.invalidFiles
-        .map(item => `${item.file.name}: ${item.reasons.join(', ')}`)
+    const invalidFiles = files.filter(file => !isValidFile(file));
+    if (invalidFiles.length > 0) {
+      const errorMessage = invalidFiles
+        .map(file => `${file.name}: Invalid file type or size too large (max 10MB)`)
         .join('\n');
-
-      Swal.fire({
-        icon: 'warning',
-        title: 'Some Files Were Rejected',
-        text: errorMessage,
-        confirmButtonColor: '#3B82F6',
-        customClass: {
-          popup: 'swal-popup',
-          title: 'swal-title',
-          content: 'swal-content',
-        },
-      });
+      alert(`Some files were rejected:\n${errorMessage}`);
     }
   }, []);
 
-  // Native drag and drop handlers (fallback)
+  // Drag and drop handlers
   const handleDragEnter = e => {
     e.preventDefault();
     e.stopPropagation();
@@ -102,35 +87,10 @@ const AnalyzeResumes = () => {
     }
   };
 
-  // File drop handler for react-dropzone (if available)
-  const onDrop = useCallback(
-    (acceptedFiles, rejectedFiles) => {
-      handleFiles(acceptedFiles);
-
-      // Show error for rejected files
-      if (rejectedFiles && rejectedFiles.length > 0) {
-        const errorMessage = rejectedFiles
-          .map(
-            rejection =>
-              `${rejection.file.name}: ${rejection.errors.map(e => e.message).join(', ')}`
-          )
-          .join('\n');
-
-        Swal.fire({
-          icon: 'warning',
-          title: 'Some Files Were Rejected',
-          text: errorMessage,
-          confirmButtonColor: '#3B82F6',
-          customClass: {
-            popup: 'swal-popup',
-            title: 'swal-title',
-            content: 'swal-content',
-          },
-        });
-      }
-    },
-    [handleFiles]
-  );
+  // File input handler
+  const handleFileInput = event => {
+    handleFiles(event.target.files);
+  };
 
   // Folder upload handler
   const handleFolderUpload = useCallback(
@@ -202,18 +162,27 @@ const AnalyzeResumes = () => {
     setFiles(prevFiles => prevFiles.map(file => ({ ...file, status: 'analyzing' })));
 
     try {
+      // Create FormData for file upload
+      const formData = new FormData();
+      files.forEach(fileItem => {
+        formData.append('files', fileItem.file);
+      });
+
       // Start progress simulation for all files
       files.forEach(fileItem => {
         simulateProgress(fileItem.id);
       });
 
-      // Extract actual file objects
-      const fileObjects = files.map(fileItem => fileItem.file);
+      // Call the new upload and analyze API endpoint
+      const response = await aiApi.post('/upload-and-analyze', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 300000, // 5 minutes timeout for large files/batch processing
+      });
 
-      // Call the analysis service
-      const result = await resumeAnalysisService.uploadAndAnalyze(fileObjects);
-
-      if (result.success && result.data.pipeline === 'completed') {
+      // Handle successful response
+      if (response.data.pipeline === 'completed') {
         // Mark all files as completed
         setFiles(prevFiles =>
           prevFiles.map(file => ({
@@ -228,29 +197,17 @@ const AnalyzeResumes = () => {
         files.forEach(fileItem => {
           results[fileItem.id] = {
             success: true,
-            steps: result.data.steps,
-            message: `Analysis completed successfully for ${result.data.files_processed} files`,
-            filesProcessed: result.data.files_processed,
+            steps: response.data.steps,
+            message: `Analysis completed successfully for ${response.data.files_processed} files`,
+            filesProcessed: response.data.files_processed,
           };
         });
         setAnalysisResults(results);
 
         // Show success notification
-        Swal.fire({
-          icon: 'success',
-          title: 'Analysis Completed!',
-          text: `Successfully analyzed ${result.data.files_processed} resume files!`,
-          confirmButtonColor: '#10B981',
-          timer: 3000,
-          timerProgressBar: true,
-          customClass: {
-            popup: 'swal-popup',
-            title: 'swal-title',
-            content: 'swal-content',
-          },
-        });
+        alert(`✅ Successfully analyzed ${response.data.files_processed} resume files!`);
       } else {
-        throw new Error(result.error || 'Pipeline failed');
+        throw new Error(response.data.error || 'Pipeline failed');
       }
     } catch (error) {
       console.error('Analysis failed:', error);
@@ -268,41 +225,20 @@ const AnalyzeResumes = () => {
       files.forEach(fileItem => {
         errorResults[fileItem.id] = {
           success: false,
-          error: error.message || 'Unknown error',
+          error: error.response?.data?.error || error.message,
           message: 'Analysis failed',
+          details: error.response?.data?.details,
         };
       });
       setAnalysisResults(errorResults);
 
       // Show error notification
-      Swal.fire({
-        icon: 'error',
-        title: 'Analysis Failed',
-        text: error.message || 'An unknown error occurred during analysis.',
-        confirmButtonColor: '#EF4444',
-        customClass: {
-          popup: 'swal-popup',
-          title: 'swal-title',
-          content: 'swal-content',
-        },
-      });
+      const errorMessage = error.response?.data?.error || error.message;
+      alert(`❌ Analysis failed: ${errorMessage}`);
     } finally {
       setIsAnalyzing(false);
     }
   };
-
-  // Dropzone configuration
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: {
-      'application/pdf': ['.pdf'],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
-    },
-    multiple: true,
-    disabled: isAnalyzing,
-    noClick: false, // Allow clicking to open file dialog
-    noKeyboard: false, // Allow keyboard navigation
-  });
 
   return (
     <div className='min-h-screen bg-gray-50'>
@@ -310,12 +246,12 @@ const AnalyzeResumes = () => {
 
       <div className='container mx-auto px-4 py-8'>
         {/* Header */}
-        {/* <div className='mb-8 text-center'>
-          <h1 className='text-3xl font-bold mb-2 text-primary'>Analyze Resumes</h1>
+        <div className='mb-8'>
+          <h1 className='text-3xl font-bold text-gray-900 mb-2'>Analyze Resumes</h1>
           <p className='text-gray-600'>
             Upload individual files or select a folder to analyze multiple resumes at once
           </p>
-        </div> */}
+        </div>
 
         {/* Upload Mode Toggle */}
         <div className='mb-6'>
@@ -352,20 +288,32 @@ const AnalyzeResumes = () => {
               {isUploadMode ? (
                 // File Drop Zone
                 <div
-                  {...getRootProps()}
+                  onDragEnter={handleDragEnter}
+                  onDragLeave={handleDragLeave}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
                   className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-                    isDragActive
+                    isDragOver
                       ? 'border-primary bg-primary/10'
-                      : 'border-gray-300 hover:border-primary-light hover:bg-gray-50'
+                      : 'border-gray-300 hover:border-primary hover:bg-gray-50'
                   } ${isAnalyzing ? 'pointer-events-none opacity-50' : ''}`}
                 >
-                  <input {...getInputProps()} />
+                  <input
+                    ref={fileInputRef}
+                    type='file'
+                    multiple
+                    accept='.pdf,.docx'
+                    onChange={handleFileInput}
+                    className='hidden'
+                    disabled={isAnalyzing}
+                  />
                   <FontAwesomeIcon
                     icon={faUpload}
                     className='text-4xl text-gray-400 mb-4'
                   />
                   <p className='text-lg font-medium text-gray-900 mb-2'>
-                    {isDragActive ? 'Drop the files here...' : 'Drag & drop resume files here'}
+                    {isDragOver ? 'Drop the files here...' : 'Drag & drop resume files here'}
                   </p>
                   <p className='text-gray-500 mb-4'>or click to select files</p>
                   <p className='text-sm text-gray-400'>
@@ -521,10 +469,10 @@ const AnalyzeResumes = () => {
               <button
                 onClick={analyzeResumes}
                 disabled={files.length === 0 || isAnalyzing}
-                className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-colors cursor-pointer ${
+                className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-colors ${
                   files.length === 0 || isAnalyzing
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-primary text-white hover:bg-primary-dark'
+                    : 'bg-green-500 text-white hover:bg-green-600'
                 }`}
               >
                 <FontAwesomeIcon
@@ -573,7 +521,7 @@ const AnalyzeResumes = () => {
               </div>
 
               {/* Analysis Steps Info */}
-              <div className='mt-6 p-4 bg-primary/8 rounded-lg'>
+              <div className='mt-6 p-4 bg-primary/10 rounded-lg'>
                 <h4 className='text-sm font-medium text-primary-dark mb-2'>Analysis Process:</h4>
                 <ul className='text-xs text-primary-dark space-y-1'>
                   <li>• File upload and validation</li>
@@ -601,11 +549,6 @@ const AnalyzeResumes = () => {
                         {result.error && (
                           <div className='mt-1 text-xs opacity-75'>Error: {result.error}</div>
                         )}
-                        {result.filesProcessed && (
-                          <div className='mt-1 text-xs opacity-75'>
-                            Files processed: {result.filesProcessed}
-                          </div>
-                        )}
                       </div>
                     ))}
                   </div>
@@ -619,4 +562,4 @@ const AnalyzeResumes = () => {
   );
 };
 
-export default AnalyzeResumes;
+export default AnalyzeResumesNative;

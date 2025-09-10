@@ -4,6 +4,8 @@
 
 @theme {
   --color-primary: #00b3b3;
+  --color-primary-dark: #008f8f;
+  --color-primary-light: #33c2c2;
   --color-background: #fafafb;
   --font-display: 'Satoshi', 'sans-serif';
 

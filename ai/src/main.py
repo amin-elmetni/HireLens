@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from api.cv_processing import app as cv_app
 from api.text_analysis import app as text_app
 from contextlib import asynccontextmanager
@@ -11,24 +12,23 @@ from pathlib import Path
 
 # Configuration du logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 
 # Chargement des variables d'environnement
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-env_path = PROJECT_ROOT / '.env'
+env_path = PROJECT_ROOT / ".env"
 load_dotenv(dotenv_path=env_path)
 
 # Configuration PostgreSQL
 db_config = {
-    'POSTGRES_HOST': os.getenv('POSTGRES_HOST', 'localhost'),
-    'POSTGRES_PORT': os.getenv('POSTGRES_PORT', '5432'),
-    'POSTGRES_DB': os.getenv('POSTGRES_DB', 'postgres'),
-    'POSTGRES_USER': os.getenv('POSTGRES_USER', 'postgres'),
-    'POSTGRES_PASSWORD': os.getenv('POSTGRES_PASSWORD', 'nttdata1234')
+    "POSTGRES_HOST": os.getenv("POSTGRES_HOST", "localhost"),
+    "POSTGRES_PORT": os.getenv("POSTGRES_PORT", "5432"),
+    "POSTGRES_DB": os.getenv("POSTGRES_DB", "pfe_db"),
+    "POSTGRES_USER": os.getenv("POSTGRES_USER", "postgres"),
+    "POSTGRES_PASSWORD": os.getenv("POSTGRES_PASSWORD", "1986"),
 }
 
 # Variable globale pour le listener
@@ -55,9 +55,20 @@ async def lifespan(app: FastAPI):
 
 # Création de l'application principale
 app = FastAPI(
-    title="CV Processing & Text Analysis API",
-    version="1.0",
-    lifespan=lifespan
+    title="CV Processing & Text Analysis API", version="1.0", lifespan=lifespan
+)
+
+# Configuration CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+    ],  # Add your frontend URLs
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Montage des sous-applications
@@ -72,15 +83,10 @@ async def root():
         "message": "Bienvenue sur l'API de traitement de CV et analyse textuelle",
         "sub_apps": {
             "cv_processing": "/cv-processing",
-            "text_analysis": "/text-analysis"
-        }
+            "text_analysis": "/text-analysis",
+        },
     }
 
 
 if __name__ == "__main__":
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True
-    )
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

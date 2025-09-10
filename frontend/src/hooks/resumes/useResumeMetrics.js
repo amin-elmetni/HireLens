@@ -59,19 +59,19 @@ export const useResumeMetrics = (resume, searchParams) => {
   }, [selectedSkills, selectedCategories, finalScore]);
 
   const categoryScoringData = useMemo(() => {
-    return selectedCategories.map(c => ({ ...c, type: 'category' }));
+    return selectedCategories.filter(c => c.score > 0).map(c => ({ ...c, type: 'category' }));
   }, [selectedCategories]);
 
   const skillScoringData = useMemo(() => {
     if (selectedSkills.length > 0) {
-      return selectedSkills.map(s => ({ ...s, type: 'skill' }));
+      return selectedSkills.filter(s => s.score > 0).map(s => ({ ...s, type: 'skill' }));
     }
 
     if (selectedCategories.length > 0) {
-      return topThreeSkills.map(s => ({ ...s, type: 'skill' }));
+      return topThreeSkills.filter(s => s.score > 0).map(s => ({ ...s, type: 'skill' }));
     }
 
-    return topFiveSkills.map(s => ({ ...s, type: 'skill' }));
+    return topFiveSkills.filter(s => s.score > 0).map(s => ({ ...s, type: 'skill' }));
   }, [selectedSkills, selectedCategories, topThreeSkills, topFiveSkills]);
 
   const skillsSectionTitle =

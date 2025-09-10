@@ -5,6 +5,8 @@ import Resumes from '@/pages/Resumes';
 import Collections from '@/pages/Collections';
 import ResumeDetails from '@/pages/ResumeDetails';
 import AnalyzeResumes from '@/pages/AnalyzeResumes';
+import Navbar from '@/components/NavBar/NavBar';
+import Profile from '@/pages/Profile';
 
 const AppRoutes = () => (
   <BrowserRouter>
@@ -58,6 +60,14 @@ const AppRoutes = () => (
         element={
           <PrivateRoute>
             <AnalyzeResumes />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path='/profile'
+        element={
+          <PrivateRoute>
+            <Profile />
           </PrivateRoute>
         }
       />
