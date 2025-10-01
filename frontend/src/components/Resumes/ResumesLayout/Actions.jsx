@@ -60,7 +60,7 @@ const Actions = ({ uuid }) => {
             <span>{commentCount}</span>
           </div>
         </div>
-        <div className='flex items-center gap-2 text-xl'>
+        <div className='flex items-center gap-[8px] text-xl translate-x-2'>
           {actionButtons.map((btn, index) => (
             <ToggleIconButton
               key={index}

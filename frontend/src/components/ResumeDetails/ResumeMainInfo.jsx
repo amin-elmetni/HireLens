@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import ConfirmationToast from '@/components/ui/ConfirmationToast';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getInitials, formatDate, extractUsernameFromUrl } from '@/utils/generalUtils';
 import { IoLocationOutline } from 'react-icons/io5';
@@ -15,6 +16,9 @@ import AddToCollectionDrawer from '@/components/Resumes/ResumesLayout/AddToColle
 
 export default function ResumeMainInfo({ resume }) {
   const { name, email, phone, personalLinks, address, finalScore, lastUpdated, uuid } = resume;
+
+  // Toast state
+  const [toast, setToast] = useState({ show: false, message: '' });
 
   const [searchParams] = useSearchParams();
   const { topCategory } = useResumeMetrics(resume, searchParams);
@@ -34,14 +38,36 @@ export default function ResumeMainInfo({ resume }) {
   // Handlers for dropdown
   const handleViewResume = () => viewResume(uuid);
   const handleDownloadResume = () => downloadResume(uuid);
-  const handleAddToCollection = () => collectionPicker.show();
 
   const handleToggleLike = async () => {
     await toggleLike();
+    setToast({
+      show: true,
+      message: liked ? 'Resume unliked!' : 'Resume liked!',
+    });
   };
 
   const handleToggleSave = async () => {
     await toggleSave();
+    const handleAddToCollection = () => {
+      collectionPicker.show();
+      setToast({
+        show: true,
+        message: 'Opened Add to Collection drawer.',
+      });
+    };
+    setToast({
+      show: true,
+      message: saved ? 'Resume unsaved!' : 'Resume saved!',
+    });
+  };
+
+  const handleAddToCollection = () => {
+    collectionPicker.show();
+    setToast({
+      show: true,
+      message: 'Opened Add to Collection drawer.',
+    });
   };
 
   const dropdownOptions = [
@@ -93,6 +119,11 @@ export default function ResumeMainInfo({ resume }) {
 
   return (
     <>
+      <ConfirmationToast
+        message={toast.message}
+        show={toast.show}
+        onClose={() => setToast({ show: false, message: '' })}
+      />
       <div className='flex flex-col gap-4'>
         <div className='flex flex-col md:flex-row items-center gap-4'>
           <div>
@@ -216,7 +247,14 @@ export default function ResumeMainInfo({ resume }) {
             )}
             {personalLinks?.github && (
               <a
-                href={personalLinks.github}
+                href={
+                  personalLinks.github.startsWith('http')
+                    ? personalLinks.github
+                    : `https://github.com/${personalLinks.github.replace(
+                        /^https?:\/\/github.com\//,
+                        ''
+                      )}`
+                }
                 target='_blank'
                 rel='noopener noreferrer'
                 className='text-gray-700  flex items-center'
